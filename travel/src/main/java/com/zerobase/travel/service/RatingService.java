@@ -31,11 +31,11 @@ public class RatingService {
 
         ratingRepository.save(rating);
 
-        //TODO 받은사람 프로필에 반영해주기
+        //TODO 김용민 받은사람 프로필에 반영해주기
         // 평점반영 api 필요
     }
 
-    //TODO validationRegisterRating 작성하기
+    //TODO 김용민 validationRegisterRating 작성하기
     private void validationRegisterRating(double score) {
         //점수 준 사람, 받은 사람이 해당 여행에 참여 하였는지
         // join 테이블 생성시 작성

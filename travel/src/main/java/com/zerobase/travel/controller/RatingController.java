@@ -16,14 +16,14 @@ public class RatingController {
 
     private final RatingService ratingService;
 
-    //TODO Response 공통 생기면 반영하기
+    //TODO 김용민 Response 공통 생기면 반영하기
     @PostMapping("/posts/{postId}/rating")
     public void registerRating(
         @PathVariable long postId,
         @RequestBody GiveRatingDto giveRatingDto
     ) {
 
-        //TODO 추후 스프링 시큐리티 개발시 authentic에서 가져오기
+        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
 
         ratingService.giveRating(giveRatingDto, postId, userId);

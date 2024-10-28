@@ -1,12 +1,12 @@
-package com.zerobase;
+package com.zerobase.travel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Main {
+public class TravelApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(TravelApplication.class, args);
     }
 }

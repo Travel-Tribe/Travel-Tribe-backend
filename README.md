@@ -1,3 +1,0 @@
-# Travel-Tribe-backend
-
-test

@@ -40,6 +40,8 @@ public class RatingService {
         //점수 준 사람, 받은 사람이 해당 여행에 참여 하였는지
         // join 테이블 생성시 작성
 
+        //이미 해당 사람에게 점수를 주었는지
+
         //score가 0 ~ 5점 사이이고 0.5점 단위 인지
         if (score < MIN_SCORE || score > MAX_SCORE) {
 

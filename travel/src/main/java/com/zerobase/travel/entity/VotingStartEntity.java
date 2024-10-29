@@ -1,6 +1,7 @@
 package com.zerobase.travel.entity;
 
 import com.zerobase.travel.type.VotingStatus;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,6 +28,7 @@ public class VotingStartEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private Long postId;
 
     @Enumerated(EnumType.STRING)

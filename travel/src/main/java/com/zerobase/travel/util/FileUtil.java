@@ -39,6 +39,8 @@ public class FileUtil {
 
         try {
 
+            createDirectories(fileUploadPath);
+
             String originalFileName = requestFile.getOriginalFilename();
             UUID uuid = UUID.randomUUID();
 

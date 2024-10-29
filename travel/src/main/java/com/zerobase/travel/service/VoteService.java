@@ -1,5 +1,7 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.dto.response.VoteResponseDto;
+import com.zerobase.travel.dto.response.VoteResponseDto.VotingStart;
 import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
@@ -25,6 +27,16 @@ public class VoteService {
 
     }
 
+    public VoteResponseDto.VotingStart getVotingStart(long userId, long postId) {
+
+        validationGetVotingStart(userId, postId);
+
+        return VotingStart.fromEntity(
+            votingStartRepository.findByPostId(postId)
+                .orElseThrow(() -> new RuntimeException())
+        );
+    }
+
     //TODO 김용민 validationRegisterRating 작성하기
     private void validationCreateVote(long organizerUserId, long postId) {
 
@@ -34,4 +46,9 @@ public class VoteService {
 
     }
 
+    //TODO 김용민 validationRegisterRating 작성하기
+    private void validationGetVotingStart(long userId, long postId) {
+        // userId가 postId 여행에 참가한 사람 인지
+
+    }
 }

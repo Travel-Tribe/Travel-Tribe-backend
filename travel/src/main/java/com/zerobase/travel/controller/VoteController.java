@@ -1,7 +1,9 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.dto.response.VoteResponseDto;
 import com.zerobase.travel.service.VoteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,17 @@ public class VoteController {
         //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
         voteService.createVote(userId, postId);
+    }
+
+    @GetMapping("/posts/{postId}/voting-starts")
+    public VoteResponseDto.VotingStart getVotingStart(
+        @PathVariable long postId
+    ) {
+
+        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
+        long userId = 1L;
+
+        return voteService.getVotingStart(userId, postId);
     }
 
 }

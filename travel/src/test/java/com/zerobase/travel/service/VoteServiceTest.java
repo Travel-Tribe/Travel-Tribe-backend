@@ -7,7 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.dto.response.VoteResponseDto.VotingStart;
+import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
+import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
 import java.util.Optional;
@@ -23,6 +25,9 @@ class VoteServiceTest {
 
     @Mock
     private VotingStartRepository votingStartRepository;
+
+    @Mock
+    private VotingRepository votingRepository;
 
     @InjectMocks
     private VoteService voteService;
@@ -69,5 +74,32 @@ class VoteServiceTest {
         assertEquals(1L, votingStart.getVotingStartsId());
     }
 
+    @Test
+    void voteVoting() throws Exception {
 
+        //given
+        long postId = 1L;
+        long userId = 2L;
+        long votingStartsId = 1L;
+        boolean approval = true;
+
+        VotingStartEntity votingStartEntity = VotingStartEntity.builder()
+            .postId(postId)
+            .build();
+
+        ArgumentCaptor<VotingEntity> captor = ArgumentCaptor.forClass(VotingEntity.class);
+
+        //when
+        given(votingStartRepository.findByPostId(anyLong()))
+            .willReturn(Optional.of(votingStartEntity));
+
+        voteService.voteVoting(userId, postId, votingStartsId, approval);
+
+        //then
+        verify(votingRepository, times(1)).save(captor.capture());
+        assertEquals(approval, captor.getValue().getApproval());
+        assertEquals(userId, captor.getValue().getUserId());
+        assertEquals(postId, captor.getValue().getVotingStartEntity().getPostId());
+
+    }
 }

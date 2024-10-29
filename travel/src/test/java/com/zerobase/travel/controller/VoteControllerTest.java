@@ -16,6 +16,7 @@ import com.zerobase.travel.dto.request.VoteRequestDto.VoteVoting;
 import com.zerobase.travel.dto.response.VoteResponseDto;
 import com.zerobase.travel.dto.response.VoteResponseDto.GetVote;
 import com.zerobase.travel.service.VoteService;
+import com.zerobase.travel.type.VotingStatus;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,33 @@ class VoteControllerTest {
     }
 
     //TODO 김용민 votingStart 조회 테스트 작성하기
+    @Test
+    void getVotingStart() throws Exception {
+
+        //given
+        long postId = 1L;
+        long userId = 1L;
+
+        VoteResponseDto.VotingStart votingStart = VoteResponseDto.VotingStart.builder()
+            .votingStartsId(1L)
+            .votingStatus(VotingStatus.STARTING.toString())
+            .build();
+
+        given(voteService.getVotingStart(anyLong(), anyLong()))
+            .willReturn(votingStart);
+
+        //when
+        //then
+        mockMvc.perform(get("/api/v1/posts/{postId}/voting-starts", postId))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.votingStartsId").value(1L))
+            .andExpect(jsonPath("$.votingStatus").value(VotingStatus.STARTING.toString()))
+            .andReturn();
+
+        verify(voteService, times(1)).getVotingStart(anyLong(), anyLong());
+
+    }
+
 
     @Test
     void voteVoting() throws Exception {

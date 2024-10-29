@@ -25,5 +25,4 @@ public class CustomUserDetailsService implements UserDetailsService {
         // UserDetails에 담아서 return하면 AuthenticationManager가 검증함
         return new CustomUserDetails(userEntity);
     }
-
 }

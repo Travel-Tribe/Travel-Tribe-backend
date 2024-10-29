@@ -1,9 +1,10 @@
 package com.zerobase.user.service;
 
 import com.zerobase.user.dto.request.JoinDTO;
-import com.zerobase.user.dto.response.ServiceResult;
+import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.type.Role;
 import com.zerobase.user.type.UserStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class JoinService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public ServiceResult joinProcess(JoinDTO joinDTO) {
+    public void joinProcess(JoinDTO joinDTO) {
         log.info("Processing registration for email: {}", joinDTO.getEmail());
 
         // 이메일 중복 체크
@@ -31,9 +32,6 @@ public class JoinService {
         // 사용자 엔티티 생성 및 저장
         userRepository.save(buildUser(joinDTO));
         log.info("User registration successful for email: {}", joinDTO.getEmail());
-
-        // 회원가입 성공 시 201 Created 상태 코드와 메시지 반환
-        return ServiceResult.success(HttpStatus.CREATED, "회원 가입에 성공했습니다!");
     }
 
     // UserEntity 빌더를 통한 엔티티 생성
@@ -43,10 +41,19 @@ public class JoinService {
             .username(joinDTO.getUsername())
             .password(passwordEncoder.encode(joinDTO.getPassword()))
             .email(joinDTO.getEmail())
-            .role(joinDTO.getRole())
+            .role(Role.ROLE_USER)
             .phone(joinDTO.getPhone())
             .nickname(joinDTO.getNickname())
             .status(UserStatus.ACTIVE)
             .build();
+    }
+
+    public boolean checkDuplicate(String type, String query) {
+        return switch (type.toLowerCase()) {
+            case "email" -> userRepository.existsByEmail(query);
+            case "nickname" -> userRepository.existsByNickname(query);
+            case "phone" -> userRepository.existsByPhone(query);
+            default -> throw new IllegalArgumentException("Invalid type: " + type);
+        };
     }
 }

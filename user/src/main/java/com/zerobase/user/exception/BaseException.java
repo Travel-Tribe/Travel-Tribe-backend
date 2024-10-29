@@ -4,11 +4,11 @@ import com.zerobase.user.dto.response.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class BizException extends RuntimeException {
+public class BaseException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public BizException(ErrorCode errorCode) {
+    public BaseException(ErrorCode errorCode) {
         super(errorCode.getErrorMessage());
         this.errorCode = errorCode;
     }

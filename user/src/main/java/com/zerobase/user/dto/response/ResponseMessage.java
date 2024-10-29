@@ -1,5 +1,6 @@
 package com.zerobase.user.dto.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,35 +11,44 @@ import org.springframework.http.HttpStatus;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseMessage {
+public class ResponseMessage<T> {
 
-    private ResponseMessageHeader header;
-    private Object body;
+    private String result;
+    private List<Errors> errors;
+    private T data;
 
-    // 실패 응답 생성 (동적으로 상태 코드 포함)
-    public static ResponseMessage fail(HttpStatus status, String message, Object data) {
+    public static <T> ResponseMessage<T> success() {
+        return success(null);
+    }
+
+    public static <T> ResponseMessage<T> success(T data) {
+        return new ResponseMessage<T>(Result.SUCCESS.toString(),null, data);
+    }
+
+    public static ResponseMessage fail(ErrorCode errorCode) {
         return ResponseMessage.builder()
-            .header(ResponseMessageHeader.builder()
-                .result(false)
-                .resultCode(status.getReasonPhrase())  // 상태 코드 설명 (예: "Bad Request")
-                .message(message)
-                .status(status.value())  // 상태 코드 (예: 400, 404)
-                .build())
-            .body(data)
+            .result(Result.FAIL.toString())
+            .errors(List.of(new Errors(errorCode)))
             .build();
     }
 
-    // 성공 응답 생성 (동적으로 상태 코드 포함)
-    public static ResponseMessage success(HttpStatus status, String message, Object data) {
+    public static ResponseMessage fail(ErrorCode errorCode, Object data) {
         return ResponseMessage.builder()
-            .header(ResponseMessageHeader.builder()
-                .result(true)
-                .resultCode(status.getReasonPhrase())  // 상태 코드 설명 (예: "OK")
-                .message(message)
-                .status(status.value())  // 상태 코드 (예: 200)
-                .build())
-            .body(data)
+            .result(Result.FAIL.toString())
+            .data(data)
+            .errors(List.of(new Errors(errorCode)))
             .build();
+    }
+
+    public static ResponseMessage fail(List<Errors> errors) {
+        return ResponseMessage.builder()
+            .result(Result.FAIL.toString())
+            .errors(errors)
+            .build();
+    }
+
+
+    public enum Result {
+        SUCCESS, FAIL
     }
 }
-

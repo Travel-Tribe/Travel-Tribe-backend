@@ -3,14 +3,23 @@ package com.zerobase.travel.controller;
 import com.zerobase.travel.dto.response.FileResponseDto;
 import com.zerobase.travel.dto.response.FileResponseDto.UploadFile;
 import com.zerobase.travel.util.FileUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +41,33 @@ public class FileController {
                 )
                 .build()
         );
+    }
+
+    @GetMapping("/download")
+    public void fileUpload(
+        HttpServletResponse response,
+        @RequestParam String fileUrl
+    ) {
+
+        File file = new File(fileUrl);
+
+        String downloadFileName = UriUtils.encode(fileUtil.getFileName(file), StandardCharsets.UTF_8);
+
+        response.setContentType("application/download");
+        response.setContentLength((int)file.length());
+        response.setHeader("Content-disposition", "attachment;filename=\"" + downloadFileName + "\"");
+
+        try (OutputStream os = response.getOutputStream(); FileInputStream fis = new FileInputStream(file)) {
+
+            FileCopyUtils.copy(fis, os);
+
+            //TODO 김용민 공통 에러처리 추가하기
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

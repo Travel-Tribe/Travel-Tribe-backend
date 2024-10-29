@@ -3,6 +3,7 @@ package com.zerobase.user.config;
 import com.zerobase.user.jwt.CustomLogoutFilter;
 import com.zerobase.user.jwt.JWTFilter;
 import com.zerobase.user.jwt.LoginFilter;
+import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.RefreshRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.util.CookieUtil;
@@ -34,6 +35,7 @@ public class SecurityConfig {
     //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final RefreshRepository refreshRepository;
     private final CookieUtil cookieUtil;
 
@@ -87,7 +89,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         // 경로별 접근 권한 설정
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/", "/join", "/reissue").permitAll()
+                .requestMatchers("api/**","/login", "/", "/join", "/reissue").permitAll()
 
 //                .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 //                .requestMatchers(HttpMethod.POST, "/posts/**").hasAnyRole("USER", "ADMIN")
@@ -105,7 +107,7 @@ public class SecurityConfig {
         http
             .addFilterAt(
                 new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,
-                    refreshRepository, cookieUtil), UsernamePasswordAuthenticationFilter.class);
+                    refreshRepository, userRepository, profileRepository, cookieUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
             .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository),

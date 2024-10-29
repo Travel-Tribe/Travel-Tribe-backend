@@ -41,7 +41,7 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            ResponseUtil.setJsonResponse(response, false, HttpStatus.UNAUTHORIZED.getReasonPhrase(), HttpServletResponse.SC_UNAUTHORIZED, "access token expired");
+            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -49,7 +49,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String category = jwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
-            ResponseUtil.setJsonResponse(response, false, HttpStatus.UNAUTHORIZED.getReasonPhrase(), HttpServletResponse.SC_UNAUTHORIZED, "invalid access token");
+            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 

@@ -2,8 +2,13 @@ package com.zerobase.user.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
+import com.zerobase.user.dto.response.LoginSuccessDTO;
+import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.RefreshEntity;
+import com.zerobase.user.entity.UserEntity;
+import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.RefreshRepository;
+import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.util.CookieUtil;
 import com.zerobase.user.util.JWTUtil;
 import com.zerobase.user.util.ResponseUtil;
@@ -14,9 +19,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,6 +38,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //JWTUtil 주입
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final CookieUtil cookieUtil;
 
     @Override
@@ -44,7 +51,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         LoginRequestDTO loginRequest = null;
         try {
             // JSON 데이터를 LoginRequest DTO로 변환
-            loginRequest = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDTO.class);
+            loginRequest = new ObjectMapper().readValue(request.getInputStream(),
+                LoginRequestDTO.class);
             log.debug("Login attempt for user with email: {}", loginRequest.getEmail());
         } catch (IOException e) {
             log.error("Failed to parse login request", e);
@@ -57,9 +65,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         log.debug("Attempting to authenticate user with email: {}", email);
 
-
         //스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+            email, password, null);
         log.debug("Generated authentication token for user: {}", email);
 
         //token에 담은 검증을 위한 AuthenticationManager로 전달
@@ -68,7 +76,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response, FilterChain chain, Authentication authentication) {
         //유저 정보
         String email = authentication.getName();
         log.info("Authentication successful for user: {}", email);
@@ -92,7 +101,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         try {
             // JSON 응답 생성
-            ResponseUtil.setJsonResponse(response, true, HttpStatus.OK.getReasonPhrase(), HttpServletResponse.SC_OK, "로그인에 성공했습니다!");
+            Optional<UserEntity> OptionalUserEntity = userRepository.findByEmail(email);
+            UserEntity userEntity = OptionalUserEntity.get();
+            Long userEntityId = userEntity.getId();
+
+            Optional<ProfileEntity> OptionalProfileEntity = profileRepository.findByUserId(
+                userEntityId);
+
+            LoginSuccessDTO loginSuccessDTO;
+
+            loginSuccessDTO = LoginSuccessDTO.builder()
+                .Id(userEntityId)
+                .profileCheck(OptionalProfileEntity.isPresent())
+                .build();
+
+            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_OK, loginSuccessDTO);
         } catch (IOException e) {
             log.error("Failed to write the response", e);
         }
@@ -116,13 +139,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 실패시 실행하는 메소드
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response, AuthenticationException failed) {
         log.warn("Authentication failed for user: {}", request.getParameter("email"), failed);
 
         // 로그인 실패 시 401 응답 코드 반환
         try {
             // JSON 응답 생성
-            ResponseUtil.setJsonResponse(response, false, HttpStatus.UNAUTHORIZED.getReasonPhrase(), HttpServletResponse.SC_UNAUTHORIZED, "로그인에 실패했습니다");
+            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
         } catch (IOException e) {
             log.error("Failed to write the response", e);
         }

@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class FileUtil {
 
+    public static final String FILE_PATH_DIVISION = "____";
+
     @Value("${file.upload.path}")
     private String fileUploadPath;
 
@@ -44,7 +46,7 @@ public class FileUtil {
             String originalFileName = requestFile.getOriginalFilename();
             UUID uuid = UUID.randomUUID();
 
-            String savedFileName = uuid + "_" + originalFileName;
+            String savedFileName = uuid + FILE_PATH_DIVISION + originalFileName;
             String fileUrl = fileUploadPath + "/" + savedFileName;
 
             File file = new File(fileUrl);
@@ -57,6 +59,13 @@ public class FileUtil {
             //TODO 김용민 공통 에러처리 추가하기
             throw new RuntimeException(e);
         }
+    }
+
+    public String getFileName(File file) {
+        String fileName = file.getName();
+        int fileDivisionIndex = fileName.indexOf(FileUtil.FILE_PATH_DIVISION);
+
+        return fileName.substring(fileDivisionIndex + FileUtil.FILE_PATH_DIVISION.length());
     }
 
 }

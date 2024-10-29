@@ -54,4 +54,16 @@ public class VoteController {
         voteService.voteVoting(userId, postId, votingStartsId, request.getApproval());
     }
 
+    //TODO 김용민 Response 공통 생기면 반영하기
+    @GetMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
+    public VoteResponseDto.GetVote getVote(
+        @PathVariable long postId,
+        @PathVariable long votingStartsId
+    ) {
+
+        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
+        long userId = 1L;
+        return voteService.getVote(userId, postId, votingStartsId);
+    }
+
 }

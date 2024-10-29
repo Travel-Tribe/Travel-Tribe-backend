@@ -60,7 +60,18 @@ public class VoteService {
         //2. 투표 결과를 확인하고 post를 닫는 상태로 변경한다.
 
     }
-    
+
+    public VoteResponseDto.GetVote getVote(long userId, long postId, long votingStartsId) {
+        validationGetVote(userId, postId, votingStartsId);
+
+        VotingStartEntity votingStartEntity = votingStartRepository.findById(votingStartsId)
+            .orElseThrow(() -> new RuntimeException());
+
+        return VoteResponseDto.GetVote.fromEntity(
+            votingRepository.findAllByVotingStartEntity(votingStartEntity)
+        );
+    }
+
     //TODO 김용민 validationRegisterRating 작성하기
     private void validationCreateVote(long organizerUserId, long postId) {
 
@@ -83,5 +94,12 @@ public class VoteService {
         
         //이미 투표를 하였는지
         
+    }
+
+    //TODO 김용민 validationRegisterRating 작성하기
+    private void validationGetVote(long userId, long postId, long votingStartsId) {
+        //votingStartsId가 postId의 투표인지
+
+        //userId가 postId 여행에 참여하였는지
     }
 }

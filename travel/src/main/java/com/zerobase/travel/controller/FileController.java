@@ -10,7 +10,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,7 +59,7 @@ public class FileController {
         String downloadFileName = UriUtils.encode(fileUtil.getFileName(file), StandardCharsets.UTF_8);
 
         response.setContentType("application/download");
-        response.setContentLength((int)file.length());
+        response.setContentLength((int) file.length());
         response.setHeader("Content-disposition", "attachment;filename=\"" + downloadFileName + "\"");
 
         try (OutputStream os = response.getOutputStream(); FileInputStream fis = new FileInputStream(file)) {
@@ -64,6 +69,29 @@ public class FileController {
             //TODO 김용민 공통 에러처리 추가하기
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<byte[]> fileDownload(
+        @RequestParam String fileUrl
+    ) {
+        File file = new File(fileUrl);
+        String fileName = fileUtil.getFileName(file);
+
+        MediaType mediaType = MediaTypeFactory.getMediaType(fileName).orElseThrow(RuntimeException::new);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", mediaType.toString());
+
+
+        try {
+            return new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), headers, HttpStatus.OK);
+
+            //TODO 김용민 공통 에러처리 추가하기
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

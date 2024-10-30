@@ -3,6 +3,7 @@ package com.zerobase.travel.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -14,11 +15,14 @@ import com.zerobase.travel.dto.response.VoteResponseDto.GetVote;
 import com.zerobase.travel.dto.response.VoteResponseDto.VotingStart;
 import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.VoteErrorCode;
 import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -70,7 +74,6 @@ class VoteServiceTest {
 
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
-
 
         //when
         VotingStart votingStart = voteService.getVotingStart(userId, postId);
@@ -158,4 +161,45 @@ class VoteServiceTest {
         assertEquals(2L, vote.getVotings().get(1).getUserId());
         assertFalse(vote.getVotings().get(1).getApproval());
     }
+
+    @Test
+    @DisplayName("투표 개시 실패 - 이미 존재하는 투표 개시")
+    void createVoteFailBy() {
+        //given
+        long postId = 1L;
+        long userId = 2L;
+
+        //when
+        given(votingStartRepository.existsByPostId(anyLong()))
+            .willReturn(true);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> voteService.createVote(userId, postId));
+        assertEquals(VoteErrorCode.ALREADY_VOTING_START, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("투표 실패 - 이미 존재하는 투표")
+    void voteVotingFailBy이미_존재하는_투표() {
+        //given
+        long postId = 1L;
+        long userId = 2L;
+        long votingStartsId = 1L;
+        boolean approval = true;
+
+        VotingStartEntity votingStartEntity = VotingStartEntity.builder()
+            .build();
+
+        //when
+        given(votingStartRepository.findByPostId(anyLong()))
+            .willReturn(Optional.of(votingStartEntity));
+
+        given(votingRepository.existsByUserIdAndVotingStartEntity(anyLong(), any()))
+            .willReturn(true);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> voteService.voteVoting(userId, postId, votingStartsId, approval));
+        assertEquals(VoteErrorCode.ALREADY_VOTE, ex.getErrorCode());
+    }
+
 }

@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportingController {
 
     private final ReportingService reportingService;
-
-    //TODO 김용민 Response 공통 생기면 반영하기
+    
     @PostMapping("/posts/{postId}/reporting")
     public ResponseEntity<ResponseMessage<Void>> reportingUser(
         @PathVariable long postId,

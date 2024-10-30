@@ -19,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class VoteController {
 
     private final VoteService voteService;
-
-    //TODO 김용민 Response 공통 생기면 반영하기
+    
     @PostMapping("/posts/{postId}/voting-starts")
     public ResponseEntity<ResponseMessage<Void>> createVote(
         @PathVariable long postId
@@ -46,7 +45,6 @@ public class VoteController {
         ));
     }
 
-    //TODO 김용민 Response 공통 생기면 반영하기
     @PostMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
     public ResponseEntity<ResponseMessage<Void>> voteVoting(
         @PathVariable long postId,
@@ -62,7 +60,6 @@ public class VoteController {
         return ResponseEntity.ok(ResponseMessage.success());
     }
 
-    //TODO 김용민 Response 공통 생기면 반영하기
     @GetMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
     public ResponseEntity<ResponseMessage<VoteResponseDto.GetVote>> getVote(
         @PathVariable long postId,

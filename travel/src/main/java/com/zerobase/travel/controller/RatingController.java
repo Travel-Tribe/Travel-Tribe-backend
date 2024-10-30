@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RatingController {
 
     private final RatingService ratingService;
-
-    //TODO 김용민 Response 공통 생기면 반영하기
+    
     @PostMapping("/posts/{postId}/rating")
     public ResponseEntity<ResponseMessage<Void>> registerRating(
         @PathVariable long postId,

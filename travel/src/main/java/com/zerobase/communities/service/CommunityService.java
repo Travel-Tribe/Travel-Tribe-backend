@@ -7,31 +7,34 @@ import com.zerobase.communities.type.CustomException;
 import com.zerobase.communities.type.ErrorCode;
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;
-import jakarta.validation.constraints.NotBlank;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 // todo : spring security ID 정보 추가할것
 @Service
+@RequiredArgsConstructor
 public class CommunityService {
 
-    CommunityRepository communityRepository;
+    private final CommunityRepository communityRepository;
 
     public CommunityDto createPost(Continent continent,
         Country country, String region,
         String title, String content) {
 
-        CommunityEntity entity = communityRepository.save(
-            CommunityEntity
-                .builder()
-                .userId(123L)
-                .continent(continent)
-                .country(country)
-                .region(region)
-                .title(title)
-                .content(content)
-                .build()
-        );
+        CommunityEntity entity = communityRepository.
+            save(
+                CommunityEntity
+                    .builder()
+                    .userId(123L)
+                    .continent(continent)
+                    .country(country)
+                    .region(region)
+                    .title(title)
+                    .content(content)
+                    .build()
+            );
 
         return CommunityDto.fromEntity(entity);
     }
@@ -46,40 +49,39 @@ public class CommunityService {
     }
 
     // 포스트 다건 조회
-    public List<CommunityDto> getPosts() {
-        List<CommunityEntity> communityEntities = communityRepository.findAll();
+    public Page<CommunityDto> getPosts(Pageable pageable) {
+        Page<CommunityEntity> communityEntities = communityRepository.findAll(
+            pageable);
 
-        return communityEntities.stream().map(CommunityDto::fromEntity)
-            .toList();
+        return communityEntities.map(CommunityDto::fromEntity);
 
 
     }
+
+
 
 
     public void deletePost(long communityId) {
         communityRepository.deleteByCommunityId(communityId);
     }
 
-    public CommunityDto updatePost(long communityId, Continent continent, Country country,
+    public CommunityDto updatePost(long communityId, Continent continent,
+        Country country,
         String region, String title, String content) {
 
-        if(!communityRepository.existsByCommunityId(communityId)){
-            throw new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT);
-        }
+        CommunityEntity communityEntity = communityRepository.findByCommunityId(
+            communityId).orElseThrow(()
+            -> new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT));
 
-        CommunityEntity entity = communityRepository.update(
-            CommunityEntity
-                .builder()
-                .communityId(communityId)
-                .userId(123L)
-                .continent(continent)
-                .country(country)
-                .region(region)
-                .title(title)
-                .content(content)
-                .build()
-        );
+        communityEntity.setContinent(continent);
+        communityEntity.setCountry(country);
+        communityEntity.setRegion(region);
+        communityEntity.setTitle(title);
+        communityEntity.setContent(content);
 
-        return CommunityDto.fromEntity(entity);
+        return CommunityDto.fromEntity(
+            communityRepository.save(communityEntity));
     }
 }
+
+

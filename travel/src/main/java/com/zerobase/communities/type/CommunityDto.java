@@ -3,7 +3,6 @@ package com.zerobase.communities.type;
 import com.zerobase.communities.entity.CommunityEntity;
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

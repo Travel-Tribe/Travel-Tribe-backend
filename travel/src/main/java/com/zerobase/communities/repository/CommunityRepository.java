@@ -10,17 +10,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommunityRepository extends JpaRepository<CommunityEntity, Long> {
 
-     
-    CommunityEntity save(CommunityEntity entity);
-
 
     Optional<CommunityEntity> findByCommunityId(Long communityId);
 
-    Page<CommunityEntity> findAll(Long communityId, Pageable pageable);
+    Page<CommunityEntity> findAll( Pageable pageable);
 
     void deleteByCommunityId(long communityId);
 
-    CommunityEntity update(CommunityEntity communityEntity);
 
-    boolean existsByCommunityId(long communityId);
+    Optional<CommunityEntity> findByCommunityId(long communityId);
 }
+

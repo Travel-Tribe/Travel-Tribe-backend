@@ -1,13 +1,14 @@
 package com.zerobase.communities.controller;
 
 import com.zerobase.communities.service.CommunityManagementService;
+import com.zerobase.communities.type.RequestCreateCommunity;
 import com.zerobase.communities.type.RequestPostCommunity;
 import com.zerobase.communities.type.ResponseCommunityDto;
-import com.zerobase.communities.type.RequestCreateCommunity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,24 +29,28 @@ public class CommunityController {
 
     // 새로운 커뮤니티 생성
     @PostMapping
-    public ResponseEntity<ResponseCommunityDto> createCommunity(@Valid @RequestBody
-    RequestCreateCommunity request) {
+    public ResponseEntity<ResponseCommunityDto> createCommunity(
+        @Valid @RequestBody
+        RequestCreateCommunity request) {
 
         return ResponseEntity.ok
             (communityManagementService.createPost(request));
     }
 
-    // 커뮤니티 리스트 조회
+    // 커뮤니티 페이지 항상 최신순으로 조회
     @GetMapping
-    public ResponseEntity<List<ResponseCommunityDto>> getCommunities() {
-        return ResponseEntity.ok( communityManagementService.getPosts());
+    public ResponseEntity<Page<ResponseCommunityDto>> getCommunities(
+        Pageable pageable) {
+
+        return ResponseEntity.ok(communityManagementService.getPosts(pageable));
     }
 
     // 커뮤니티 단건 조회
     @GetMapping(value = "/{communityId}")
     public ResponseEntity<ResponseCommunityDto> getCommunity(
         @Min(1) @PathVariable long communityId) {
-        return ResponseEntity.ok(communityManagementService.getPost(communityId));
+        return ResponseEntity.ok(
+            communityManagementService.getPost(communityId));
 
     }
 
@@ -62,7 +67,8 @@ public class CommunityController {
     @PutMapping(value = "/{communityId}")
     public ResponseEntity<ResponseCommunityDto> updateCommunity(
         @Valid @RequestBody RequestPostCommunity request) {
-       return ResponseEntity.ok(communityManagementService.updatePost(request));
+        return ResponseEntity.ok(
+            communityManagementService.updatePost(request));
     }
 
 

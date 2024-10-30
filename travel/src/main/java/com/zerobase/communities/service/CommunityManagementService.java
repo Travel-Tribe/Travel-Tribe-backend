@@ -2,13 +2,15 @@ package com.zerobase.communities.service;
 
 import com.zerobase.communities.type.CommunityDto;
 import com.zerobase.communities.type.CommunityFileDto;
+import com.zerobase.communities.type.RequestCreateCommunity;
 import com.zerobase.communities.type.RequestPostCommunity;
 import com.zerobase.communities.type.ResponseCommunityDto;
-import com.zerobase.communities.type.RequestCreateCommunity;
-import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,21 +37,15 @@ public class CommunityManagementService {
     }
 
     //다건 조회
-    public List<ResponseCommunityDto> getPosts() {
-        List<CommunityDto> communityDtos = communityService.getPosts();
+    public Page<ResponseCommunityDto> getPosts(Pageable pageable) {
 
-        List<ResponseCommunityDto> responseCommunityDtos = new ArrayList<>();
+        Page<CommunityDto> communityDtos = communityService.getPosts(pageable);
 
-        for (CommunityDto communityDto : communityDtos) {
-            List<CommunityFileDto> communityFileDtos
-                = communityFileService.getFiles(communityDto.getCommunityId());
+        Page<ResponseCommunityDto> responseCommunityDtos = communityDtos.map(e
+            -> ResponseCommunityDto.fromEntity(e,
+            communityFileService.getFiles(e.getCommunityId())));
 
-            responseCommunityDtos.add(
-                ResponseCommunityDto.fromEntity(communityDto, communityFileDtos));
-        }
-
-        return responseCommunityDtos;
-
+         return responseCommunityDtos;
     }
 
     // 단건조회

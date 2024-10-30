@@ -3,6 +3,7 @@ package com.zerobase.communities.type;
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +12,9 @@ import lombok.Setter;
 @Setter
 public class RequestCreateCommunity {
 
-    @NotBlank
+    @NotNull
     Continent continent;
-    @NotBlank
+    @NotNull
     Country country;
     @NotBlank
     String region;

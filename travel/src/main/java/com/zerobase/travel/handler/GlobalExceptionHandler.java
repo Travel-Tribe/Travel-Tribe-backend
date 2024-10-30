@@ -1,11 +1,11 @@
 package com.zerobase.travel.handler;
 
 
+import com.zerobase.travel.common.response.Errors;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.TokenException;
 import com.zerobase.travel.exception.errorcode.BasicErrorCode;
-import com.zerobase.travel.exception.errorcode.Errors;
 import com.zerobase.travel.exception.errorcode.ValidErrorCode;
 import java.util.List;
 import java.util.stream.Collectors;

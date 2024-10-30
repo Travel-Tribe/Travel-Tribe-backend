@@ -1,18 +1,15 @@
 package com.zerobase.travel.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.dto.request.ReportingRequestDto;
-import com.zerobase.travel.service.RatingService;
 import com.zerobase.travel.service.ReportingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,8 @@ class ReportingControllerTest {
         mockMvc.perform(post("/api/v1/posts/{postId}/reporting", postId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reportUser)))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value("SUCCESS"));
 
         verify(reportingService, times(1)).reportingUser(any(), anyLong(), anyLong());
 

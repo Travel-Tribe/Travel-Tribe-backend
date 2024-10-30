@@ -1,16 +1,17 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.response.FileResponseDto;
 import com.zerobase.travel.dto.response.FileResponseDto.UploadFile;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.BasicErrorCode;
 import com.zerobase.travel.util.FileUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,16 +36,17 @@ public class FileController {
 
     // 파일 저장은 추후 변경 가능 (현재는 DB에 저장하는 값이 파일 경로 그래도 나오 보안 위험)
     @PostMapping("/upload")
-    public ResponseEntity<FileResponseDto.UploadFile> fileUpload(
+    public ResponseEntity<ResponseMessage<FileResponseDto.UploadFile>> fileUpload(
         @RequestParam MultipartFile file
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.ok(ResponseMessage.success(
             UploadFile.builder()
                 .fileUrl(
                     fileUtil.saveFile(file).getAbsolutePath().replace("\\\\", "/")
                 )
-                .build()
+                .build())
+
         );
     }
 
@@ -66,11 +68,8 @@ public class FileController {
 
             FileCopyUtils.copy(fis, os);
 
-            //TODO 김용민 공통 에러처리 추가하기
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BizException(BasicErrorCode.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -87,13 +86,11 @@ public class FileController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", mediaType.toString());
 
-
         try {
             return new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), headers, HttpStatus.OK);
 
-            //TODO 김용민 공통 에러처리 추가하기
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BizException(BasicErrorCode.INTERNAL_SERVER_ERROR);
         }
 
     }

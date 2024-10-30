@@ -1,12 +1,18 @@
 package com.zerobase.travel.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.entity.RatingEntity;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.RatingErrorCode;
 import com.zerobase.travel.repository.RatingRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +54,69 @@ class RatingServiceTest {
         assertEquals(3L, captor.getValue().getReceiverUserId());
         assertEquals(5.0, captor.getValue().getScore());
         assertEquals("좋아요", captor.getValue().getComment());
+
+    }
+
+    @Test
+    @DisplayName("평점 주기 실패 - 이미 평점을 주었음")
+    void giveRatingFailBy이미_평점을_주었음() {
+
+        //given
+        long postId = 1L;
+        long senderUserId = 2L;
+
+        GiveRatingDto giveRatingDto = GiveRatingDto.builder()
+            .score(7.0)
+            .build();
+
+        given(ratingRepository.existsByPostIdAndSenderUserIdAndReceiverUserId(anyLong(), anyLong(), anyLong()))
+            .willReturn(true);
+
+        //when
+        BizException ex = assertThrows(BizException.class, () -> ratingService.giveRating(giveRatingDto, postId, senderUserId));
+
+        //then
+        assertEquals(RatingErrorCode.ALREADY_RATING, ex.getErrorCode());
+
+    }
+
+    @Test
+    @DisplayName("평점 주기 실패 - 평점 범위가 다름")
+    void giveRatingFailBy평점_범위가_다름() {
+
+        //given
+        long postId = 1L;
+        long senderUserId = 2L;
+
+        GiveRatingDto giveRatingDto = GiveRatingDto.builder()
+            .score(7.0)
+            .build();
+
+        //when
+        BizException ex = assertThrows(BizException.class, () -> ratingService.giveRating(giveRatingDto, postId, senderUserId));
+
+        //then
+        assertEquals(RatingErrorCode.SCORE_OUT_OF_RANGE, ex.getErrorCode());
+
+    }
+
+    @Test
+    @DisplayName("평점 주기 실패 - 평점 단위가 다름")
+    void giveRatingFailBy평점_단위가_다름() {
+
+        //given
+        long postId = 1L;
+        long senderUserId = 2L;
+
+        GiveRatingDto giveRatingDto = GiveRatingDto.builder()
+            .score(4.6)
+            .build();
+
+        //when
+        BizException ex = assertThrows(BizException.class, () -> ratingService.giveRating(giveRatingDto, postId, senderUserId));
+
+        //then
+        assertEquals(RatingErrorCode.SCORE_OUT_OF_UNIT, ex.getErrorCode());
 
     }
 }

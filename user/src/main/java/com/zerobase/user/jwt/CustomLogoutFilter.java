@@ -1,8 +1,17 @@
 package com.zerobase.user.jwt;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.EXPIRED_TOKEN_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_REFRESH_TOKEN_CATEGORY_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_TOKEN_FORMAT_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_IN_DATABASE;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.repository.RefreshRepository;
 import com.zerobase.user.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,7 +28,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
-
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void doFilter(
@@ -59,16 +68,25 @@ public class CustomLogoutFilter extends GenericFilterBean {
         if (refresh == null) {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(REFRESH_TOKEN_NOT_FOUND_ERROR)));
             return;
         }
 
         //expired check
         try {
             jwtUtil.isExpired(refresh);
+        } catch (MalformedJwtException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(INVALID_TOKEN_FORMAT_ERROR)));
+            return;
         } catch (ExpiredJwtException e) {
 
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(EXPIRED_TOKEN_ERROR)));
             return;
         }
 
@@ -78,6 +96,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(INVALID_REFRESH_TOKEN_CATEGORY_ERROR)));
             return;
         }
 
@@ -87,6 +107,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(REFRESH_TOKEN_NOT_IN_DATABASE)));
             return;
         }
 
@@ -101,5 +123,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json; charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.success()));
     }
 }

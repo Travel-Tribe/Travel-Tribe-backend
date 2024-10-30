@@ -34,7 +34,7 @@ public class CommunityEntity {
     private Country country;
     private String region;
     private String title;
-    private String contents;
+    private String content;
 
 
 

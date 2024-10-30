@@ -13,8 +13,10 @@ public enum UserErrorCode implements ErrorCode {
     NICKNAME_ERROR("E01007","사용자 닉네임은 필수 입니다."),
     PHONE_ERROR("E01008","사용자 핸드폰번호는 필수 입니다"),
     PASSWORD_ERROR("E01009","비밀번호는 4자 이상 입력해야 합니다."),
-    MAIL_ERROR("E01010","이메일 형식이 잘못되었습니다."),
-    LOGIN_FAIL_ERROR("E01018","로그인 실패!");
+    NEW_PASSWORD_ERROR("E01010","새비밀번호는 4자 이상 입력해야 합니다."),
+    MAIL_ERROR("E01011","이메일 형식이 잘못되었습니다."),
+    LOGIN_FAIL_ERROR("E01012","로그인 실패!"),
+    USER_PW_MISMATCH_ERROR("E01013","사용자 비밀번호 불일치!");
 
     private final String errorCode;
     private final String errorMessage;

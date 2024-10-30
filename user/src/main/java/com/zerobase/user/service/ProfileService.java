@@ -1,9 +1,11 @@
 package com.zerobase.user.service;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ERROR;
 import static com.zerobase.user.dto.response.ProfileErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.UserErrorCode.USER_NOT_FOUND_ERROR;
 
 import com.zerobase.user.dto.request.ProfileRequestDTO;
+import com.zerobase.user.dto.response.BasicErrorCode;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.entity.LangAbilityEntity;
 import com.zerobase.user.entity.ProfileEntity;
@@ -18,6 +20,7 @@ import com.zerobase.user.type.Gender;
 import com.zerobase.user.type.MBTI;
 import com.zerobase.user.type.Smoking;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,17 +36,30 @@ public class ProfileService {
     private final LangAbilityRepository langAbilityRepository;
 
     @Transactional
-    public void createProfile(Long userId, ProfileRequestDTO request) {
-        UserEntity user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public void createProfile(ProfileRequestDTO request, UserEntity currentUser) {
+        UserEntity user = userRepository.findById(currentUser.getId())
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        // MBTI, Smoking, Gender 변환 중 발생할 수 있는 예외를 처리
+        MBTI mbti;
+        Smoking smoking;
+        Gender gender;
+
+        try {
+            mbti = MBTI.valueOf(request.getMbti().toUpperCase());
+            smoking = Smoking.valueOf(request.getSmoking().toUpperCase());
+            gender = Gender.valueOf(request.getGender().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BizException(ILLEGAL_ARGUMENT__ERROR);
+        }
 
         // 프로필 생성
         ProfileEntity profile = ProfileEntity.builder()
             .user(user)
             .introduction(request.getIntroduction())
-            .mbti(MBTI.valueOf(request.getMbti().toUpperCase()))
-            .smoking(Smoking.valueOf(request.getSmoking().toUpperCase()))
-            .gender(Gender.valueOf(request.getGender().toUpperCase()))
+            .mbti(mbti)
+            .smoking(smoking)
+            .gender(gender)
             .birth(request.getBirth())
             .fileAddress(request.getFileAddress())
             .build();
@@ -64,14 +80,14 @@ public class ProfileService {
     }
 
     @Transactional
-    public void editProfile(Long userId, ProfileRequestDTO profileRequest) {
+    public void editProfile(ProfileRequestDTO profileRequest, UserEntity currentUser) {
         // 사용자 및 프로필 조회
-        UserEntity user = userRepository.findById(userId)
+        userRepository.findById(currentUser.getId())
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
-        ProfileEntity profile = profileRepository.findByUserId(userId)
+        ProfileEntity profile = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        // 프로필 정보 업데이트 (필드별 null 체크)
+        // 프로필 정보 업데이트
         if (profileRequest.getIntroduction() != null) {
             profile.setIntroduction(profileRequest.getIntroduction());
         }
@@ -112,9 +128,10 @@ public class ProfileService {
     }
 
 
+
     public ProfileResponseDTO getProfile(Long userId) {
         // 사용자 및 프로필 조회
-        UserEntity user = userRepository.findById(userId)
+        userRepository.findById(userId)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
         ProfileEntity profile = profileRepository.findByUserId(userId)
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));

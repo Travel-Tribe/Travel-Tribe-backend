@@ -1,5 +1,6 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.response.FileResponseDto;
 import com.zerobase.travel.dto.response.FileResponseDto.UploadFile;
 import com.zerobase.travel.util.FileUtil;
@@ -10,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,16 +35,17 @@ public class FileController {
 
     // 파일 저장은 추후 변경 가능 (현재는 DB에 저장하는 값이 파일 경로 그래도 나오 보안 위험)
     @PostMapping("/upload")
-    public ResponseEntity<FileResponseDto.UploadFile> fileUpload(
+    public ResponseEntity<ResponseMessage<FileResponseDto.UploadFile>> fileUpload(
         @RequestParam MultipartFile file
     ) {
 
-        return ResponseEntity.ok(
+        return ResponseEntity.ok(ResponseMessage.success(
             UploadFile.builder()
                 .fileUrl(
                     fileUtil.saveFile(file).getAbsolutePath().replace("\\\\", "/")
                 )
-                .build()
+                .build())
+
         );
     }
 

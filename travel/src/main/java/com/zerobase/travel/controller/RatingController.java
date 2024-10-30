@@ -1,8 +1,10 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.service.RatingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +20,7 @@ public class RatingController {
 
     //TODO 김용민 Response 공통 생기면 반영하기
     @PostMapping("/posts/{postId}/rating")
-    public void registerRating(
+    public ResponseEntity<ResponseMessage<Void>> registerRating(
         @PathVariable long postId,
         @RequestBody GiveRatingDto giveRatingDto
     ) {
@@ -27,6 +29,8 @@ public class RatingController {
         long userId = 1L;
 
         ratingService.giveRating(giveRatingDto, postId, userId);
+
+        return ResponseEntity.ok(ResponseMessage.success());
     }
 
 }

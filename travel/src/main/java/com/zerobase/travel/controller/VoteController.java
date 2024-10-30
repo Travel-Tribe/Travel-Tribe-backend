@@ -1,9 +1,11 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.request.VoteRequestDto;
 import com.zerobase.travel.dto.response.VoteResponseDto;
 import com.zerobase.travel.service.VoteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,29 +22,33 @@ public class VoteController {
 
     //TODO 김용민 Response 공통 생기면 반영하기
     @PostMapping("/posts/{postId}/voting-starts")
-    public void createVote(
+    public ResponseEntity<ResponseMessage<Void>> createVote(
         @PathVariable long postId
     ) {
 
         //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
         voteService.createVote(userId, postId);
+
+        return ResponseEntity.ok(ResponseMessage.success());
     }
 
     @GetMapping("/posts/{postId}/voting-starts")
-    public VoteResponseDto.VotingStart getVotingStart(
+    public ResponseEntity<ResponseMessage<VoteResponseDto.VotingStart>> getVotingStart(
         @PathVariable long postId
     ) {
 
         //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
 
-        return voteService.getVotingStart(userId, postId);
+        return ResponseEntity.ok(ResponseMessage.success(
+            voteService.getVotingStart(userId, postId)
+        ));
     }
 
     //TODO 김용민 Response 공통 생기면 반영하기
     @PostMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
-    public void voteVoting(
+    public ResponseEntity<ResponseMessage<Void>> voteVoting(
         @PathVariable long postId,
         @PathVariable long votingStartsId,
         @RequestBody VoteRequestDto.VoteVoting request
@@ -52,18 +58,22 @@ public class VoteController {
         //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
         voteService.voteVoting(userId, postId, votingStartsId, request.getApproval());
+
+        return ResponseEntity.ok(ResponseMessage.success());
     }
 
     //TODO 김용민 Response 공통 생기면 반영하기
     @GetMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
-    public VoteResponseDto.GetVote getVote(
+    public ResponseEntity<ResponseMessage<VoteResponseDto.GetVote>> getVote(
         @PathVariable long postId,
         @PathVariable long votingStartsId
     ) {
 
         //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
         long userId = 1L;
-        return voteService.getVote(userId, postId, votingStartsId);
+        return ResponseEntity.ok(ResponseMessage.success(
+            voteService.getVote(userId, postId, votingStartsId)
+        ));
     }
 
 }

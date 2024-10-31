@@ -2,4 +2,6 @@ rootProject.name = 'TravelTribe'
 include 'travel'
 include 'user'
 include 'pay'
+include 'gateway'
+include 'eureka'
 

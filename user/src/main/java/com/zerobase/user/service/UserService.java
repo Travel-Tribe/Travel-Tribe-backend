@@ -1,18 +1,25 @@
 package com.zerobase.user.service;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.AUTHENTICATION_CODE_EXPIRED_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
 
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
+import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
+import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
 import com.zerobase.user.dto.response.OtherUserInfoResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
+import com.zerobase.user.entity.EmailVerificationEntity;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
+import com.zerobase.user.repository.EmailVerificationRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.type.Role;
 import com.zerobase.user.type.UserStatus;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class JoinService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailVerificationRepository verificationRepository;
+    private final EmailService emailService;
+    private final PasswordResetService passwordResetService;
 
     public void joinProcess(JoinDTO joinDTO) {
         log.info("Processing registration for email: {}", joinDTO.getEmail());
@@ -123,5 +133,53 @@ public class JoinService {
         }
     }
 
+    @Transactional
+    public boolean verifyEmailCode(String email, String code) {
+        EmailVerificationEntity verification = verificationRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(NOT_FOUND_EMAIL_AUTHENTICATION_ERROR));
 
+        if (verification.getExpirationTime().isBefore(LocalDateTime.now())) {
+            throw new BizException(AUTHENTICATION_CODE_EXPIRED_ERROR);
+        }
+
+        return verification.getVerificationCode().equals(code);
+    }
+
+
+    public void userEmailAuthenticationProcess(UserEmailAuthenticationDTO userEmailAuthenticationDTO) {
+        String email = userEmailAuthenticationDTO.getEmail();
+
+        // 인증 코드 생성 및 저장
+        String verificationCode = generateVerificationCode();
+        EmailVerificationEntity verification = new EmailVerificationEntity();
+        verification.setEmail(email);
+        verification.setVerificationCode(verificationCode);
+        verification.setExpirationTime(LocalDateTime.now().plusMinutes(10));  // 10분 후 만료
+
+        verificationRepository.save(verification);
+
+        // 인증 코드 발송
+        emailService.sendVerificationCode(email, verificationCode);
+    }
+
+    private String generateVerificationCode() {
+        return String.valueOf((int) ((Math.random() * 900000) + 100000));  // 6자리 난수 생성
+    }
+
+    @Transactional
+    public void resetPasswordProcess(ResetPasswordEmailDTO resetPasswordDTO) {
+        String email = resetPasswordDTO.getEmail();
+        String generateRandomPassword;
+        String encryptedPassword;
+        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
+        if (optionalUserEntity.isEmpty()) {
+            throw new BizException(USER_NOT_FOUND_ERROR);
+        }else{
+            UserEntity userEntity = optionalUserEntity.get();
+            generateRandomPassword = passwordResetService.generateRandomPassword();
+            encryptedPassword = passwordResetService.encryptPassword(generateRandomPassword);
+            userEntity.setPassword(encryptedPassword);
+        }
+        emailService.sendResetPassword(email, generateRandomPassword);
+    }
 }

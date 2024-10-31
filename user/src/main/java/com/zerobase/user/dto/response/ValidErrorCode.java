@@ -28,7 +28,8 @@ public enum ValidErrorCode implements ErrorCode {
     MISSING_MBTI_ERROR("E01031", "MBTI는 필수 입력 항목입니다."),
     MISSING_SMOKING_STATUS_ERROR("E01032", "흡연 여부는 필수 입력 항목입니다."),
     MISSING_GENDER_ERROR("E01033", "성별은 필수 입력 항목입니다."),
-    MISSING_BIRTH_DATE_ERROR("E01034", "생년월일은 필수 입력 항목입니다.");
+    MISSING_BIRTH_DATE_ERROR("E01034", "생년월일은 필수 입력 항목입니다."),
+    AUTHENTICATION_CODE_ERROR("E01035", "인증 코드는 필수입니다.");
 
     private final String errorCode;
     private final String errorMessage;

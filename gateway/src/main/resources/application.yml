@@ -13,9 +13,9 @@ spring:
           uri: http://localhost:8081/
           predicates:
             - Path=/api/v1/posts/**, /api/v1/reviews, /api/v1/communities, /api/v1/file
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8000/eureka/
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8000/eureka/

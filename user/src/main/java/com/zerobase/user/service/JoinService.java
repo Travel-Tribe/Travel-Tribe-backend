@@ -1,7 +1,7 @@
 package com.zerobase.user.service;
 
-import static com.zerobase.user.dto.response.UserErrorCode.USER_NOT_FOUND_ERROR;
-import static com.zerobase.user.dto.response.UserErrorCode.USER_PW_MISMATCH_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
 
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
@@ -114,10 +114,11 @@ public class JoinService {
     }
 
     public void deleteProcess(UserEntity currentUser) {
-        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(currentUser.getEmail());
-        if(!optionalUserEntity.isPresent()){
+        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(
+            currentUser.getEmail());
+        if (!optionalUserEntity.isPresent()) {
             throw new BizException(USER_NOT_FOUND_ERROR);
-        }else {
+        } else {
             userRepository.delete(optionalUserEntity.get());
         }
     }

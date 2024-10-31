@@ -1,11 +1,17 @@
 package com.zerobase.user.jwt;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.EXPIRED_TOKEN_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_TOKEN_FORMAT_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.NOT_ACCESS_TOKEN_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.type.Role;
 import com.zerobase.user.util.JWTUtil;
 import com.zerobase.user.util.ResponseUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +19,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +31,8 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
 
         // 헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
@@ -40,8 +46,11 @@ public class JWTFilter extends OncePerRequestFilter {
         // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
         try {
             jwtUtil.isExpired(accessToken);
+        } catch (MalformedJwtException e) {
+            ResponseUtil.setJsonResponse(response, SC_UNAUTHORIZED, INVALID_TOKEN_FORMAT_ERROR);
+            return;
         } catch (ExpiredJwtException e) {
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
+            ResponseUtil.setJsonResponse(response, SC_UNAUTHORIZED, EXPIRED_TOKEN_ERROR);
             return;
         }
 
@@ -49,7 +58,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String category = jwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
+            ResponseUtil.setJsonResponse(response, SC_UNAUTHORIZED, NOT_ACCESS_TOKEN_ERROR);
             return;
         }
 
@@ -85,7 +94,8 @@ public class JWTFilter extends OncePerRequestFilter {
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
         //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null,
+            customUserDetails.getAuthorities());
         //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 

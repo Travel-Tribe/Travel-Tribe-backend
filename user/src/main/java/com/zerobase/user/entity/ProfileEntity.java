@@ -37,7 +37,7 @@ public class ProfileEntity {
     @Column(name = "profile_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 

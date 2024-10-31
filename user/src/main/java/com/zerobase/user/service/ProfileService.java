@@ -1,11 +1,10 @@
 package com.zerobase.user.service;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ERROR;
-import static com.zerobase.user.dto.response.ProfileErrorCode.PROFILE_NOT_FOUND_ERROR;
-import static com.zerobase.user.dto.response.UserErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 
 import com.zerobase.user.dto.request.ProfileRequestDTO;
-import com.zerobase.user.dto.response.BasicErrorCode;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.entity.LangAbilityEntity;
 import com.zerobase.user.entity.ProfileEntity;
@@ -20,7 +19,6 @@ import com.zerobase.user.type.Gender;
 import com.zerobase.user.type.MBTI;
 import com.zerobase.user.type.Smoking;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -126,7 +124,6 @@ public class ProfileService {
 
         // 변경된 프로필 정보를 DB에 반영 (더티 체킹에 의해 자동 반영)
     }
-
 
 
     public ProfileResponseDTO getProfile(Long userId) {

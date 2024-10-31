@@ -20,7 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // DB에서 조회하고, 없으면 예외를 던짐
         UserEntity userEntity = userRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+            .orElseThrow(
+                () -> new UsernameNotFoundException("User not found with email: " + email));
 
         // UserDetails에 담아서 return하면 AuthenticationManager가 검증함
         return new CustomUserDetails(userEntity);

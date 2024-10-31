@@ -23,14 +23,14 @@ public class VisitedCountryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public VisitedCountryEntity(ProfileEntity profileEntity, String countryName) {
-        this.profileEntity = profileEntity;
-        this.countryName = countryName;
-    }
-
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
     private ProfileEntity profileEntity;
 
     private String countryName;
+
+    public VisitedCountryEntity(ProfileEntity profileEntity, String countryName) {
+        this.profileEntity = profileEntity;
+        this.countryName = countryName;
+    }
 }

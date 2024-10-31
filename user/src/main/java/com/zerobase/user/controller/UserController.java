@@ -1,12 +1,12 @@
 package com.zerobase.user.controller;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
-import static com.zerobase.user.dto.response.UserErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 
 import com.zerobase.user.dto.request.EditUserInfoDTO;
+import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
-import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.entity.UserEntity;
@@ -57,17 +57,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMessage.success());
     }
 
-    // 회원 비밀번호 초기화 및 변경
+    // 회원 정보 변경
     @PatchMapping("/Info")
-    public ResponseEntity<?> editUserInfo(@RequestBody @Valid EditUserInfoDTO editUserInfoDTO, Authentication authentication) {
+    public ResponseEntity<?> editUserInfo(@RequestBody @Valid EditUserInfoDTO editUserInfoDTO,
+        Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
         joinService.editUserInfoProcess(editUserInfoDTO, currentUser);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
     }
 
-    // 회원 비밀번호 초기화 및 변경
+    // 회원 비밀번호 변경
     @PatchMapping("/password")
-    public ResponseEntity<?> editUserPassword(@RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO, Authentication authentication) {
+    public ResponseEntity<?> editUserPassword(
+        @RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO,
+        Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
         joinService.editUserPasswordProcess(editUserPasswordDTO, currentUser);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
@@ -84,13 +87,15 @@ public class UserController {
     // 나의 회원정보 조회
     @GetMapping
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success(joinService.getUserInfo(getCurrentUser(authentication))));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseMessage.success(joinService.getUserInfo(getCurrentUser(authentication))));
     }
 
     // 다른 회원 정보 조회
     @GetMapping("/{userId}")
     public ResponseEntity<?> getOtherUserInfo(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success(joinService.getOtherUserInfo(userId)));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseMessage.success(joinService.getOtherUserInfo(userId)));
     }
 
     @PostMapping("/duplicate")
@@ -124,7 +129,8 @@ public class UserController {
     @GetMapping("/{userId}/profile")
     public ResponseEntity<?> getProfile(@PathVariable Long userId) {
         ProfileResponseDTO profileResponseDTO = profileService.getProfile(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success(profileResponseDTO));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseMessage.success(profileResponseDTO));
     }
 
 }

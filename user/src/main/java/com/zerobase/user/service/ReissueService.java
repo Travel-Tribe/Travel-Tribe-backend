@@ -1,10 +1,12 @@
 package com.zerobase.user.service;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.EXPIRED_TOKEN_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_REFRESH_TOKEN_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_FOUND_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_REFRESH_TOKEN_CATEGORY_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_FOUND_IN_COOKIE_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_IN_DATABASE;
 import static com.zerobase.user.dto.response.BasicErrorCode.TOKEN_VALIDATION_ERROR;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.zerobase.user.entity.RefreshEntity;
 import com.zerobase.user.exception.TokenException;
@@ -18,7 +20,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +36,7 @@ public class ReissueService {
 
         if (refreshToken == null) {
             log.warn("Refresh token not found in cookies");
-            throw new TokenException(REFRESH_TOKEN_ERROR);
+            throw new TokenException(REFRESH_TOKEN_NOT_FOUND_IN_COOKIE_ERROR);
         }
 
         // Refresh 토큰 검증
@@ -117,20 +118,20 @@ public class ReissueService {
             // 토큰이 "refresh" 카테고리인지 확인
             if (!"refresh".equals(jwtUtil.getCategory(refreshToken))) {
                 log.warn("Token is not a refresh token: {}", refreshToken);
-                throw new TokenException(INVALID_REFRESH_TOKEN_ERROR, HttpStatus.BAD_REQUEST);
+                throw new TokenException(INVALID_REFRESH_TOKEN_CATEGORY_ERROR, BAD_REQUEST);
             }
 
             // DB에 Refresh 토큰이 존재하는지 확인
             if (!refreshRepository.existsByRefresh(refreshToken)) {
                 log.warn("Refresh token does not exist in DB: {}", refreshToken);
-                throw new TokenException(REFRESH_TOKEN_NOT_FOUND_ERROR);
+                throw new TokenException(REFRESH_TOKEN_NOT_IN_DATABASE);
             }
         } catch (ExpiredJwtException e) {
             log.warn("Expired refresh token: {}", refreshToken);
             throw new TokenException(EXPIRED_TOKEN_ERROR);
         } catch (Exception e) {
             log.error("Error validating refresh token: {}", refreshToken, e);
-            throw new TokenException(TOKEN_VALIDATION_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new TokenException(TOKEN_VALIDATION_ERROR, INTERNAL_SERVER_ERROR);
         }
     }
 }

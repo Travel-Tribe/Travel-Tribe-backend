@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
@@ -22,7 +21,7 @@ public class ResponseMessage<T> {
     }
 
     public static <T> ResponseMessage<T> success(T data) {
-        return new ResponseMessage<T>(Result.SUCCESS.toString(),null, data);
+        return new ResponseMessage<T>(Result.SUCCESS.toString(), null, data);
     }
 
     public static ResponseMessage fail(ErrorCode errorCode) {

@@ -23,14 +23,14 @@ public class LangAbilityEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public LangAbilityEntity(ProfileEntity profileEntity, String lang) {
-        this.profileEntity = profileEntity;
-        this.lang = lang;
-    }
-
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
     private ProfileEntity profileEntity;
 
     private String lang;
+
+    public LangAbilityEntity(ProfileEntity profileEntity, String lang) {
+        this.profileEntity = profileEntity;
+        this.lang = lang;
+    }
 }

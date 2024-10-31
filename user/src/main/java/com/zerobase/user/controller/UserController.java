@@ -18,10 +18,14 @@ import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
 import com.zerobase.user.jwt.CustomUserDetails;
 import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.service.ReissueService;
 import com.zerobase.user.service.UserService;
 import com.zerobase.user.service.ProfileService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,7 @@ public class UserController {
     private final UserService userService;
     private final ProfileService profileService;
     private final UserRepository userRepository;
+    private final ReissueService reissueService;
 
     private UserEntity getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -60,6 +65,12 @@ public class UserController {
     public ResponseEntity<?> joinProcess(@RequestBody @Valid JoinDTO joinDTO) {
         userService.joinProcess(joinDTO);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+        reissueService.reissue(request, response);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
     }
 
     // 회원 정보 변경

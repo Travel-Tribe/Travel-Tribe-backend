@@ -1,25 +1,30 @@
 package com.zerobase.user.controller;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_AUTHENTICATION_CODE_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
+import com.zerobase.user.dto.request.EmailVerificationDTO;
 import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
+import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
+import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
 import com.zerobase.user.jwt.CustomUserDetails;
 import com.zerobase.user.repository.UserRepository;
-import com.zerobase.user.service.JoinService;
+import com.zerobase.user.service.UserService;
 import com.zerobase.user.service.ProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-    private final JoinService joinService;
+    private final UserService userService;
     private final ProfileService profileService;
     private final UserRepository userRepository;
 
@@ -53,8 +58,8 @@ public class UserController {
     // 회원가입
     @PostMapping
     public ResponseEntity<?> joinProcess(@RequestBody @Valid JoinDTO joinDTO) {
-        joinService.joinProcess(joinDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMessage.success());
+        userService.joinProcess(joinDTO);
+        return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
 
     // 회원 정보 변경
@@ -62,8 +67,34 @@ public class UserController {
     public ResponseEntity<?> editUserInfo(@RequestBody @Valid EditUserInfoDTO editUserInfoDTO,
         Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
-        joinService.editUserInfoProcess(editUserInfoDTO, currentUser);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
+        userService.editUserInfoProcess(editUserInfoDTO, currentUser);
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
+    }
+
+    // 회원 이메일 인증 요청
+    @PostMapping("/change-email/request")
+    public ResponseEntity<?> UserEmailAuthentication(
+        @RequestBody @Valid UserEmailAuthenticationDTO userEmailAuthenticationDTO,
+        Authentication authentication) {
+        getCurrentUser(authentication);
+        userService.userEmailAuthenticationProcess(userEmailAuthenticationDTO);
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
+    }
+
+    // 회원 이메일 인증 코드 검증
+    @PostMapping("/change-email/verify")
+    @Transactional
+    public ResponseEntity<?> verifyEmailCode(@RequestBody @Valid EmailVerificationDTO emailVerificationDTO,  Authentication authentication) {
+        UserEntity currentUser = getCurrentUser(authentication);
+        boolean isVerified = userService.verifyEmailCode(emailVerificationDTO.getEmail(), emailVerificationDTO.getCode());
+
+        if (isVerified) {
+            currentUser.setEmail(emailVerificationDTO.getEmail());
+            return ResponseEntity.ok(ResponseMessage.success());
+        } else {
+            return ResponseEntity.status(BAD_REQUEST)
+                .body(ResponseMessage.fail(INVALID_AUTHENTICATION_CODE_ERROR));
+        }
     }
 
     // 회원 비밀번호 변경
@@ -72,30 +103,40 @@ public class UserController {
         @RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO,
         Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
-        joinService.editUserPasswordProcess(editUserPasswordDTO, currentUser);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
+        userService.editUserPasswordProcess(editUserPasswordDTO, currentUser);
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
+
+    // 회원 비밀번호 초기화
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+        @RequestBody @Valid ResetPasswordEmailDTO resetPasswordDTO){
+        userService.resetPasswordProcess(resetPasswordDTO);
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
+    }
+
+
 
     // 회원 탈퇴
     @DeleteMapping
     public ResponseEntity<?> deleteProcess(Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
-        joinService.deleteProcess(currentUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMessage.success());
+        userService.deleteProcess(currentUser);
+        return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
 
     // 나의 회원정보 조회
     @GetMapping
     public ResponseEntity<?> getUserInfo(Authentication authentication) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseMessage.success(joinService.getUserInfo(getCurrentUser(authentication))));
+        return ResponseEntity.status(OK)
+            .body(ResponseMessage.success(userService.getUserInfo(getCurrentUser(authentication))));
     }
 
     // 다른 회원 정보 조회
     @GetMapping("/{userId}")
     public ResponseEntity<?> getOtherUserInfo(@PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseMessage.success(joinService.getOtherUserInfo(userId)));
+        return ResponseEntity.status(OK)
+            .body(ResponseMessage.success(userService.getOtherUserInfo(userId)));
     }
 
     @PostMapping("/duplicate")
@@ -103,8 +144,8 @@ public class UserController {
         @RequestParam("type") String type,
         @RequestParam("query") String query) {
 
-        // joinService에서 중복 여부를 확인
-        return ResponseEntity.ok(ResponseMessage.success(joinService.checkDuplicate(type, query)));
+        // userService에서 중복 여부를 확인
+        return ResponseEntity.ok(ResponseMessage.success(userService.checkDuplicate(type, query)));
     }
 
     // 프로필 생성
@@ -113,7 +154,7 @@ public class UserController {
         @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
         profileService.createProfile(profileRequest, currentUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseMessage.success());
+        return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
 
     // 프로필 수정
@@ -122,14 +163,14 @@ public class UserController {
         @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
         profileService.editProfile(profileRequest, currentUser);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseMessage.success());
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
 
     // 프로필 조회
     @GetMapping("/{userId}/profile")
     public ResponseEntity<?> getProfile(@PathVariable Long userId) {
         ProfileResponseDTO profileResponseDTO = profileService.getProfile(userId);
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(OK)
             .body(ResponseMessage.success(profileResponseDTO));
     }
 

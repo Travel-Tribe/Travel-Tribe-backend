@@ -1,5 +1,7 @@
 package com.zerobase.user.jwt;
 
+import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
 import com.zerobase.user.dto.response.LoginSuccessDTO;
@@ -146,7 +148,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 로그인 실패 시 401 응답 코드 반환
         try {
             // JSON 응답 생성
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED);
+            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+                LOGIN_FAIL_ERROR);
         } catch (IOException e) {
             log.error("Failed to write the response", e);
         }

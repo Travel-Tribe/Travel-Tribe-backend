@@ -89,7 +89,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         // 경로별 접근 권한 설정
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("api/**","/login", "/", "/join", "/reissue").permitAll()
+                .requestMatchers("api/**", "/login", "/", "/join", "/reissue").permitAll()
 
 //                .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 //                .requestMatchers(HttpMethod.POST, "/posts/**").hasAnyRole("USER", "ADMIN")
@@ -107,7 +107,8 @@ public class SecurityConfig {
         http
             .addFilterAt(
                 new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,
-                    refreshRepository, userRepository, profileRepository, cookieUtil), UsernamePasswordAuthenticationFilter.class);
+                    refreshRepository, userRepository, profileRepository, cookieUtil),
+                UsernamePasswordAuthenticationFilter.class);
 
         http
             .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository),

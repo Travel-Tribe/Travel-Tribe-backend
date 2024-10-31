@@ -26,18 +26,20 @@ import org.springframework.web.filter.GenericFilterBean;
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void doFilter(
-        ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
 
         doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
-    private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    private void doFilter(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws IOException, ServletException {
 
         //path and method verify
         String requestUri = request.getRequestURI();
@@ -69,7 +71,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(REFRESH_TOKEN_NOT_FOUND_ERROR)));
+            response.getWriter().write(objectMapper.writeValueAsString(
+                ResponseMessage.fail(REFRESH_TOKEN_NOT_FOUND_ERROR)));
             return;
         }
 
@@ -79,14 +82,16 @@ public class CustomLogoutFilter extends GenericFilterBean {
         } catch (MalformedJwtException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(INVALID_TOKEN_FORMAT_ERROR)));
+            response.getWriter().write(
+                objectMapper.writeValueAsString(ResponseMessage.fail(INVALID_TOKEN_FORMAT_ERROR)));
             return;
         } catch (ExpiredJwtException e) {
 
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(EXPIRED_TOKEN_ERROR)));
+            response.getWriter()
+                .write(objectMapper.writeValueAsString(ResponseMessage.fail(EXPIRED_TOKEN_ERROR)));
             return;
         }
 
@@ -97,7 +102,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(INVALID_REFRESH_TOKEN_CATEGORY_ERROR)));
+            response.getWriter().write(objectMapper.writeValueAsString(
+                ResponseMessage.fail(INVALID_REFRESH_TOKEN_CATEGORY_ERROR)));
             return;
         }
 
@@ -108,7 +114,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
             //response status code
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.fail(REFRESH_TOKEN_NOT_IN_DATABASE)));
+            response.getWriter().write(objectMapper.writeValueAsString(
+                ResponseMessage.fail(REFRESH_TOKEN_NOT_IN_DATABASE)));
             return;
         }
 

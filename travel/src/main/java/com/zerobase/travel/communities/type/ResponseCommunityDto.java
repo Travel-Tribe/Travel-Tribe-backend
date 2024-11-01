@@ -1,7 +1,7 @@
-package com.zerobase.communities.type;
+package com.zerobase.travel.communities.type;
 
-import com.zerobase.typeCommon.Continent;
-import com.zerobase.typeCommon.Country;
+import com.zerobase.travel.typeCommon.Continent;
+import com.zerobase.travel.typeCommon.Country;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

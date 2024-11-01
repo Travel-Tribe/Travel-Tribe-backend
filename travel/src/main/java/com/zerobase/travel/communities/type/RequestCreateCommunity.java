@@ -1,8 +1,7 @@
-package com.zerobase.communities.type;
+package com.zerobase.travel.communities.type;
 
-import com.zerobase.typeCommon.Continent;
-import com.zerobase.typeCommon.Country;
-import jakarta.validation.constraints.Min;
+import com.zerobase.travel.typeCommon.Continent;
+import com.zerobase.travel.typeCommon.Country;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -11,11 +10,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RequestPostCommunity {
+public class RequestCreateCommunity {
 
-
-    @Min(1)
-    long communityId;
     @NotNull
     Continent continent;
     @NotNull

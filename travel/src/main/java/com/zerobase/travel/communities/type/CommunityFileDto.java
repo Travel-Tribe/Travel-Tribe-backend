@@ -1,6 +1,6 @@
-package com.zerobase.communities.type;
+package com.zerobase.travel.communities.type;
 
-import com.zerobase.communities.entity.CommunityFileEntity;
+import com.zerobase.travel.communities.entity.CommunityFileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

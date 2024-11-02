@@ -4,15 +4,30 @@ server:
 spring:
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            exposedHeaders: "Authorization"
+            allowCredentials: true
       routes:
-        - id: first-service
-          uri: http://localhost:8080/
+        - id: user-service
+          uri: http://localhost:8080
           predicates:
-            - Path=/api/v1/users/**, /login, /logout,
-        - id: second-service
-          uri: http://localhost:8081/
+            - Path=/api/v1/users/**, /login, /logout  # '/api/v1/users' 및 하위 경로 포함
+        # User 모듈로의 요청에는 필터를 적용하지 않음
+        - id: post-service
+          uri: http://localhost:8081
           predicates:
-            - Path=/api/v1/posts/**, /api/v1/reviews, /api/v1/communities, /api/v1/file
+            - Path=/api/v1/posts/**, /api/v1/reviews/**, /api/v1/communities/**, /api/v1/file/**
+          filters:
+            - Jwt
+          # post-service로의 요청에만 JwtFilter 적용
+
+  jwt:
+    secret: dlstoddmsgksqjsQnsdlslchljsdmfekgotkfwkvhrlgkwlakfwk
 #eureka:
 #  client:
 #    register-with-eureka: true

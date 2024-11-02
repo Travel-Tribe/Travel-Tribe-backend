@@ -1,6 +1,6 @@
-package com.zerobase.communities.type;
+package com.zerobase.model;
 
-import com.zerobase.communities.entity.CommunityEntity;
+import com.zerobase.entity.CommunityEntity;
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;
 import lombok.Builder;

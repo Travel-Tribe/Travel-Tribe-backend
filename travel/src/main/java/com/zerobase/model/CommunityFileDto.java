@@ -1,6 +1,6 @@
-package com.zerobase.communities.type;
+package com.zerobase.model;
 
-import com.zerobase.communities.entity.CommunityFileEntity;
+import com.zerobase.entity.CommunityFileEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

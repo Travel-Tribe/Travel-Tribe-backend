@@ -1,6 +1,6 @@
-package com.zerobase.communities.repository;
+package com.zerobase.repository;
 
-import com.zerobase.communities.entity.CommunityFileEntity;
+import com.zerobase.entity.CommunityFileEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

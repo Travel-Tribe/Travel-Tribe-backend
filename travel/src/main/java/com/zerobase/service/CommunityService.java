@@ -1,10 +1,10 @@
-package com.zerobase.communities.service;
+package com.zerobase.service;
 
-import com.zerobase.communities.entity.CommunityEntity;
-import com.zerobase.communities.repository.CommunityRepository;
-import com.zerobase.communities.type.CommunityDto;
-import com.zerobase.communities.type.CustomException;
-import com.zerobase.communities.type.ErrorCode;
+import com.zerobase.repository.CommunityRepository;
+import com.zerobase.entity.CommunityEntity;
+import com.zerobase.model.CommunityDto;
+import com.zerobase.model.type.CustomException;
+import com.zerobase.model.type.ErrorCode;
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;
 import lombok.RequiredArgsConstructor;

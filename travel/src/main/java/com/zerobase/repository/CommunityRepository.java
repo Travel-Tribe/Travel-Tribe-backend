@@ -1,6 +1,6 @@
-package com.zerobase.communities.repository;
+package com.zerobase.repository;
 
-import com.zerobase.communities.entity.CommunityEntity;
+import com.zerobase.entity.CommunityEntity;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

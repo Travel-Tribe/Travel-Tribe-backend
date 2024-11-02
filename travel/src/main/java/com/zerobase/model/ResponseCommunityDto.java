@@ -1,4 +1,4 @@
-package com.zerobase.communities.type;
+package com.zerobase.model;
 
 import com.zerobase.typeCommon.Continent;
 import com.zerobase.typeCommon.Country;

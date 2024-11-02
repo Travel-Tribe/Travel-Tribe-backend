@@ -1,4 +1,4 @@
-package com.zerobase.communities.type;
+package com.zerobase.model.type;
 
 
 import lombok.AllArgsConstructor;

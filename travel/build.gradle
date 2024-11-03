@@ -25,6 +25,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    // Hibernate Spatial, Point
+    implementation 'org.hibernate:hibernate-spatial:5.4.32.Final'
+    implementation 'org.locationtech.jts:jts-core:1.18.2'
+
     runtimeOnly 'com.h2database:h2'
 
     compileOnly 'org.projectlombok:lombok'

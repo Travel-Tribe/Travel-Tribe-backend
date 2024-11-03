@@ -1,4 +1,4 @@
-package com.zerobase.typeCommon;/*
+package com.zerobase.travel.typeCommon;/*
  * Copyright (C) 2012 Neo Visionaries Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

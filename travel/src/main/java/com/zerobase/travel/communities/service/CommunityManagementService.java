@@ -1,15 +1,13 @@
-package com.zerobase.communities.service;
+package com.zerobase.travel.communities.service;
 
-import com.zerobase.communities.type.CommunityDto;
-import com.zerobase.communities.type.CommunityFileDto;
-import com.zerobase.communities.type.RequestCreateCommunity;
-import com.zerobase.communities.type.RequestPostCommunity;
-import com.zerobase.communities.type.ResponseCommunityDto;
-import java.util.ArrayList;
+import com.zerobase.travel.communities.type.CommunityDto;
+import com.zerobase.travel.communities.type.CommunityFileDto;
+import com.zerobase.travel.communities.type.RequestCreateCommunity;
+import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

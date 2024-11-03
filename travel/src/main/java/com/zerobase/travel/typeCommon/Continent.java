@@ -1,4 +1,4 @@
-package com.zerobase.typeCommon;
+package com.zerobase.travel.typeCommon;
 
 import lombok.AllArgsConstructor;
 

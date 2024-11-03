@@ -1,7 +1,7 @@
 package com.zerobase.entity;
 
 import com.zerobase.model.type.KaKaoPayStatus;
-import com.zerobase.model.type.KaoKaoPayMethod;
+import com.zerobase.model.type.PayMethod;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
@@ -21,14 +21,12 @@ public class KakaoPayPaymentHistoryEntity {
 
     @Id
     private Long KakaoPayPaymentHistoryId;
-    private String paymentId;
-    @OneToOne
-    private PaymentHistoryEntity paymentHistoryEntity;
+    private Long paymentId;
     private Long userId;
     private String tid;
     private String partnerOrderId;
     private String partnerUserId;
     private KaKaoPayStatus kaKaoStatus;
-    private KaoKaoPayMethod kaoKaoPayMethod;
-
+    private PayMethod payMethod;
+    private Long amount;
 }

@@ -19,9 +19,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/travel_user?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://travel_mysql:3306/travel_user?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: root
-    password: "*seoksm1017*"
+    password: 1q2w3e4r@@
 
   jwt:
     secret: dlstoddmsgksqjsQnsdlslchljsdmfekgotkfwkvhrlgkwlakfwk

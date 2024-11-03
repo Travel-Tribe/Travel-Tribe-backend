@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 7070
 
 spring:
   cloud:
@@ -14,12 +14,12 @@ spring:
             allowCredentials: true
       routes:
         - id: user-service
-          uri: http://localhost:8080
+          uri: http://10.178.0.4:8080
           predicates:
             - Path=/api/v1/users/**, /login, /logout  # '/api/v1/users' 및 하위 경로 포함
         # User 모듈로의 요청에는 필터를 적용하지 않음
         - id: post-service
-          uri: http://localhost:8081
+          uri: http://10.178.0.4:8081
           predicates:
             - Path=/api/v1/posts/**, /api/v1/reviews/**, /api/v1/communities/**, /api/v1/file/**
           filters:

@@ -1,9 +1,9 @@
-package com.zerobase.communities.controller;
+package com.zerobase.travel.communities.controller;
 
-import com.zerobase.communities.service.CommunityManagementService;
-import com.zerobase.communities.type.RequestCreateCommunity;
-import com.zerobase.communities.type.RequestPostCommunity;
-import com.zerobase.communities.type.ResponseCommunityDto;
+import com.zerobase.travel.communities.service.CommunityManagementService;
+import com.zerobase.travel.communities.type.RequestCreateCommunity;
+import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

@@ -10,6 +10,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity,Long> {
 
     Optional<PaymentEntity> findByPaykey(String tid);
 
-    Optional<PaymentEntity> findByReferencialOrderId(Long referentialOrderId);
+    Optional<PaymentEntity> findByReferentialOrderId(Long referentialOrderId);
+
 
 }

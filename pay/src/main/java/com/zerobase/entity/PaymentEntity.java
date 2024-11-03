@@ -32,6 +32,6 @@ public class PaymentEntity {
     // 여기서는 deposit
     private OrderType referencialOrderType;
     // 여기서는 현재, deposit_id
-    private Long referencialOrderId;
+    private Long referentialOrderId;
 
 }

@@ -11,6 +11,24 @@ repositories {
     mavenCentral()
 }
 
+// profile의 기본값 local로 설정
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+
+// 리소스 폴더 지정
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources-${profile}"
+        }
+    }
+}
+
+tasks {
+    processResources {
+        duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+    }
+}
+
 dependencies {
 
 //    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.1.3'

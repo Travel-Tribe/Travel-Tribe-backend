@@ -1,9 +1,6 @@
-package com.zerobase.model;
+package com.zerobase.model.type;
 
 import com.zerobase.entity.PaymentEntity;
-import com.zerobase.model.type.OrderType;
-import com.zerobase.model.type.PGMethod;
-import com.zerobase.model.type.PaymentStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

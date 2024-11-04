@@ -39,24 +39,27 @@ public class PayController {
 
     }
 
-    // 결제시도후 payDeposit 생성하기
+    // client 결제성공시 url 신호받기
     @PostMapping(value = "/deposit/success")
-    public ResponseEntity<Object> CreatePayDepositSuccess() {
+    public ResponseEntity<Object> PayDepositSuccess(@RequestParam("pg_token") String pgToken) {
+        log.info(" pay deposit success sign from client");
 
         return null;
     }
 
 
-    // 결제시도후 payDeposit 생성하기
+    // client 결제실패시 url 신호받기
     @PostMapping(value = "/deposit/fail")
-    public ResponseEntity<Object> CreatePayDepositFail() {
+    public ResponseEntity<Object> PayDepositFail() {
+        log.info(" pay deposit fail sign from client");
 
         return null;
     }
 
-    // 결제시도후 payDeposit 생성하기
+    // client 결제환불시 url 신호받기
     @PostMapping(value = "/deposit/refund")
-    public ResponseEntity<Object> CreatePayDepositCancel() {
+    public ResponseEntity<Object> PayDepositRefund() {
+        log.info(" pay deposit refund sign from client");
 
         return null;
     }

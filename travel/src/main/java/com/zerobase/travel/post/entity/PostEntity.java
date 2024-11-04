@@ -90,6 +90,7 @@ public class PostEntity {
 
     // Post와 Day 간의 연관관계 설정
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<DayEntity> days = new HashSet<>();
 
     // 연관관계 편의 메서드 for DayEntity

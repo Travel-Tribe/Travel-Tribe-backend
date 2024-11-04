@@ -25,6 +25,7 @@ jobs:
       - name: JDK 17 설정
         uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'  # JDK 배포판 지정 (선택 사항)
           java-version: '17'
         # Java 17 버전의 JDK 설정. Maven을 통해 테스트를 실행할 Java 환경을 준비합니다.
 
@@ -32,59 +33,79 @@ jobs:
       - name: Maven 패키지 캐시
         uses: actions/cache@v3  # 최신 버전으로 업데이트
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-m2
-        # Maven의 .m2 디렉토리를 캐시하여 의존성 다운로드 시간을 줄입니다.
-        # pom.xml 해시값을 기준으로 캐시 키를 생성하여 파일 변경이 없으면 캐시를 재사용합니다.
+        # Maven의 .m2/repository 디렉토리를 캐시하여 의존성 다운로드 시간을 줄입니다.
 
       # 4. 테스트 실행 및 코드 커버리지 리포트 생성
       - name: 테스트 실행 및 코드 커버리지 리포트
         run: mvn test jacoco:report
-        # Maven을 사용해 테스트를 실행하고 JaCoCo 플러그인을 통해 코드 커버리지 리포트를 생성합니다.
+        # Maven을 사용해 테스트를 실행하고 JaCoCo를 통해 코드 커버리지 리포트를 생성합니다.
 
       # 5. 코드 커버리지 리포트 업로드
       - name: 코드 커버리지 리포트 업로드
         uses: actions/upload-artifact@v3  # 최신 버전으로 업데이트
         with:
           name: code-coverage-report
-          path: target/site/jacoco/index.html
-        # 생성된 JaCoCo 리포트를 GitHub Actions의 아티팩트로 업로드하여 Actions 탭에서 확인할 수 있습니다.
+          path: target/site/jacoco
+        # 생성된 JaCoCo 리포트를 GitHub Actions의 아티팩트로 업로드합니다.
 
-      # 6. PR에 코드 커버리지 결과 표시
+      # 6. 코드 커버리지 결과 PR에 표시
       - name: 코드 커버리지 결과 PR에 표시
-        if: always()  # 이전 단계 성공 여부와 관계없이 항상 실행
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           script: |
-            const { exec } = require('child_process');
-            exec("grep -A 1 '<counter type=\"LINE\"' target/site/jacoco/jacoco.xml | grep missed -o -c", (err, stdout, stderr) => {
+            const fs = require('fs');
+            const xml2js = require('xml2js');
+            const parser = new xml2js.Parser();
+
+            fs.readFile('target/site/jacoco/jacoco.xml', (err, data) => {
               if (err) {
-                console.error(err);
+                console.error('JaCoCo 리포트를 읽는 중 오류 발생:', err);
                 return;
               }
-              const missedLines = parseInt(stdout.trim());
-              const coveredLines = parseInt(stdout.trim());
-              const coverage = ((coveredLines / (missedLines + coveredLines)) * 100).toFixed(2);
-              
-              github.rest.issues.createComment({
-                issue_number: context.payload.pull_request.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `### 테스트 및 코드 커버리지 결과\n- 커버리지: ${coverage}%`
+
+              parser.parseString(data, (err, result) => {
+                if (err) {
+                  console.error('JaCoCo 리포트를 파싱하는 중 오류 발생:', err);
+                  return;
+                }
+
+                const counters = result.report.counter;
+                let covered = 0;
+                let missed = 0;
+
+                counters.forEach(counter => {
+                  if (counter.$.type === 'LINE') {
+                    covered = parseInt(counter.$.covered);
+                    missed = parseInt(counter.$.missed);
+                  }
+                });
+
+                const total = covered + missed;
+                const coverage = total > 0 ? ((covered / total) * 100).toFixed(2) : '0.00';
+
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `### 테스트 및 코드 커버리지 결과\n- 커버리지: ${coverage}%`
+                });
               });
             });
-        # JaCoCo XML 리포트에서 커버리지 퍼센티지를 계산하고 이를 PR에 댓글로 표시합니다.
+        # JaCoCo XML 리포트를 파싱하여 커버리지 퍼센티지를 계산하고 이를 PR에 댓글로 표시합니다.
 
       # 7. 테스트 실패 시 PR에 알림
       - name: 테스트 실패 알림
-        if: failure()  # 이전 단계가 실패할 경우 실행
+        if: failure() && github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.payload.pull_request.number,
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '⚠️ 테스트 실패: 코드 커버리지가 부족하거나 문제가 발생했습니다.'

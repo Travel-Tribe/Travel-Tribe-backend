@@ -1,6 +1,8 @@
 package com.zerobase.travel.entity;
 
+import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
+import com.zerobase.travel.type.RatingStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +29,8 @@ public class ParticipationEntity {
     private PostEntity postEntity;
     private String userId;
     private ParticipationStatus participationStatus;
+    private RatingStatus ratingStatus;
+    private DepositStatus depositStatus;
 
 
 

@@ -19,6 +19,6 @@ public class ProfileRequestDTO {
     @NotNull(message = "E01034")
     private LocalDate birth;
     private String fileAddress;  // 파일 주소는 필수가 아닌 경우 그대로 둠
-    private List<String> countryName;
-    private List<String> lang;
+    private List<String> visitedCountries;
+    private List<String> langAbilities;
 }

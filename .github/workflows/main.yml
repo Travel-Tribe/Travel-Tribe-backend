@@ -1,6 +1,5 @@
-name: Java CI with Maven
+name: Java CI with Gradle
 
-# 워크플로우 트리거 설정
 on:
   push:
     branches:
@@ -13,7 +12,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest  # 최신 Ubuntu 가상 환경 설정
+    runs-on: ubuntu-latest
 
     steps:
       # 1. 코드 체크아웃
@@ -25,89 +24,65 @@ jobs:
       - name: JDK 17 설정
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'  # JDK 배포판 지정 (선택 사항)
-          java-version: '17'
-        # Java 17 버전의 JDK 설정. Maven을 통해 테스트를 실행할 Java 환경을 준비합니다.
+          distribution: 'temurin'  # 'temurin'은 오픈JDK 배포 버전입니다.
+          java-version: '17'  # 사용하는 JDK 버전을 설정합니다.
 
-      # 3. Maven 의존성 캐싱
-      - name: Maven 패키지 캐시
-        uses: actions/cache@v3  # 최신 버전으로 업데이트
+      # 3. Gradle 의존성 캐시 설정
+      - name: Gradle 의존성 캐시 설정
+        uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          path: ~/.gradle/caches  # 캐시 경로를 설정합니다.
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-m2
-        # Maven의 .m2/repository 디렉토리를 캐시하여 의존성 다운로드 시간을 줄입니다.
+            ${{ runner.os }}-gradle-
+        # 위 설정을 통해 Gradle의 의존성을 캐시하여 빌드 시간을 절약합니다.
 
       # 4. 테스트 실행 및 코드 커버리지 리포트 생성
-      - name: 테스트 실행 및 코드 커버리지 리포트
-        run: mvn test jacoco:report
-        # Maven을 사용해 테스트를 실행하고 JaCoCo를 통해 코드 커버리지 리포트를 생성합니다.
+      - name: 테스트 실행 및 코드 커버리지 리포트 생성
+        run: ./gradlew test jacocoTestReport
+        # Gradle을 통해 테스트 실행 및 JaCoCo 플러그인으로 코드 커버리지 리포트를 생성합니다.
 
       # 5. 코드 커버리지 리포트 업로드
       - name: 코드 커버리지 리포트 업로드
-        uses: actions/upload-artifact@v3  # 최신 버전으로 업데이트
+        uses: actions/upload-artifact@v3
         with:
           name: code-coverage-report
-          path: target/site/jacoco
-        # 생성된 JaCoCo 리포트를 GitHub Actions의 아티팩트로 업로드합니다.
+          path: build/reports/jacoco/test/html/
+        # 생성된 JaCoCo 리포트를 GitHub Actions에 업로드해 Artifacts 섹션에서 확인 가능하게 합니다.
 
-      # 6. 코드 커버리지 결과 PR에 표시
-      - name: 코드 커버리지 결과 PR에 표시
-        if: github.event_name == 'pull_request'
+      # 6. 코드 커버리지 결과를 PR에 댓글로 표시
+      - name: 코드 커버리지 결과 PR 댓글 표시
+        if: always()
         uses: actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
-            const xml2js = require('xml2js');
-            const parser = new xml2js.Parser();
+            const reportPath = 'build/reports/jacoco/test/jacocoTestReport.xml';
+            if (fs.existsSync(reportPath)) {
+              const xml = fs.readFileSync(reportPath, 'utf-8');
+              const covered = xml.match(/covered="(\d+)"/g).map(num => parseInt(num.match(/\d+/)[0])).reduce((a, b) => a + b, 0);
+              const missed = xml.match(/missed="(\d+)"/g).map(num => parseInt(num.match(/\d+/)[0])).reduce((a, b) => a + b, 0);
+              const coverage = ((covered / (covered + missed)) * 100).toFixed(2);
 
-            fs.readFile('target/site/jacoco/jacoco.xml', (err, data) => {
-              if (err) {
-                console.error('JaCoCo 리포트를 읽는 중 오류 발생:', err);
-                return;
-              }
-
-              parser.parseString(data, (err, result) => {
-                if (err) {
-                  console.error('JaCoCo 리포트를 파싱하는 중 오류 발생:', err);
-                  return;
-                }
-
-                const counters = result.report.counter;
-                let covered = 0;
-                let missed = 0;
-
-                counters.forEach(counter => {
-                  if (counter.$.type === 'LINE') {
-                    covered = parseInt(counter.$.covered);
-                    missed = parseInt(counter.$.missed);
-                  }
-                });
-
-                const total = covered + missed;
-                const coverage = total > 0 ? ((covered / total) * 100).toFixed(2) : '0.00';
-
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: `### 테스트 및 코드 커버리지 결과\n- 커버리지: ${coverage}%`
-                });
+              github.rest.issues.createComment({
+                issue_number: context.payload.pull_request.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `### 테스트 및 코드 커버리지 결과\n- 커버리지: ${coverage}%`
               });
-            });
-        # JaCoCo XML 리포트를 파싱하여 커버리지 퍼센티지를 계산하고 이를 PR에 댓글로 표시합니다.
+            }
+        # 이 스크립트는 JaCoCo XML 리포트를 읽어 커버리지 퍼센티지를 계산하고, 이를 PR에 댓글로 표시합니다.
 
-      # 7. 테스트 실패 시 PR에 알림
+      # 7. 테스트 실패 시 알림 설정
       - name: 테스트 실패 알림
-        if: failure() && github.event_name == 'pull_request'
+        if: failure()
         uses: actions/github-script@v6
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.issue.number,
+              issue_number: context.payload.pull_request.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '⚠️ 테스트 실패: 코드 커버리지가 부족하거나 문제가 발생했습니다.'
-            });
-        # 테스트 실패 시 PR에 알림을 남겨 작성자가 문제를 빠르게 확인할 수 있도록 합니다.
+            })
+        # 테스트 실패 시 PR에 알림을 남겨, 작성자가 문제를 빠르게 확인하고 대응할 수 있도록 합니다.

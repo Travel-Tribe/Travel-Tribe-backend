@@ -146,7 +146,8 @@ public class UserService {
     }
 
 
-    public void userEmailAuthenticationProcess(UserEmailAuthenticationDTO userEmailAuthenticationDTO) {
+    public void userEmailAuthenticationProcess(
+        UserEmailAuthenticationDTO userEmailAuthenticationDTO) {
         String email = userEmailAuthenticationDTO.getEmail();
 
         // 인증 코드 생성 및 저장
@@ -174,12 +175,31 @@ public class UserService {
         Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
         if (optionalUserEntity.isEmpty()) {
             throw new BizException(USER_NOT_FOUND_ERROR);
-        }else{
+        } else {
             UserEntity userEntity = optionalUserEntity.get();
             generateRandomPassword = passwordResetService.generateRandomPassword();
             encryptedPassword = passwordResetService.encryptPassword(generateRandomPassword);
             userEntity.setPassword(encryptedPassword);
         }
         emailService.sendResetPassword(email, generateRandomPassword);
+    }
+
+    public UserInfoResponseDTO findByUserWithEmail(String userEmail) {
+        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(userEmail);
+
+        if (!optionalUserEntity.isPresent()) {
+            throw new BizException(USER_NOT_FOUND_ERROR);
+        }
+
+        UserEntity userEntity = optionalUserEntity.get();
+
+        return UserInfoResponseDTO.builder()
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .email(userEntity.getEmail())
+            .status(userEntity.getStatus())
+            .phone(userEntity.getPhone())
+            .build();
     }
 }

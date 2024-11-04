@@ -65,13 +65,13 @@ public class ProfileService {
         profileRepository.save(profile);
 
         // 방문 국가 저장
-        List<VisitedCountryEntity> countries = request.getCountryName().stream()
+        List<VisitedCountryEntity> countries = request.getVisitedCountries().stream()
             .map(country -> new VisitedCountryEntity(profile, country))
             .collect(Collectors.toList());
         visitedCountryRepository.saveAll(countries);
 
         // 언어 능력 저장
-        List<LangAbilityEntity> languages = request.getLang().stream()
+        List<LangAbilityEntity> languages = request.getLangAbilities().stream()
             .map(lang -> new LangAbilityEntity(profile, lang))
             .collect(Collectors.toList());
         langAbilityRepository.saveAll(languages);
@@ -106,17 +106,17 @@ public class ProfileService {
         }
 
         // 기존 방문 국가와 언어 삭제 및 업데이트
-        if (profileRequest.getCountryName() != null) {
+        if (profileRequest.getVisitedCountries() != null) {
             visitedCountryRepository.deleteAllByProfileEntity(profile);
-            List<VisitedCountryEntity> newCountries = profileRequest.getCountryName().stream()
+            List<VisitedCountryEntity> newCountries = profileRequest.getVisitedCountries().stream()
                 .map(country -> new VisitedCountryEntity(profile, country))
                 .collect(Collectors.toList());
             visitedCountryRepository.saveAll(newCountries);
         }
 
-        if (profileRequest.getLang() != null) {
+        if (profileRequest.getLangAbilities() != null) {
             langAbilityRepository.deleteAllByProfileEntity(profile);
-            List<LangAbilityEntity> newLanguages = profileRequest.getLang().stream()
+            List<LangAbilityEntity> newLanguages = profileRequest.getLangAbilities().stream()
                 .map(lang -> new LangAbilityEntity(profile, lang))
                 .collect(Collectors.toList());
             langAbilityRepository.saveAll(newLanguages);

@@ -26,10 +26,12 @@ public class DayEntity {
 
     // Day와 DayDetail 간의 연관관계 설정
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<DayDetailEntity> dayDetails = new HashSet<>();
 
     // Day와 ItineraryVisit 간의 연관관계 설정
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<ItineraryVisitEntity> itineraryVisits = new HashSet<>();
 
     // 연관관계 편의 메서드 for DayDetailEntity

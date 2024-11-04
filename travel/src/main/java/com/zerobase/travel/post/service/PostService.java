@@ -4,12 +4,15 @@ import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
 import com.zerobase.travel.post.dto.request.ItineraryVisitDTO;
 import com.zerobase.travel.post.dto.request.PostDTO;
+import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
 import com.zerobase.travel.post.entity.ItineraryVisitEntity;
 import com.zerobase.travel.post.entity.PostEntity;
+import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -17,21 +20,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserClient userClient; // FeignClient 주입
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Transactional
     public void createPost(PostDTO postDTO, String userEmail) {
 
         // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
-        //Long userId = userService.findUserIdByEmail(userEmail);
+        // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
+        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        log.info(userInfo.toString());
+        Long userId = userInfo.getId();
 
         PostEntity postEntity = PostEntity.builder()
             .title(postDTO.getTitle())
-            //.userId(userId)
+            .userId(userId)
             .travelStartDate(postDTO.getTravelStartDate())
             .travelEndDate(postDTO.getTravelEndDate())
             .maxParticipants(postDTO.getMaxParticipants())

@@ -1,5 +1,6 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.entity.PostEntity;
@@ -45,7 +46,7 @@ public class ParticipationService {
 
         List<ParticipationStatus> statuses =
             new ArrayList<>(
-                List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN));
+                List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
 
         List<ParticipationEntity> participationEntities
             = participationRepository.findByPostEntityIdAndParticipationStatusIn(

@@ -1,0 +1,92 @@
+name: Java CI with Maven
+
+# 워크플로우 트리거 설정
+on:
+push:
+branches:
+    - main
+      - dev
+pull_request:
+branches:
+    - main
+      - dev
+
+jobs:
+test:
+runs-on: ubuntu-latest  # 가상 환경으로 최신 Ubuntu 설정
+
+steps:
+    # 1. 코드 체크아웃
+      - name: 코드 체크아웃
+uses: actions/checkout@v2
+        # GitHub Actions가 저장소의 코드를 가져옵니다.
+
+      # 2. JDK 설정
+      - name: JDK 17 설정
+uses: actions/setup-java@v2
+with:
+java-version: '17'
+    # Java 17 버전으로 JDK 설정. Maven을 통해 테스트를 실행할 Java 환경을 준비합니다.
+
+      # 3. Maven 캐시 설정
+      - name: Maven 패키지 캐시
+uses: actions/cache@v2
+with:
+path: ~/.m2
+key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+restore-keys: |
+${{ runner.os }}-m2
+        # Maven의 .m2 디렉토리를 캐시하여 의존성 다운로드 시간을 절약합니다.
+        # pom.xml 해시값을 기준으로 캐시 키를 생성하여, 파일 변경이 없으면 캐시를 재사용합니다.
+
+    # 4. 테스트 실행 및 코드 커버리지 리포트 생성
+      - name: 테스트 실행 및 코드 커버리지 리포트
+run: mvn test jacoco:report
+        # Maven을 사용해 테스트 실행 및 JaCoCo 플러그인으로 코드 커버리지 리포트를 생성합니다.
+
+      # 5. 코드 커버리지 리포트 업로드
+      - name: 코드 커버리지 리포트 업로드
+uses: actions/upload-artifact@v2
+with:
+name: code-coverage-report
+path: target/site/jacoco/index.html
+        # 생성된 JaCoCo 리포트를 GitHub Actions에 업로드해 Artifacts 섹션에서 확인 가능하게 합니다.
+
+      # 6. GitHub PR에 코드 커버리지 알림 표시
+      - name: 테스트 및 커버리지 결과 표시
+        if: always()
+uses: actions/github-script@v6
+with:
+script: |
+    const { exec } = require('child_process');
+exec("grep -A 1 '<counter type=\"LINE\"' target/site/jacoco/jacoco.xml | grep missed -o -c", (err, stdout, stderr) => {
+    if (err) {
+    console.error(err);
+                return;
+                    }
+                    const missedLines = parseInt(stdout.trim());
+    const coveredLines = parseInt(stdout.trim());
+    const coverage = ((coveredLines / (missedLines + coveredLines)) * 100).toFixed(2);
+
+              github.rest.issues.createComment({
+    issue_number: context.payload.pull_request.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: `### 테스트 및 코드 커버리지 결과\n- 커버리지: ${coverage}%`
+});
+    });
+    # JaCoCo XML 리포트를 읽고 커버리지 퍼센티지를 계산하여 GitHub PR에 댓글로 표시합니다.
+
+      # 7. GitHub 알림 설정
+      - name: 알림 설정
+        if: failure()
+uses: actions/github-script@v6
+with:
+script: |
+    github.rest.issues.createComment({
+    issue_number: context.payload.pull_request.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: '⚠️ 테스트 실패: 코드 커버리지가 부족하거나 문제가 발생했습니다.'
+})
+    # 실패 시 PR에 알림을 남겨, 작성자가 문제를 빠르게 확인하고 대응할 수 있도록 합니다.

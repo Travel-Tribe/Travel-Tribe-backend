@@ -49,6 +49,8 @@ jobs:
         run: ./gradlew test jacocoTestReport
         # Gradle을 사용해 테스트 실행 및 JaCoCo 플러그인으로 코드 커버리지 리포트를 생성합니다.
 
+
+
       # 6. 코드 커버리지 리포트 업로드
       - name: 코드 커버리지 리포트 업로드
         uses: actions/upload-artifact@v3

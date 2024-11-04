@@ -1,4 +1,4 @@
-package com.zerobase.travel.entity;
+package com.zerobase.travel.type;
 
 public enum ParticipationStatus {
     JOIN_READY,

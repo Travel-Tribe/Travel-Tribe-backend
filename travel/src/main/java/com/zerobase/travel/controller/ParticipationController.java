@@ -1,6 +1,6 @@
 package com.zerobase.travel.controller;
 
-import com.zerobase.travel.service.ParticipationDto;
+import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.service.ParticipationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

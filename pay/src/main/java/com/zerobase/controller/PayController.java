@@ -40,7 +40,7 @@ public class PayController {
     }
 
     // client 결제성공시 url 신호받기
-    @PostMapping(value = "/deposit/success")
+    @GetMapping(value = "/deposit/success")
     public ResponseEntity<Object> PayDepositSuccess(@RequestParam("pg_token") String pgToken) {
         log.info(" pay deposit success sign from client");
 
@@ -49,7 +49,7 @@ public class PayController {
 
 
     // client 결제실패시 url 신호받기
-    @PostMapping(value = "/deposit/fail")
+    @GetMapping(value = "/deposit/fail")
     public ResponseEntity<Object> PayDepositFail() {
         log.info(" pay deposit fail sign from client");
 
@@ -57,7 +57,7 @@ public class PayController {
     }
 
     // client 결제환불시 url 신호받기
-    @PostMapping(value = "/deposit/refund")
+    @GetMapping(value = "/deposit/refund")
     public ResponseEntity<Object> PayDepositRefund() {
         log.info(" pay deposit refund sign from client");
 

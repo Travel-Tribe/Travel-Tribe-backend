@@ -6,16 +6,19 @@ import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
+import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class VoteService {
 
+    private final PostRepository postRepository;
     private final VotingStartRepository votingStartRepository;
     private final VotingRepository votingRepository;
 
@@ -42,6 +45,7 @@ public class VoteService {
         );
     }
 
+    @Transactional
     public void voteVoting(long userId, long postId, long votingStartsId, boolean approval) {
 
         VotingStartEntity votingStartEntity = votingStartRepository.findByPostId(postId)
@@ -73,10 +77,12 @@ public class VoteService {
         );
     }
 
-    //TODO 김용민 validationRegisterRating 작성하기
     private void validationCreateVote(long organizerUserId, long postId) {
 
         //organizerUserId가 postId의 주최자 인지
+        if (!postRepository.existsByPostIdAndUserId(postId, organizerUserId)) {
+            throw new BizException(VoteErrorCode.ONLY_AUTHOR_CAN_START_VOTE);
+        }
 
         //이미 게시된 투표 인지
         if (votingStartRepository.existsByPostId(postId)) {
@@ -94,14 +100,16 @@ public class VoteService {
     //TODO 김용민 validationRegisterRating 작성하기
     private void validationVoteVoting(long userId, long postId, long votingStartsId, VotingStartEntity votingStartEntity) {
         //votingStartsId가 postId의 투표인지
-
-        //userId가 postId 여행에 참여하였는지
+        if (!votingStartRepository.existsByIdAndPostId(votingStartsId, postId)) {
+            throw new BizException(VoteErrorCode.VOTE_NOT_ALLOW_THIS_POST);
+        }
 
         //이미 투표를 하였는지
         if (votingRepository.existsByUserIdAndVotingStartEntity(userId, votingStartEntity)) {
             throw new BizException(VoteErrorCode.ALREADY_VOTE);
         }
 
+        //userId가 postId 여행에 참여하였는지
     }
 
     //TODO 김용민 validationRegisterRating 작성하기

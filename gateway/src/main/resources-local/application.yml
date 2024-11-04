@@ -10,7 +10,7 @@ spring:
             allowedOrigins: "http://localhost:3000"
             allowedMethods: "*"
             allowedHeaders: "*"
-            exposedHeaders: "Authorization, access, X-User-Email, X-User-Role"
+            exposedHeaders: "Authorization, access"
             allowCredentials: true
       routes:
         - id: user-service

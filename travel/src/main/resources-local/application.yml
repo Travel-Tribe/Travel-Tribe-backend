@@ -38,3 +38,5 @@ file:
   upload:
     path: C:\travel\upload
 
+user-service:
+  url: http://localhost:8080

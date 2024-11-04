@@ -16,7 +16,6 @@ import lombok.Data;
 // 예시: PostDTO 클래스에 유효성 검사 추가
 @Data
 public class PostDTO {
-    private Long postId;
 
     @NotBlank(message = "제목은 필수입니다.")
     private String title;

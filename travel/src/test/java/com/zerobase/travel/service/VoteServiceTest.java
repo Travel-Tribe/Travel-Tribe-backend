@@ -182,10 +182,10 @@ class VoteServiceTest {
         long postId = 1L;
         long userId = 2L;
 
-        //when
         given(postRepository.existsByPostIdAndUserId(anyLong(), anyLong()))
             .willReturn(true);
 
+        //when
         given(votingStartRepository.existsByPostId(anyLong()))
             .willReturn(true);
 
@@ -222,13 +222,13 @@ class VoteServiceTest {
         VotingStartEntity votingStartEntity = VotingStartEntity.builder()
             .build();
 
-        //when
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
         given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
             .willReturn(true);
 
+        //when
         given(votingRepository.existsByUserIdAndVotingStartEntity(anyLong(), any()))
             .willReturn(true);
 
@@ -249,10 +249,10 @@ class VoteServiceTest {
         VotingStartEntity votingStartEntity = VotingStartEntity.builder()
             .build();
 
-        //when
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
+        //when
         given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
             .willReturn(false);
 

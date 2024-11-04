@@ -1,4 +1,4 @@
-package com.zerobase.travel.service;
+package com.zerobase.travel.dto;
 
 import com.zerobase.travel.entity.ParticipationEntity;
 import lombok.AllArgsConstructor;

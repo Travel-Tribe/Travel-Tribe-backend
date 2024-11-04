@@ -2,8 +2,12 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.5'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
+jacoco {
+    toolVersion = "0.8.7"  // Use the appropriate version as needed
+}
 group = 'com.zerobase'
 version = '0.0.1-SNAPSHOT'
 
@@ -51,6 +55,16 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
+
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport  // Ensures jacocoTestReport runs after tests
+}
+
+jacocoTestReport {
+    dependsOn test  // Ensures tests run before generating the report
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

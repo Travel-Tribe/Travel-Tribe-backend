@@ -1,6 +1,6 @@
-package com.zerobase.travel.communities.repository;
+package com.zerobase.travel.repository;
 
-import com.zerobase.travel.communities.entity.CommunityFileEntity;
+import com.zerobase.travel.entity.CommunityFileEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

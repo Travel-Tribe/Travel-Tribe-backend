@@ -1,4 +1,4 @@
-package com.zerobase.travel.communities.entity;
+package com.zerobase.travel.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

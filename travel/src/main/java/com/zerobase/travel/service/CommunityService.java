@@ -1,12 +1,12 @@
-package com.zerobase.travel.communities.service;
+package com.zerobase.travel.service;
 
-import com.zerobase.travel.communities.entity.CommunityEntity;
-import com.zerobase.travel.communities.repository.CommunityRepository;
-import com.zerobase.travel.communities.type.CommunityDto;
+import com.zerobase.travel.entity.CommunityEntity;
+import com.zerobase.travel.repository.CommunityRepository;
+import com.zerobase.travel.dto.CommunityDto;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
+import com.zerobase.travel.type.Continent;
+import com.zerobase.travel.type.Country;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

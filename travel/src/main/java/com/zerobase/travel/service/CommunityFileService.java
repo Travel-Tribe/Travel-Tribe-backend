@@ -1,9 +1,9 @@
-package com.zerobase.travel.communities.service;
+package com.zerobase.travel.service;
 
-import com.zerobase.travel.communities.entity.CommunityEntity;
-import com.zerobase.travel.communities.entity.CommunityFileEntity;
-import com.zerobase.travel.communities.repository.CommunityFileRepository;
-import com.zerobase.travel.communities.type.CommunityFileDto;
+import com.zerobase.travel.entity.CommunityEntity;
+import com.zerobase.travel.entity.CommunityFileEntity;
+import com.zerobase.travel.repository.CommunityFileRepository;
+import com.zerobase.travel.dto.CommunityFileDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

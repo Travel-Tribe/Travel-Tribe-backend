@@ -1,6 +1,6 @@
-package com.zerobase.travel.communities.repository;
+package com.zerobase.travel.repository;
 
-import com.zerobase.travel.communities.entity.CommunityEntity;
+import com.zerobase.travel.entity.CommunityEntity;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,10 +1,10 @@
-package com.zerobase.travel.communities.service;
+package com.zerobase.travel.service;
 
-import com.zerobase.travel.communities.type.CommunityDto;
-import com.zerobase.travel.communities.type.CommunityFileDto;
-import com.zerobase.travel.communities.type.RequestCreateCommunity;
-import com.zerobase.travel.communities.type.RequestPostCommunity;
-import com.zerobase.travel.communities.type.ResponseCommunityDto;
+import com.zerobase.travel.dto.CommunityDto;
+import com.zerobase.travel.dto.CommunityFileDto;
+import com.zerobase.travel.dto.request.RequestCreateCommunity;
+import com.zerobase.travel.dto.request.RequestPostCommunity;
+import com.zerobase.travel.dto.response.ResponseCommunityDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

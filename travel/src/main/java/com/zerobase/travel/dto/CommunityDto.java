@@ -1,8 +1,8 @@
-package com.zerobase.travel.communities.type;
+package com.zerobase.travel.dto;
 
-import com.zerobase.travel.communities.entity.CommunityEntity;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
+import com.zerobase.travel.entity.CommunityEntity;
+import com.zerobase.travel.type.Continent;
+import com.zerobase.travel.type.Country;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

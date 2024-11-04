@@ -1,7 +1,7 @@
-package com.zerobase.travel.communities.entity;
+package com.zerobase.travel.entity;
 
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
+import com.zerobase.travel.type.Continent;
+import com.zerobase.travel.type.Country;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

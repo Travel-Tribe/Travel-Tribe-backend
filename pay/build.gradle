@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.5'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'com.zerobase'
@@ -31,6 +32,16 @@ dependencies {
 
 }
 
+
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport  // Ensures jacocoTestReport runs after tests
+}
+
+jacocoTestReport {
+    dependsOn test  // Ensures tests run before generating the report
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

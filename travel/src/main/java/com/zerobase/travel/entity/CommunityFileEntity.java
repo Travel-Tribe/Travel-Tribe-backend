@@ -21,7 +21,7 @@ import lombok.Setter;
 public class CommunityFileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long communityFileId;
     @ManyToOne
     @JoinColumn(name = "community_id",referencedColumnName = "communityId")

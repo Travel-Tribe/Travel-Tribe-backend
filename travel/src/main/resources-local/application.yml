@@ -15,7 +15,7 @@ spring:
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     open-in-view: false
     properties:
       hibernate:

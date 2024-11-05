@@ -4,14 +4,15 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.PERMISSION_
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.POST_NOT_FOUND_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_CALL_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FOUND_ERROR;
-import static com.zerobase.travel.post.dto.request.DayDTO.*;
 
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
 import com.zerobase.travel.post.dto.request.ItineraryVisitDTO;
 import com.zerobase.travel.post.dto.request.PostDTO;
+import com.zerobase.travel.post.dto.request.PostSearchCriteria;
 import com.zerobase.travel.post.dto.response.ResponsePostDTO;
+import com.zerobase.travel.post.dto.response.ResponsePostsDTO;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
@@ -19,15 +20,17 @@ import com.zerobase.travel.post.entity.ItineraryVisitEntity;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
+import com.zerobase.travel.post.specification.PostSpecification;
 import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -190,7 +193,8 @@ public class PostService {
                         .build();
 
                     if (visitDTO.getLatitude() != null && visitDTO.getLongitude() != null) {
-                        Coordinate coordinate = new Coordinate(visitDTO.getLongitude(), visitDTO.getLatitude());
+                        Coordinate coordinate = new Coordinate(visitDTO.getLongitude(),
+                            visitDTO.getLatitude());
                         Point point = geometryFactory.createPoint(coordinate);
                         visitEntity.setPoint(point);
                     }
@@ -275,7 +279,7 @@ public class PostService {
             .limitSmoke(existingPost.getLimitSmoke())
             .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
-            .days(existingPost.getDays().stream().map(dayEntity -> builder()
+            .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
                 .dayDetails(dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
                     .title(dayDetailEntity.getTitle())
                     .description(dayDetailEntity.getDescription())
@@ -286,6 +290,74 @@ public class PostService {
                     .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
                     .orderNumber(visitEntity.getOrderNumber())
                     .build()).collect(Collectors.toList()))
+                .build()).collect(Collectors.toList()))
+            .build();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail) {
+        // 사용자 정보 조회
+        UserInfoResponseDTO userInfo;
+        try {
+            userInfo = userClient.getUserInfoByEmail(userEmail);
+            log.info("User Info: {}", userInfo);
+        } catch (FeignException e) {
+            log.error("userClient 호출 실패: {}", e.getMessage());
+            throw new BizException(USER_INFO_CALL_ERROR);
+        }
+
+        if (userInfo == null) {
+            throw new BizException(USER_NOT_FOUND_ERROR);
+        }
+
+        // Specification 생성
+        Specification<PostEntity> spec = PostSpecification.getPosts(criteria);
+        log.debug("Specification: {}", spec); // Specification 로그 추가
+
+        // 게시글 검색
+        List<PostEntity> posts = postRepository.findAll(spec);
+
+        log.debug("Found Posts: {}", posts.size()); // 검색된 게시글 수 로그 추가
+
+        // DTO 매핑
+        return posts.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    private ResponsePostsDTO mapToDTO(PostEntity existingPost) {
+        return ResponsePostsDTO.builder()
+            .postId(existingPost.getPostId()) // postId 추가
+            .userId(existingPost.getUserId())
+            .title(existingPost.getTitle())
+            .travelStartDate(existingPost.getTravelStartDate())
+            .travelEndDate(existingPost.getTravelEndDate())
+            .maxParticipants(existingPost.getMaxParticipants())
+            .travelCountry(existingPost.getTravelCountry().name()) // Enum을 String으로 변환
+            .continent(existingPost.getContinent().name()) // Enum을 String으로 변환
+            .region(existingPost.getRegion())
+            .accommodationFee(existingPost.getAccommodationFee())
+            .transportationFee(existingPost.getTransportationFee())
+            .airplaneFee(existingPost.getAirplaneFee())
+            .foodFee(existingPost.getFoodFee())
+            .limitMinAge(existingPost.getLimitMinAge())
+            .limitMaxAge(existingPost.getLimitMaxAge())
+            .limitSex(existingPost.getLimitSex().name()) // Enum을 String으로 변환
+            .limitSmoke(existingPost.getLimitSmoke().name()) // Enum을 String으로 변환
+            .preferenceType(existingPost.getPreferenceType())
+            .deadline(existingPost.getDeadline())
+            .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
+                .dayDetails(
+                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
+                        .title(dayDetailEntity.getTitle())
+                        .description(dayDetailEntity.getDescription())
+                        .fileAddress(dayDetailEntity.getFileAddress())
+                        .build()).collect(Collectors.toList()))
+                .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                    .map(visitEntity -> ItineraryVisitDTO.builder()
+                        .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
+                        .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
+                        .orderNumber(visitEntity.getOrderNumber())
+                        .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
     }

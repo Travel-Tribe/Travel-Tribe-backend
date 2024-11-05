@@ -75,9 +75,6 @@ public class PostDTO {
     @NotNull(message = "마감 날짜는 필수입니다.")
     private LocalDate deadline;
 
-    @NotNull(message = "상태는 필수입니다.")
-    private PostStatus status;
-
     @NotEmpty(message = "여행 일정은 최소 1일 이상이어야 합니다.")
     private List<DayDTO> days;
 }

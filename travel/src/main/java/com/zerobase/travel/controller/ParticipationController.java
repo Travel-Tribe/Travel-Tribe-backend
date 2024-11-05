@@ -20,7 +20,7 @@ public class ParticipationController {
 
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
-        @PathVariable Long postId, String userId) {
+        @PathVariable Long postId,  String userId) {
 
         return participationService.createParticipation(postId, userId);
 

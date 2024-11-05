@@ -1,11 +1,13 @@
 package com.zerobase.travel.post.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class DayDTO {
     @NotEmpty(message = "일차 상세는 최소 1개 이상이어야 합니다.")
     private List<DayDetailDTO> dayDetails;

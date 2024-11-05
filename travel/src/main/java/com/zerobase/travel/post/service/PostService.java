@@ -4,12 +4,14 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.PERMISSION_
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.POST_NOT_FOUND_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_CALL_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.travel.post.dto.request.DayDTO.*;
 
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
 import com.zerobase.travel.post.dto.request.ItineraryVisitDTO;
 import com.zerobase.travel.post.dto.request.PostDTO;
+import com.zerobase.travel.post.dto.response.ResponsePostDTO;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
@@ -20,6 +22,7 @@ import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -228,5 +231,62 @@ public class PostService {
 
         // 게시글 삭제
         postRepository.delete(existingPost);
+    }
+
+    @Transactional
+    public ResponsePostDTO findPost(Long postId, String userEmail) {
+        // 게시글 조회
+        PostEntity existingPost = postRepository.findById(postId)
+            .orElseThrow(() -> new BizException(POST_NOT_FOUND_ERROR));
+
+        // 사용자 정보 조회
+        UserInfoResponseDTO userInfo;
+        try {
+            userInfo = userClient.getUserInfoByEmail(userEmail);
+            log.info("User Info: {}", userInfo);
+        } catch (FeignException e) {
+            log.error("userClient 호출 실패: {}", e.getMessage());
+            throw new BizException(USER_INFO_CALL_ERROR);
+        }
+
+        if (userInfo == null) {
+            throw new BizException(USER_NOT_FOUND_ERROR);
+        }
+
+        Long userId = userInfo.getId();
+
+        // ResponsePostDTO 빌드
+        return ResponsePostDTO.builder()
+            .userId(userId)
+            .title(existingPost.getTitle())
+            .travelStartDate(existingPost.getTravelStartDate())
+            .travelEndDate(existingPost.getTravelEndDate())
+            .maxParticipants(existingPost.getMaxParticipants())
+            .travelCountry(existingPost.getTravelCountry())
+            .continent(existingPost.getContinent())
+            .region(existingPost.getRegion())
+            .accommodationFee(existingPost.getAccommodationFee())
+            .transportationFee(existingPost.getTransportationFee())
+            .airplaneFee(existingPost.getAirplaneFee())
+            .foodFee(existingPost.getFoodFee())
+            .limitMinAge(existingPost.getLimitMinAge())
+            .limitMaxAge(existingPost.getLimitMaxAge())
+            .limitSex(existingPost.getLimitSex())
+            .limitSmoke(existingPost.getLimitSmoke())
+            .preferenceType(existingPost.getPreferenceType())
+            .deadline(existingPost.getDeadline())
+            .days(existingPost.getDays().stream().map(dayEntity -> builder()
+                .dayDetails(dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
+                    .title(dayDetailEntity.getTitle())
+                    .description(dayDetailEntity.getDescription())
+                    .fileAddress(dayDetailEntity.getFileAddress())
+                    .build()).collect(Collectors.toList()))
+                .itineraryVisits(dayEntity.getItineraryVisits().stream().map(visitEntity -> ItineraryVisitDTO.builder()
+                    .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
+                    .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
+                    .orderNumber(visitEntity.getOrderNumber())
+                    .build()).collect(Collectors.toList()))
+                .build()).collect(Collectors.toList()))
+            .build();
     }
 }

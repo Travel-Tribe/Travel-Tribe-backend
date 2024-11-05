@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class ParticipationController {
 
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
-        @PathVariable Long postId, String userId) {
+        @PathVariable Long postId, @RequestHeader(value="userId") String userId) {
 
         return participationService.createParticipation(postId, userId);
 
@@ -28,7 +29,7 @@ public class ParticipationController {
 
     // 참여취소
     @GetMapping("{postId}/participations{participationId}")
-    public ResponseEntity<Object> deleteParticipations( @PathVariable Long postId,  String userId ) {
+    public ResponseEntity<Object> deleteParticipations( @PathVariable Long postId,  @RequestHeader(value="userId") String userId ) {
 
         participationService.unjoinWithDepositPenaltyParticipation(postId,userId);
 
@@ -40,7 +41,7 @@ public class ParticipationController {
     // 참여자 조회시에 Status에 Join과 Joinready 둘다 조회가 필요할지? 어떤 상태의 유저가 필요한지 확인필요
     @GetMapping("{postId}/participations")
     public ResponseEntity<List<ParticipationDto>> getParticipations(
-        @PathVariable Long postId) {
+        @PathVariable Long postId ) {
         return ResponseEntity.ok(
             participationService.getParticipationsStatusOfJoinAndJoinReady(postId));
     }

@@ -26,6 +26,16 @@ public class ParticipationController {
 
     }
 
+    // 참여취소
+    @GetMapping("{postId}/participations{participationId}")
+    public ResponseEntity<Object> deleteParticipations( @PathVariable Long postId,  String userId ) {
+
+        participationService.unjoinWithDepositPenaltyParticipation(postId,userId);
+
+        return null;
+    }
+
+
 
     // 참여자 조회시에 Status에 Join과 Joinready 둘다 조회가 필요할지? 어떤 상태의 유저가 필요한지 확인필요
     @GetMapping("{postId}/participations")
@@ -35,11 +45,6 @@ public class ParticipationController {
             participationService.getParticipationsStatusOfJoinAndJoinReady(postId));
     }
 
-    // 참여취소는 정책적으로 디테일한 상의후 구현필요
-    @GetMapping("{postId}/participations{participationId}")
-    public ResponseEntity<Object> deleteParticipations() {
-        return null;
-    }
 
 
 }

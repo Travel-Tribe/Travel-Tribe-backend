@@ -1,7 +1,6 @@
 package com.zerobase.user.jwt;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.CREATE_TOKEN_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.INTERNAL_SERVER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
@@ -100,17 +99,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Long userEntityId = userEntity.getId();
 
         try {
-        //토큰 생성
-        String access = jwtUtil.createJwt("access", email, role, 1800000L, userEntityId);
-        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);
-        log.info("Generated access and refresh tokens for user: {}", email);
+            //토큰 생성
+            String access = jwtUtil.createJwt("access", email, role, 1800000L, userEntityId);
+            String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);
+            log.info("Generated access and refresh tokens for user: {}", email);
 
-        //Refresh 토큰 저장
-        addRefreshEntity(email, refresh, 86400000L);
+            //Refresh 토큰 저장
+            addRefreshEntity(email, refresh, 86400000L);
 
-        //응답 설정
-        response.setHeader("access", access);
-        response.addCookie(cookieUtil.createCookie("refresh", refresh));
+            //응답 설정
+            response.setHeader("access", access);
+            response.addCookie(cookieUtil.createCookie("refresh", refresh));
 
             // JSON 응답 생성
 
@@ -125,10 +124,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .build();
 
             ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_OK, loginSuccessDTO);
-        } catch (IOException e) {
-            log.error("Failed to write the response", e);
-            throw new BizException(ILLEGAL_ARGUMENT__ERROR);
-        }catch (JwtException e) { // jwtUtil.createJwt(...) 에서 발생할 수 있는 예외
+        } catch (JwtException e) { // jwtUtil.createJwt(...) 에서 발생할 수 있는 예외
             log.error("Failed to create JWT token", e);
             throw new BizException(CREATE_TOKEN_ERROR);
         } catch (Exception e) { // 기타 모든 예외

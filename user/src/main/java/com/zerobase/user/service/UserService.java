@@ -13,9 +13,11 @@ import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
 import com.zerobase.user.dto.response.OtherUserInfoResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.EmailVerificationEntity;
+import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
 import com.zerobase.user.repository.EmailVerificationRepository;
+import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.type.Role;
 import com.zerobase.user.type.UserStatus;
@@ -37,6 +39,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailVerificationRepository verificationRepository;
     private final EmailService emailService;
+    private final ProfileRepository profileRepository;
     private final PasswordResetService passwordResetService;
 
     public void joinProcess(JoinDTO joinDTO) {
@@ -109,15 +112,20 @@ public class UserService {
     }
 
     public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
+
         Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
         if (!optionalUserEntity.isPresent()) {
             throw new BizException(USER_NOT_FOUND_ERROR);
         } else {
             UserEntity userEntity = optionalUserEntity.get();
+            Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(userEntity.getId());
+            ProfileEntity profileEntity = optionalProfileEntity.get();
             return OtherUserInfoResponseDTO.builder()
                 .username(userEntity.getUsername())
                 .nickname(userEntity.getNickname())
                 .email(userEntity.getEmail())
+                .ratingAvg(profileEntity.getRatingAvg())
+                .gender(profileEntity.getGender())
                 .status(userEntity.getStatus())
                 .build();
         }

@@ -5,6 +5,7 @@ import com.zerobase.travel.dto.request.ReviewRequestDto;
 import com.zerobase.travel.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +43,19 @@ public class ReviewController {
     ) {
 
         reviewService.modifyReview(request, userEmail, postId, reviewId);
+
+        return ResponseEntity.ok(ResponseMessage.success());
+    }
+
+    @DeleteMapping("/posts/{postId}/reviews/{reviewId}")
+    public ResponseEntity<ResponseMessage<Void>> deleteReview(
+        @RequestHeader("X-User-Email") String userEmail,
+        @PathVariable long postId,
+        @PathVariable long reviewId
+
+    ) {
+
+        reviewService.deleteReview(userEmail, postId, reviewId);
 
         return ResponseEntity.ok(ResponseMessage.success());
     }

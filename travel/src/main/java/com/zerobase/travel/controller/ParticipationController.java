@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class ParticipationController {
 
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
-        @PathVariable Long postId,  String userId) {
+        @PathVariable Long postId, @RequestHeader("userId") String userId) {
 
         return participationService.createParticipation(postId, userId);
 

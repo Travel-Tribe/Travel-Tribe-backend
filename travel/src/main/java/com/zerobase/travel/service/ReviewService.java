@@ -62,6 +62,19 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    public void deleteReview(String userEmail, long postId, long reviewId) {
+
+        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        long userId = userInfo.getId();
+
+        validationDeleteReview(reviewId, userId, postId);
+
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
+
+        reviewRepository.delete(review);
+    }
+
     private void validationCreateReview(long userId, long postId) {
         //후기를 이미 작성하였는지
         if (reviewRepository.existsByUserIdAndPostId(userId, postId)) {
@@ -84,4 +97,18 @@ public class ReviewService {
         }
 
     }
+
+    private void validationDeleteReview(long reviewId, long userId, long postId) {
+        //내가쓴 후기가 맞는지
+        if (!reviewRepository.existsByIdAndUserId(reviewId, userId)) {
+            throw new BizException(ReviewErrorCode.NOT_MY_REVIEW);
+        }
+
+        //삭제하려는 후기가 postid에 해당하는 후기인지
+        if (!reviewRepository.existsByIdAndPostId(reviewId, postId)) {
+            throw new BizException(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST);
+        }
+
+    }
+
 }

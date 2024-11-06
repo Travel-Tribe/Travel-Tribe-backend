@@ -4,41 +4,56 @@ import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.service.ParticipationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(value = "api/v1/posts/")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class ParticipationController {
 
     private final ParticipationService participationService;
 
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
-        @PathVariable Long postId, String userId) {
+        @PathVariable Long postId, @RequestHeader("X-User-Id") String userId) {
+        log.info("createParticipation controller start");
 
         return participationService.createParticipation(postId, userId);
 
     }
 
 
-    // 참여자 조회시에 Status에 Join과 Joinready 둘다 조회가 필요할지? 어떤 상태의 유저가 필요한지 확인필요
+    // 참여자 조회시에 Status에 Join 상태의 유저 확인
     @GetMapping("{postId}/participations")
-    public ResponseEntity<List<ParticipationDto>> getParticipations(
+    public ResponseEntity<List<ParticipationDto>> getParticipationsByPost(
         @PathVariable Long postId) {
+        log.info("getParticipationsByPost controller start");
         return ResponseEntity.ok(
-            participationService.getParticipationsStatusOfJoinAndJoinReady(postId));
+            participationService.getParticipationsStatusOfJoin(postId));
     }
 
-    // 참여취소는 정책적으로 디테일한 상의후 구현필요
+    // 유저들의 완료된 여행에 대해서
+    @GetMapping("/participations/by-userid/{userId}")
+    public ResponseEntity<Integer> getParticipationsCompletedByUserId(
+        @PathVariable String userId) {
+        log.info("getParticipationsCompletedByUserId controller start");
+        return ResponseEntity.ok(
+            participationService.countParticipationsCompletedByUserId(userId));
+    }
+
+    // 참여취소
     @DeleteMapping("{postId}/participations{participationId}")
     public ResponseEntity<Object> deleteParticipations() {
+        log.info("deleteParticipations controller start");
         return ResponseEntity.ok().build();
     }
 

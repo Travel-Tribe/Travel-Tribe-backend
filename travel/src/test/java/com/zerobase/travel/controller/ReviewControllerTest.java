@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,6 +67,43 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.result").value("SUCCESS"));
 
         verify(reviewService, times(1)).createReview(any(), any(), anyLong());
+
+    }
+
+    @Test
+    @WithMockUser
+    void successModifyReview() throws Exception {
+
+        //given
+        long postId = 1L;
+        long reviewId = 1L;
+
+        ReviewRequestDto.ModifyReview.File file1 = new ReviewRequestDto.ModifyReview.File();
+        file1.setFileAddress("/ca/asd/asd");
+
+        ReviewRequestDto.ModifyReview.File file2 = new ReviewRequestDto.ModifyReview.File();
+        file2.setFileAddress("/ca/asd/asd");
+
+        ReviewRequestDto.ModifyReview review = ReviewRequestDto.ModifyReview.builder()
+            .title("서울 여행")
+            .contents("서울 여행 즐거워요.")
+            .continent("ASIA")
+            .country("KR")
+            .region("서울")
+            .files(List.of(file1, file2))
+            .build();
+
+        //when
+        //then
+        mockMvc.perform(put("/api/v1/posts/{postId}/reviews/{reviewId}", postId, reviewId)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(review))
+                .header("X-User-Email", "test@test.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value("SUCCESS"));
+
+        verify(reviewService, times(1)).modifyReview(any(), any(), anyLong(), anyLong());
 
     }
 }

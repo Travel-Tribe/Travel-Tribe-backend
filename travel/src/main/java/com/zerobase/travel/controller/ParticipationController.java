@@ -5,6 +5,7 @@ import com.zerobase.travel.service.ParticipationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,9 +37,9 @@ public class ParticipationController {
     }
 
     // 참여취소는 정책적으로 디테일한 상의후 구현필요
-    @GetMapping("{postId}/participations{participationId}")
+    @DeleteMapping("{postId}/participations{participationId}")
     public ResponseEntity<Object> deleteParticipations() {
-        return null;
+        return ResponseEntity.ok().build();
     }
 
 

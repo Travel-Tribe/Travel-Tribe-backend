@@ -23,11 +23,14 @@ public class ParticipationService {
        2. 최대 개수를 넘겨서는 안될것
      */
     public void validateApplicant() {
+        log.info("participation validation service start ");
+
 
 
     }
 
     public ParticipationDto createParticipation(Long postId, String userId) {
+        log.info("participation creation service start ");
 
         this.validateApplicant();
 
@@ -43,6 +46,7 @@ public class ParticipationService {
 
     public List<ParticipationDto> getParticipationsStatusOfJoinAndJoinReady(
         Long postId) {
+        log.info("participation getParticipationsStatusOfJoinAndJoinReady");
 
         List<ParticipationStatus> statuses =
             new ArrayList<>(

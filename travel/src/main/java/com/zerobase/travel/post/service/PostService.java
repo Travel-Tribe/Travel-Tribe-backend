@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -296,7 +298,7 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public List<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail) {
+    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail,  Pageable pageable) {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
@@ -311,29 +313,20 @@ public class PostService {
             throw new BizException(USER_NOT_FOUND_ERROR);
         }
 
-        // Specification 생성
-        Specification<PostEntity> spec = PostSpecification.getPosts(criteria);
-        log.debug("Specification: {}", spec); // Specification 로그 추가
-
-        // 게시글 검색
-        List<PostEntity> posts = postRepository.findAll(spec);
-
-        log.debug("Found Posts: {}", posts.size()); // 검색된 게시글 수 로그 추가
-
-        // DTO 매핑
-        return posts.stream().map(this::mapToDTO).collect(Collectors.toList());
+        Page<PostEntity> posts = postRepository.findAll(PostSpecification.getPosts(criteria), pageable);
+        return posts.map(this::mapToDTO);
     }
 
     private ResponsePostsDTO mapToDTO(PostEntity existingPost) {
         return ResponsePostsDTO.builder()
-            .postId(existingPost.getPostId()) // postId 추가
+            .postId(existingPost.getPostId())
             .userId(existingPost.getUserId())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())
             .maxParticipants(existingPost.getMaxParticipants())
-            .travelCountry(existingPost.getTravelCountry().name()) // Enum을 String으로 변환
-            .continent(existingPost.getContinent().name()) // Enum을 String으로 변환
+            .travelCountry(existingPost.getTravelCountry().name())
+            .continent(existingPost.getContinent().name())
             .region(existingPost.getRegion())
             .accommodationFee(existingPost.getAccommodationFee())
             .transportationFee(existingPost.getTransportationFee())
@@ -341,23 +334,21 @@ public class PostService {
             .foodFee(existingPost.getFoodFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
-            .limitSex(existingPost.getLimitSex().name()) // Enum을 String으로 변환
-            .limitSmoke(existingPost.getLimitSmoke().name()) // Enum을 String으로 변환
+            .limitSex(existingPost.getLimitSex().name())
+            .limitSmoke(existingPost.getLimitSmoke().name())
             .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
-                .dayDetails(
-                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
-                        .title(dayDetailEntity.getTitle())
-                        .description(dayDetailEntity.getDescription())
-                        .fileAddress(dayDetailEntity.getFileAddress())
-                        .build()).collect(Collectors.toList()))
-                .itineraryVisits(dayEntity.getItineraryVisits().stream()
-                    .map(visitEntity -> ItineraryVisitDTO.builder()
-                        .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
-                        .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
-                        .orderNumber(visitEntity.getOrderNumber())
-                        .build()).collect(Collectors.toList()))
+                .dayDetails(dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
+                    .title(dayDetailEntity.getTitle())
+                    .description(dayDetailEntity.getDescription())
+                    .fileAddress(dayDetailEntity.getFileAddress())
+                    .build()).collect(Collectors.toList()))
+                .itineraryVisits(dayEntity.getItineraryVisits().stream().map(visitEntity -> ItineraryVisitDTO.builder()
+                    .latitude(visitEntity.getPoint().getY())
+                    .longitude(visitEntity.getPoint().getX())
+                    .orderNumber(visitEntity.getOrderNumber())
+                    .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
     }

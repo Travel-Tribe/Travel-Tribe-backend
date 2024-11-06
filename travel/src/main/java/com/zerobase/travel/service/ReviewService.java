@@ -1,14 +1,20 @@
 package com.zerobase.travel.service;
 
 import com.zerobase.travel.dto.request.ReviewRequestDto.CreateReview;
+import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview;
+import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview.File;
+import com.zerobase.travel.entity.ReviewEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReviewErrorCode;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.repository.ReviewFileRepository;
 import com.zerobase.travel.repository.ReviewRepository;
+import com.zerobase.travel.typeCommon.Continent;
+import com.zerobase.travel.typeCommon.Country;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,14 +34,54 @@ public class ReviewService {
         reviewRepository.save(request.toEntity(userId, postId));
     }
 
+    @Transactional
+    public void modifyReview(ModifyReview request, String userEmail, long postId, long reviewId) {
+
+        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        long userId = userInfo.getId();
+
+        validationModifyReview(reviewId, userId, postId);
+
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
+
+        reviewFileRepository.deleteAll(review.getReviewFileList());
+        review.removeReviewFiles();
+
+        review.setTitle(request.getTitle());
+        review.setContents(request.getContents());
+        review.setContinent(Continent.valueOf(request.getContinent()));
+        review.setCountry(Country.valueOf(request.getCountry()));
+        review.setRegion(request.getRegion());
+        review.addReviewFiles(
+            request.getFiles().stream()
+                .map(File::toEntity)
+                .toList()
+        );
+
+        reviewRepository.save(review);
+    }
+
     private void validationCreateReview(long userId, long postId) {
         //후기를 이미 작성하였는지
         if (reviewRepository.existsByUserIdAndPostId(userId, postId)) {
             throw new BizException(ReviewErrorCode.ALREADY_WRITE_REVIEW);
         }
-        
+
         //작성자가 여행을 갔다왔는지
 
     }
 
+    private void validationModifyReview(long reviewId, long userId, long postId) {
+        //내가쓴 후기가 맞는지
+        if (!reviewRepository.existsByIdAndUserId(reviewId, userId)) {
+            throw new BizException(ReviewErrorCode.NOT_MY_REVIEW);
+        }
+
+        //수정하려는 후기가 postid에 해당하는 후기인지
+        if (!reviewRepository.existsByIdAndPostId(reviewId, postId)) {
+            throw new BizException(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST);
+        }
+
+    }
 }

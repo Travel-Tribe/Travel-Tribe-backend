@@ -63,4 +63,9 @@ public class ReviewEntity {
             addReviewFile(reviewFileEntity);
         }
     }
+
+    public void removeReviewFiles() {
+
+        reviewFileList = new ArrayList<>();
+    }
 }

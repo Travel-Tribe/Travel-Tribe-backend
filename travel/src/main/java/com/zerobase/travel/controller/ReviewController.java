@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,20 @@ public class ReviewController {
     ) {
 
         reviewService.createReview(request, userEmail, postId);
+
+        return ResponseEntity.ok(ResponseMessage.success());
+    }
+
+    @PutMapping("/posts/{postId}/reviews/{reviewId}")
+    public ResponseEntity<ResponseMessage<Void>> modifyReview(
+        @RequestHeader("X-User-Email") String userEmail,
+        @PathVariable long postId,
+        @PathVariable long reviewId,
+        @RequestBody ReviewRequestDto.ModifyReview request
+
+    ) {
+
+        reviewService.modifyReview(request, userEmail, postId, reviewId);
 
         return ResponseEntity.ok(ResponseMessage.success());
     }

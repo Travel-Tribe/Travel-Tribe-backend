@@ -225,4 +225,93 @@ class ReviewServiceTest {
         BizException ex = assertThrows(BizException.class, () -> reviewService.modifyReview(review, userEmail, postId, reviewId));
         assertEquals(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST, ex.getErrorCode());
     }
+
+    @Test
+    void successDeleteReview() {
+        //given
+        long postId = 1L;
+        long reviewId = 2L;
+        long userId = 3L;
+        String userEmail = "test@test.com";
+
+        given(userClient.getUserInfoByEmail(any()))
+            .willReturn(UserInfoResponseDTO.builder()
+                .id(userId).build());
+
+        given(reviewRepository.existsByIdAndUserId(anyLong(), anyLong()))
+            .willReturn(true);
+
+        given(reviewRepository.existsByIdAndPostId(anyLong(), anyLong()))
+            .willReturn(true);
+
+        given(reviewRepository.findById(anyLong()))
+            .willReturn(Optional.of(
+                    ReviewEntity.builder()
+                        .id(reviewId)
+                        .userId(userId)
+                        .postId(postId)
+                        .build()
+                )
+            );
+
+        ArgumentCaptor<ReviewEntity> captor = ArgumentCaptor.forClass(ReviewEntity.class);
+
+        //when
+        reviewService.deleteReview(userEmail, postId, reviewId);
+
+        //then
+        verify(reviewRepository, times(1)).delete(captor.capture());
+        assertEquals(reviewId, captor.getValue().getId());
+    }
+
+    @Test
+    @DisplayName("후기 삭제 실패 - 내가 작성한 후기가 아님")
+    void failDeleteReview_1() {
+        //given
+        String userEmail = "test@test.com";
+        long postId = 1L;
+        long reviewId = 2L;
+
+        given(userClient.getUserInfoByEmail(any()))
+            .willReturn(
+                UserInfoResponseDTO.builder()
+                    .id(1L)
+                    .build()
+            );
+
+        //when
+        given(reviewRepository.existsByIdAndUserId(anyLong(), anyLong()))
+            .willReturn(false);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> reviewService.deleteReview(userEmail, postId, reviewId));
+        assertEquals(ReviewErrorCode.NOT_MY_REVIEW, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("후기 삭제 실패 - 수정하는 후기가 postId에 해당하는 후기가 아님")
+    void failDeleteReview_2() {
+        //given
+        String userEmail = "test@test.com";
+        long postId = 1L;
+        long reviewId = 2L;
+
+        given(userClient.getUserInfoByEmail(any()))
+            .willReturn(
+                UserInfoResponseDTO.builder()
+                    .id(1L)
+                    .build()
+            );
+
+        given(reviewRepository.existsByIdAndUserId(anyLong(), anyLong()))
+            .willReturn(true);
+
+        //when
+        given(reviewRepository.existsByIdAndPostId(anyLong(), anyLong()))
+            .willReturn(false);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> reviewService.deleteReview(userEmail, postId, reviewId));
+        assertEquals(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST, ex.getErrorCode());
+    }
 }

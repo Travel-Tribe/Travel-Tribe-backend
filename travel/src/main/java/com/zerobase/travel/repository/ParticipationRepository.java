@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ParticipationRepository extends JpaRepository<ParticipationEntity,Long> {
 
-    List<ParticipationEntity> findByPostEntityPostIdAndParticipationStatusIn(Long postId, List<ParticipationStatus> participationStatuses);
+    List<ParticipationEntity> findByPostEntityPostIdAndParticipationStatus(Long postId, ParticipationStatus participationStatuse);
+
+    int countByParticipationStatusAndUserId(ParticipationStatus participationStatus, String userId);
 }

@@ -42,12 +42,14 @@ public class JwtGatewayFilterFactory extends
                 // 이메일과 역할 정보를 추출하여 헤더에 추가
                 String email = jwtUtil.getEmail(accessToken);
                 String role = jwtUtil.getRole(accessToken);
+                String userId = jwtUtil.getUserId(accessToken);
 
                 // 기존 헤더를 복사하고 새로운 헤더를 추가
                 HttpHeaders headers = new HttpHeaders();
                 headers.putAll(exchange.getRequest().getHeaders());
                 headers.add("X-User-Email", email);
                 headers.add("X-User-Role", role);
+                headers.add("X-User-Id", userId);
 
                 // 새로운 ServerHttpRequestDecorator를 생성하여 헤더를 교체
                 ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {

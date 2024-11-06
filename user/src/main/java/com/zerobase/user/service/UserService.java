@@ -210,4 +210,11 @@ public class UserService {
             .phone(userEntity.getPhone())
             .build();
     }
+
+    @Transactional
+    public void updateUserProfileAvgRating(Long userId, Double avg) {
+        Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(userId);
+        ProfileEntity profileEntity = optionalProfileEntity.get();
+        profileEntity.setRatingAvg(avg);
+    }
 }

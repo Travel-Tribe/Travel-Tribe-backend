@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.OK;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.post.dto.request.PostDTO;
 import com.zerobase.travel.post.dto.request.PostSearchCriteria;
+import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostsDTO;
 import com.zerobase.travel.post.service.PostService;
@@ -13,6 +14,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,7 +84,8 @@ public class PostController {
         @RequestParam(required = false) String continent,
         @RequestParam(required = false) String country,
         @RequestParam(required = false) String mbti,
-        @RequestHeader("X-User-Email") String userEmail
+        @RequestHeader("X-User-Email") String userEmail,
+        @PageableDefault(size = 8, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.info("searchPosts - email: " + userEmail);
 
@@ -101,9 +107,19 @@ public class PostController {
         }
 
         // 검색 수행
-        List<ResponsePostsDTO> postEntities = postService.searchPosts(criteria, userEmail);
+        Page<ResponsePostsDTO> postPage = postService.searchPosts(criteria, userEmail, pageable);
 
-        return ResponseEntity.status(OK).body(ResponseMessage.success(postEntities));
+        // PagedResponseDTO로 변환
+        PagedResponseDTO<ResponsePostsDTO> pagedResponse = PagedResponseDTO.<ResponsePostsDTO>builder()
+            .content(postPage.getContent())
+            .pageNumber(postPage.getNumber())
+            .pageSize(postPage.getSize())
+            .totalElements(postPage.getTotalElements())
+            .totalPages(postPage.getTotalPages())
+            .last(postPage.isLast())
+            .build();
+
+        return ResponseEntity.status(OK).body(ResponseMessage.success(pagedResponse));
     }
 
 }

@@ -17,6 +17,7 @@ import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
+import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
@@ -37,6 +38,9 @@ class VoteServiceTest {
     private VotingStartRepository votingStartRepository;
 
     @Mock
+    private PostRepository postRepository;
+
+    @Mock
     private VotingRepository votingRepository;
 
     @InjectMocks
@@ -49,6 +53,12 @@ class VoteServiceTest {
         long userId = 2L;
 
         ArgumentCaptor<VotingStartEntity> captor = ArgumentCaptor.forClass(VotingStartEntity.class);
+
+        given(postRepository.existsByPostIdAndUserId(anyLong(), anyLong()))
+            .willReturn(true);
+
+        given(votingStartRepository.existsByPostId(anyLong()))
+            .willReturn(false);
 
         //when
         voteService.createVote(userId, postId);
@@ -101,6 +111,9 @@ class VoteServiceTest {
         //when
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
+
+        given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
+            .willReturn(true);
 
         voteService.voteVoting(userId, postId, votingStartsId, approval);
 
@@ -169,6 +182,9 @@ class VoteServiceTest {
         long postId = 1L;
         long userId = 2L;
 
+        given(postRepository.existsByPostIdAndUserId(anyLong(), anyLong()))
+            .willReturn(true);
+
         //when
         given(votingStartRepository.existsByPostId(anyLong()))
             .willReturn(true);
@@ -176,6 +192,22 @@ class VoteServiceTest {
         //then
         BizException ex = assertThrows(BizException.class, () -> voteService.createVote(userId, postId));
         assertEquals(VoteErrorCode.ALREADY_VOTING_START, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("투표 개시 실패 - 모집 게시글의 주최자가 아닙니다")
+    void createVoteFailBy주최자가아닙니다() {
+        //given
+        long postId = 1L;
+        long userId = 2L;
+
+        //when
+        given(postRepository.existsByPostIdAndUserId(anyLong(), anyLong()))
+            .willReturn(false);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> voteService.createVote(userId, postId));
+        assertEquals(VoteErrorCode.ONLY_AUTHOR_CAN_START_VOTE, ex.getErrorCode());
     }
 
     @Test
@@ -190,16 +222,43 @@ class VoteServiceTest {
         VotingStartEntity votingStartEntity = VotingStartEntity.builder()
             .build();
 
-        //when
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
+        given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
+            .willReturn(true);
+
+        //when
         given(votingRepository.existsByUserIdAndVotingStartEntity(anyLong(), any()))
             .willReturn(true);
 
         //then
         BizException ex = assertThrows(BizException.class, () -> voteService.voteVoting(userId, postId, votingStartsId, approval));
         assertEquals(VoteErrorCode.ALREADY_VOTE, ex.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("투표 실패 - 게시글에 해당하는 투표가 아님")
+    void voteVotingFailBy게시글에해당하는투표가아님() {
+        //given
+        long postId = 1L;
+        long userId = 2L;
+        long votingStartsId = 1L;
+        boolean approval = true;
+
+        VotingStartEntity votingStartEntity = VotingStartEntity.builder()
+            .build();
+
+        given(votingStartRepository.findByPostId(anyLong()))
+            .willReturn(Optional.of(votingStartEntity));
+
+        //when
+        given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
+            .willReturn(false);
+
+        //then
+        BizException ex = assertThrows(BizException.class, () -> voteService.voteVoting(userId, postId, votingStartsId, approval));
+        assertEquals(VoteErrorCode.VOTE_NOT_ALLOW_THIS_POST, ex.getErrorCode());
     }
 
 }

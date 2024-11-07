@@ -9,4 +9,6 @@ public interface VotingStartRepository extends JpaRepository<VotingStartEntity, 
     Optional<VotingStartEntity> findByPostId(long postId);
 
     boolean existsByPostId(long postId);
+
+    boolean existsByIdAndPostId(long votingStartsId, long postId);
 }

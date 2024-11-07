@@ -4,13 +4,11 @@ import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
 import static com.zerobase.config.Constants.TAX_FREE_AMOUNT;
 
 import com.zerobase.model.DepositDto;
-import com.zerobase.model.PayReadyApiDto;
 import com.zerobase.model.ResponseApi;
-import com.zerobase.model.ResponseApi.PayRefundApiDto;
+import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentDto;
-import com.zerobase.model.ResponseDepositPayDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +41,7 @@ public class PayManagementService {
 
         // pg 사와 통신을 통해 tid 추출
         ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApiService.sendPayReadySign(
-            participationId, userId);
+            depositDto.getDepositId(), userId);
 
         // tid를 기반으로 결제데이터 생성 & 카카오페이 결제 이력 저장
         PaymentDto payment = paymentService.createPayment(
@@ -55,57 +53,56 @@ public class PayManagementService {
             .postId(depositDto.getPostId())
             .participationId(depositDto.getParticipationId())
             .userId(depositDto.getUserId())
-            .depositStatus(depositDto.getDepositStatus())
             .amount(payment.getAmount())
             .next_redirect_pc_url(payReadyApiDto.getNext_redirect_pc_url())
             .build();
     }
 
-    /* 기능 기획에 대한 상세 회의 진행후 코드 완성진행
 
     /*
-    1. 사용자는 pg사 로부터 결제 인증을 성공하면 성공 url로 연결되어 서버에 tid와 pg token을 전송함
-    2. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
+    1. 사용자는 pg사 로부터 결제 인증을 성공하면 성공 url로 연결되어 queryparam으로 pg token을 전송함
+    2. 이전 단계에서 보낸 tid와 이번에 받은 pgtoken을 사용하여 카카오 서버에 확정 신호를 보냄
+    3. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
 
+     */
 
     @Transactional
     public void successDepositPay(
-        String userId, String tid, String pgToken) {
+        String userId, String pgToken) {
         log.info("success customer DepositPay");
 
-        PaymentDto paymentDto = paymentService.ChangeStatusToCompleteByTid(tid);
+        PaymentDto paymentDto = paymentService.ChangeStatusToCompleteByUserId(
+            userId);
 
-        ResponseApi.PayConfirmDto payConfirmDto;
         try {
-            payConfirmDto = kakaopayApiService.sendPayConfirmSign(
-                tid, paymentDto.getReferentialOrderId(), userId, pgToken);
+            kakaopayApiService.sendPayConfirmSign(
+                paymentDto.getPayKey(), paymentDto.getReferentialOrderId(),
+                userId, pgToken);
         } catch (Exception e) {
             throw new CustomException();
         }
 
-        depositService.changeStatusToCompleteByOrderId(
-            paymentDto.getReferentialOrderId());
 
     }
 
+    /*
     1. 사용자는 pg사 로부터 결제 인증을 성공하면 성공 url로 연결되어 서버에 tid와 pg token을 전송함
     2. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
+*/
 
-
-    @Transactional
     public void failedDepositPay(String tid) {
         log.info("fail customer DepositPay");
 
-        PaymentDto paymentDto = paymentService.ChangeStatusToFailByTid(tid);
-        depositService.changeStatusToFailByOrderId(
-            paymentDto.getReferentialOrderId());
+        paymentService.ChangeStatusToFailByUserId(tid);
+
     }
 
 
 
-        tid 정보를 통해서 server 측에서 pg사에 API를 통해 취소요청이 가능함.
-        client 측에서는 participation을 기준으로 취소요청을 할 것으로 생각됨.
-
+    /*
+    tid 정보를 통해서 server 측에서 pg사에 API를 통해 취소요청이 가능함.
+    client 측에서는 participation을 기준으로 취소요청을 할 것으로 생각됨.
+    */
 
 
     @Transactional
@@ -113,15 +110,14 @@ public class PayManagementService {
         Long participationId) {
         log.info("refund customer DepositPay");
 
-        DepositDto depositDto = depositService.
-            changeStatusToRefundedByParticipationId(participationId);
+        DepositDto depositDto = depositService.findByParticipationId(
+            participationId);
 
         PaymentDto paymentDto = paymentService.
             ChangeStatusToRefundedByOrderId(depositDto.getDepositId());
 
-        PayRefundApiDto payRefundApiDto;
         try {
-            payRefundApiDto = kakaopayApiService.sendPayRefundSign(
+            kakaopayApiService.sendPayRefundSign(
                 paymentDto.getPayKey(), DEPOSIT_AMOUNT, TAX_FREE_AMOUNT);
         } catch (Exception e) {
             throw new CustomException();
@@ -129,7 +125,7 @@ public class PayManagementService {
 
 
     }
-    */
-
-
 }
+
+
+

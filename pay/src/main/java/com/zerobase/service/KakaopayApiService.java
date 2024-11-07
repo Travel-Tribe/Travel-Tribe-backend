@@ -66,7 +66,7 @@ public class KakaopayApiService implements ApiService {
         return payReadyApiDto;
     }
 
-    /*
+
 
     public ResponseApi.PayConfirmDto sendPayConfirmSign(
         String tid, Long orderId, String userId, String pgToken) {
@@ -130,7 +130,7 @@ public class KakaopayApiService implements ApiService {
     }
 
 
-     */
+
 }
 
 

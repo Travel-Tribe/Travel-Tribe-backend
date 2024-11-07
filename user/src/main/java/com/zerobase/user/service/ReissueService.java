@@ -9,8 +9,10 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.zerobase.user.entity.RefreshEntity;
+import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.TokenException;
 import com.zerobase.user.repository.RefreshRepository;
+import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.util.CookieUtil;
 import com.zerobase.user.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -18,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class ReissueService {
 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
     private final CookieUtil cookieUtil;
 
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
@@ -46,9 +50,13 @@ public class ReissueService {
         String email = jwtUtil.getEmail(refreshToken);
         String role = jwtUtil.getRole(refreshToken);
 
+        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
+        UserEntity userEntity = optionalUserEntity.get();
+        Long userEntityId = userEntity.getId();
+
         // 새로운 Access, Refresh 토큰 생성
-        String newAccessToken = jwtUtil.createJwt("access", email, role, 600000L);  // 10분 만료
-        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, 86400000L);  // 1일 만료
+        String newAccessToken = jwtUtil.createJwt("access", email, role, 600000L, userEntityId);  // 10분 만료
+        String newRefreshToken = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);  // 1일 만료
 
         // DB에 새 Refresh 토큰 저장
         updateRefreshToken(email, refreshToken, newRefreshToken);

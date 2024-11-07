@@ -20,12 +20,6 @@ public class RequestApi {
 
         private String tid;
 
-        @JsonProperty("total_amount")
-        private String totalAmount;
-
-        @JsonProperty("tax_free_amount")
-        private String taxFreeAmount;
-
 
         @JsonProperty("partner_order_id")
         private String partnerOrderId;

@@ -6,9 +6,64 @@ Content-Type: application/json
   "postId": "1234",
   "participationId": "1234",
   "userId": "userid",
-  "paymentMethod": "KAKAOPAY"
+  "pgMethod": "KAKAOPAY"
 }
 
+###
+# curl --location 'https://open-api.kakaopay.com/online/v1/payment/ready'
+#--header 'Authorization: SECRET_KEY ${SECRET_KEY}'
+#--header 'Content-Type: application/json'
+#--data '{
+#		"cid": "TC0ONETIME",
+#		"partner_order_id": "partner_order_id",
+#		"partner_user_id": "partner_user_id",
+#		"item_name": "초코파이",
+#		"quantity": "1",
+#		"total_amount": "2200",
+#		"vat_amount": "200",
+#		"tax_free_amount": "0",
+#		"approval_url": "https://developers.kakao.com/success",
+#		"fail_url": "https://developers.kakao.com/fail",
+#		"cancel_url": "https://developers.kakao.com/cancel"
+#	}'
+POST https://open-api.kakaopay.com/online/v1/payment/ready
+Authorization: SECRET_KEY DEVBB2EC55AEA5209485B283C6EAC15502C4B307
+Content-Type: application/json
+
+{
+  "cid": "TC0ONETIME",
+  "partner_order_id": "partner_order_id",
+  "partner_user_id": "partner_user_id",
+  "item_name": "초코파이",
+  "quantity": "1",
+  "total_amount": "2200",
+  "vat_amount": "200",
+  "tax_free_amount": "0",
+  "approval_url": "http://localhost:8080/api/v1/pay/deposit/success",
+  "fail_url": "http://localhost:8080/api/v1/pay/deposit/success",
+  "cancel_url": "http://localhost:8080/api/v1/pay/deposit/success"
+}
+
+### 결제내역 조회하기
+
+GET http://localhost:8080/api/v1/pay/list
+userId: userid
+
+### 성공사인 보내기 ; token은 매 요청마다 변경됨
+http://localhost:8080/api/v1/pay/deposit/success?pg_token=1c980ca5770210f6106f
+userId: userid
 
 
+### 성공사인 보내기 ; token은 매 요청마다 변경됨
+POST https://open-api.kakaopay.com/online/v1/payment/approve
+Authorization: SECRET_KEY DEVBB2EC55AEA5209485B283C6EAC15502C4B307
+Content-Type: application/json
+
+{
+    "cid": "TC0ONETIME",
+    "tid": "T72ab85d05806393ef3d",
+    "partner_order_id": "1",
+    "partner_user_id": "userid",
+    "pg_token": "405f73dc664fd6c8694c"
+}
 

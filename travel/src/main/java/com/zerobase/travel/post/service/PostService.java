@@ -5,6 +5,7 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.POST_NOT_FO
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_CALL_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FOUND_ERROR;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
@@ -43,6 +44,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserClient userClient; // FeignClient 주입
+    private final UserClientService userClientService;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Transactional
@@ -50,7 +52,7 @@ public class PostService {
 
         // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
         // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         log.info(userInfo.toString());
         Long userId = userInfo.getId();
 
@@ -130,7 +132,7 @@ public class PostService {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
-            userInfo = userClient.getUserInfoByEmail(userEmail);
+            userInfo = userClientService.getUserInfo(userEmail);
             log.info("User Info: {}", userInfo);
         } catch (FeignException e) {
             log.error("userClient 호출 실패: {}", e.getMessage());
@@ -217,7 +219,7 @@ public class PostService {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
-            userInfo = userClient.getUserInfoByEmail(userEmail);
+            userInfo = userClientService.getUserInfo(userEmail);
             log.info("User Info: {}", userInfo);
         } catch (FeignException e) {
             log.error("userClient 호출 실패: {}", e.getMessage());
@@ -248,7 +250,7 @@ public class PostService {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
-            userInfo = userClient.getUserInfoByEmail(userEmail);
+            userInfo = userClientService.getUserInfo(userEmail);
             log.info("User Info: {}", userInfo);
         } catch (FeignException e) {
             log.error("userClient 호출 실패: {}", e.getMessage());
@@ -302,7 +304,7 @@ public class PostService {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
-            userInfo = userClient.getUserInfoByEmail(userEmail);
+            userInfo = userClientService.getUserInfo(userEmail);
             log.info("User Info: {}", userInfo);
         } catch (FeignException e) {
             log.error("userClient 호출 실패: {}", e.getMessage());

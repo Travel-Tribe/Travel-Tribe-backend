@@ -24,9 +24,9 @@ public class InternalUserController {
 
     // 프로필 조회
     @GetMapping("/{userEmail}")
-    public ResponseEntity<UserInfoResponseDTO> getUserEmail(@PathVariable String userEmail) {
+    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserEmail(@PathVariable String userEmail) {
         UserInfoResponseDTO byUserWithEmail = userService.findByUserWithEmail(userEmail);
-        return ResponseEntity.status(OK).body(byUserWithEmail);
+        return ResponseEntity.status(OK).body(ResponseMessage.success(byUserWithEmail));
     }
 
     // 사용자 평균평점을 업데이트 시켜주는 기능

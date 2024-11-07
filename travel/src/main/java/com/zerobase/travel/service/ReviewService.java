@@ -3,6 +3,7 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.dto.request.ReviewRequestDto.CreateReview;
 import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview;
 import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview.File;
+import com.zerobase.travel.dto.response.ReviewResponseDto;
 import com.zerobase.travel.entity.ReviewEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReviewErrorCode;
@@ -73,6 +74,24 @@ public class ReviewService {
             .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
 
         reviewRepository.delete(review);
+    }
+
+    public ReviewResponseDto.Review getReview(long postId, long reviewId) {
+
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
+
+        validationGetReview(reviewId, postId);
+        
+        return ReviewResponseDto.Review.fromEntity(review);
+
+    }
+
+    private void validationGetReview(long reviewId, long postId) {
+        //가져오려는 후기가 postid에 해당하는 후기인지
+        if (!reviewRepository.existsByIdAndPostId(reviewId, postId)) {
+            throw new BizException(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST);
+        }
     }
 
     private void validationCreateReview(long userId, long postId) {

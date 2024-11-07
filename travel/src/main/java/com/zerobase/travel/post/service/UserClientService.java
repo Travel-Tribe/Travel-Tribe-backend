@@ -17,7 +17,7 @@ public class UserClientService {
     private final UserClient userClient;
 
     public UserInfoResponseDTO getUserInfo(String userEmail) {
-        ResponseMessage<UserInfoResponseDTO> response = userClient.getUserInfoByEmail(userEmail);
+        ResponseMessage<UserInfoResponseDTO> response = userClient.updateUserRating(userEmail);
         if (response.getResult().equals(SUCCESS.toString())) {
             return response.getData();
         } else {

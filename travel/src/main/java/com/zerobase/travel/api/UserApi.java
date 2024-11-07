@@ -13,7 +13,7 @@ public class UserApi {
     private final UserClient userFeignClient;
 
     public ResponseMessage<Void> updateUserRating(long userId, double rating) {
-        return userFeignClient.getUserInfoByEmail(userId, new UpdateUserRating(rating));
+        return userFeignClient.updateUserRating(userId, new UpdateUserRating(rating));
     }
 
 

@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface UserClient {
 
     @GetMapping("/internal/api/v1/users/{userEmail}")
-    ResponseMessage<UserInfoResponseDTO> getUserInfoByEmail(@PathVariable("userEmail") String userEmail);
+    ResponseMessage<UserInfoResponseDTO> updateUserRating(@PathVariable("userEmail") String userEmail);
 
     @PutMapping("/internal/api/v1/users/{userId}/profile-rating")
-    ResponseMessage<Void> getUserInfoByEmail(
+    ResponseMessage<Void> updateUserRating(
         @PathVariable("userId") long userId,
         @RequestBody UpdateUserRating request
     );

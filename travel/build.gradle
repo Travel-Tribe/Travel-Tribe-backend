@@ -47,6 +47,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.redisson:redisson:3.22.0'
+
 
     // Hibernate Spatial, Point
     implementation 'org.hibernate:hibernate-spatial:6.6.1.Final'

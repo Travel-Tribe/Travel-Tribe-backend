@@ -5,6 +5,7 @@ import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview;
 import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview.File;
 import com.zerobase.travel.dto.response.ReviewResponseDto;
 import com.zerobase.travel.dto.response.ReviewResponseDto.ReviewPage;
+import com.zerobase.travel.post.service.UserClientService;
 import com.zerobase.travel.repository.specification.ReviewSearchDto;
 import com.zerobase.travel.entity.ReviewEntity;
 import com.zerobase.travel.exception.BizException;
@@ -28,11 +29,11 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewFileRepository reviewFileRepository;
-    private final UserClient userClient;
+    private final UserClientService userClientService;
 
     public void createReview(CreateReview request, String userEmail, long postId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationCreateReview(userId, postId);
@@ -43,7 +44,7 @@ public class ReviewService {
     @Transactional
     public void modifyReview(ModifyReview request, String userEmail, long postId, long reviewId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationModifyReview(reviewId, userId, postId);
@@ -70,7 +71,7 @@ public class ReviewService {
 
     public void deleteReview(String userEmail, long postId, long reviewId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationDeleteReview(reviewId, userId, postId);

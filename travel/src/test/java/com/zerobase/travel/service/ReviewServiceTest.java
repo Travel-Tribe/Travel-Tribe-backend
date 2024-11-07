@@ -21,6 +21,7 @@ import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReviewErrorCode;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.UserClient;
+import com.zerobase.travel.post.service.UserClientService;
 import com.zerobase.travel.repository.ReviewFileRepository;
 import com.zerobase.travel.repository.ReviewRepository;
 import com.zerobase.travel.repository.specification.ReviewSearchDto;
@@ -50,7 +51,7 @@ class ReviewServiceTest {
     private ReviewFileRepository reviewFileRepository;
 
     @Mock
-    private UserClient userClient;
+    private UserClientService userClientService;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -76,7 +77,7 @@ class ReviewServiceTest {
             .files(List.of(file1, file2))
             .build();
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(UserInfoResponseDTO.builder()
                 .id(2L).build());
 
@@ -109,7 +110,7 @@ class ReviewServiceTest {
         String userEmail = "test@test.com";
         long postId = 1L;
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(
                 UserInfoResponseDTO.builder()
                     .id(1L)
@@ -148,7 +149,7 @@ class ReviewServiceTest {
             .files(List.of(file1, file2))
             .build();
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(UserInfoResponseDTO.builder()
                 .id(userId).build());
 
@@ -196,7 +197,7 @@ class ReviewServiceTest {
         long postId = 1L;
         long reviewId = 2L;
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(
                 UserInfoResponseDTO.builder()
                     .id(1L)
@@ -221,7 +222,7 @@ class ReviewServiceTest {
         long postId = 1L;
         long reviewId = 2L;
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(
                 UserInfoResponseDTO.builder()
                     .id(1L)
@@ -248,7 +249,7 @@ class ReviewServiceTest {
         long userId = 3L;
         String userEmail = "test@test.com";
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(UserInfoResponseDTO.builder()
                 .id(userId).build());
 
@@ -286,7 +287,7 @@ class ReviewServiceTest {
         long postId = 1L;
         long reviewId = 2L;
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(
                 UserInfoResponseDTO.builder()
                     .id(1L)
@@ -310,7 +311,7 @@ class ReviewServiceTest {
         long postId = 1L;
         long reviewId = 2L;
 
-        given(userClient.getUserInfoByEmail(any()))
+        given(userClientService.getUserInfo(any()))
             .willReturn(
                 UserInfoResponseDTO.builder()
                     .id(1L)

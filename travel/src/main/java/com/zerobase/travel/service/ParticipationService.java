@@ -28,7 +28,7 @@ public class ParticipationService {
        3. 게시글의 상태가 현재 모집중인지 확인
      */
 
-    public void validateApplicant() {
+    public void validateApplicant(String userId) {
         log.info("participation validation service start ");
 
 

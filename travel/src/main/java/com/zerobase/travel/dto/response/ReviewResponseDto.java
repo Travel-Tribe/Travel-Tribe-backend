@@ -69,13 +69,24 @@ public class ReviewResponseDto {
     @ToString
     public static class ReviewPage {
 
-        private Page<Review> reviews;
+        private List<Review> reviews;
+        private int pageNumber;
+        private int pageSize;
+        private long totalElements;
+        private int totalPages;
+        private boolean last;
+
 
         public static ReviewPage fromPageEntity(Page<ReviewEntity> entityPage) {
             return ReviewPage.builder()
                 .reviews(
-                    entityPage.map(ReviewResponseDto.Review::fromEntity)
+                    entityPage.map(ReviewResponseDto.Review::fromEntity).toList()
                 )
+                .pageNumber(entityPage.getNumber())
+                .pageSize(entityPage.getSize())
+                .totalElements(entityPage.getTotalElements())
+                .totalPages(entityPage.getTotalPages())
+                .last(entityPage.isLast())
                 .build();
         }
 

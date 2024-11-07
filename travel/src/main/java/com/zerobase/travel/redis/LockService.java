@@ -21,7 +21,7 @@ public class LockService {
                 log.debug("Lock failed to get for PostId : {}", postId);
             }
         }catch (Exception e){
-            log.error("Redis Lock Failed", e);
+            log.error("Redis Lock Exception", e);
         }
 
     }
@@ -33,7 +33,7 @@ public class LockService {
     }
 
     private static String getLockName(String lockName) {
-        return "TravelPartyPostId" + lockName;
+        return "TravelPartyPostId :" + lockName;
     }
 
 }

@@ -5,6 +5,7 @@ import com.zerobase.travel.communities.type.CommunityFileDto;
 import com.zerobase.travel.communities.type.RequestCreateCommunity;
 import com.zerobase.travel.communities.type.RequestPostCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
+import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,8 @@ public class CommunityManagementService {
     }
 
     //다건 조회
-    public Page<ResponseCommunityDto> getPosts(Pageable pageable) {
+    public PagedResponseDTO<ResponseCommunityDto> getPosts(Pageable pageable) {
+
 
         Page<CommunityDto> communityDtos = communityService.getPosts(pageable);
 
@@ -43,8 +45,27 @@ public class CommunityManagementService {
             -> ResponseCommunityDto.fromEntity(e,
             communityFileService.getFiles(e.getCommunityId())));
 
-         return responseCommunityDtos;
+        return ConvertPageToPagedResponse(
+            responseCommunityDtos);
     }
+
+    private static PagedResponseDTO<ResponseCommunityDto> ConvertPageToPagedResponse(
+        Page<ResponseCommunityDto> responseCommunityDtos) {
+
+        // PagedResponseDTO로 변환
+        PagedResponseDTO<ResponseCommunityDto> pagedResponse
+            = PagedResponseDTO.<ResponseCommunityDto>builder()
+            .content(responseCommunityDtos.getContent())
+            .pageNumber(responseCommunityDtos.getNumber())
+            .pageSize(responseCommunityDtos.getSize())
+            .totalElements(responseCommunityDtos.getTotalElements())
+            .totalPages(responseCommunityDtos.getTotalPages())
+            .last(responseCommunityDtos.isLast())
+            .build();
+
+        return pagedResponse;
+    }
+
 
     // 단건조회
     public ResponseCommunityDto getPost(long communityId) {

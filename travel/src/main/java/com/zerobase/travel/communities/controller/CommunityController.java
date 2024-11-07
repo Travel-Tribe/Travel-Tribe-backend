@@ -4,11 +4,13 @@ import com.zerobase.travel.communities.service.CommunityManagementService;
 import com.zerobase.travel.communities.type.RequestCreateCommunity;
 import com.zerobase.travel.communities.type.RequestPostCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
+import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,8 +41,9 @@ public class CommunityController {
 
     // 커뮤니티 페이지 항상 최신순으로 조회
     @GetMapping
-    public ResponseEntity<Page<ResponseCommunityDto>> getCommunities(
-        Pageable pageable) {
+    public ResponseEntity<PagedResponseDTO<ResponseCommunityDto>> getCommunities(
+        @PageableDefault(size = 8, sort = "communityId", direction = Direction.DESC) Pageable pageable
+    ) {
 
         return ResponseEntity.ok(communityManagementService.getPosts(pageable));
     }
@@ -60,7 +63,7 @@ public class CommunityController {
         @Min(1) @PathVariable long communityId) {
         communityManagementService.deletePost(communityId);
 
-        return null;
+        return ResponseEntity.ok().build();
     }
 
     // 커뮤니티 수정

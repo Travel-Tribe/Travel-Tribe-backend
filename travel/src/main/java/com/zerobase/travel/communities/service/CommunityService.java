@@ -48,7 +48,7 @@ public class CommunityService {
         return CommunityDto.fromEntity(communityEntity);
     }
 
-    // 포스트 다건 조회
+    // 포스트 8건 조회
     public Page<CommunityDto> getPosts(Pageable pageable) {
         Page<CommunityEntity> communityEntities = communityRepository.findAll(
             pageable);

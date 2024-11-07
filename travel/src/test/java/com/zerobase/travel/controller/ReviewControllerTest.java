@@ -181,4 +181,117 @@ class ReviewControllerTest {
         verify(reviewService, times(1)).getReview(anyLong(), anyLong());
 
     }
+
+    @Test
+    @WithMockUser
+    void successGetReviewPage() throws Exception {
+
+        // given
+        // given
+        List<ReviewResponseDto.Review> reviewList = List.of(
+            ReviewResponseDto.Review.builder()
+                .reviewId(1L)
+                .postId(2L)
+                .userId(3L)
+                .continent(Continent.AFRICA.toString())
+                .country(Country.KR.toString())
+                .region("서울")
+                .title("서울 여행")
+                .contents("서울여행 좋아요.")
+                .files(List.of(
+                    ReviewResponseDto.ReviewFile.builder()
+                        .fileAddress("/asd/asd/asd")
+                        .build()
+                ))
+                .build(),
+            ReviewResponseDto.Review.builder()
+                .reviewId(2L)
+                .postId(3L)
+                .userId(4L)
+                .continent(Continent.EUROPE.toString())
+                .country(Country.FR.toString())
+                .region("파리")
+                .title("파리 여행")
+                .contents("파리여행 추천해요.")
+                .files(List.of(
+                    ReviewResponseDto.ReviewFile.builder()
+                        .fileAddress("/qwe/qwe/qwe")
+                        .build()
+                ))
+                .build(),
+            ReviewResponseDto.Review.builder()
+                .reviewId(3L)
+                .postId(4L)
+                .userId(5L)
+                .continent(Continent.ASIA.toString())
+                .country(Country.JP.toString())
+                .region("도쿄")
+                .title("도쿄 여행")
+                .contents("도쿄여행 최고에요.")
+                .files(List.of(
+                    ReviewResponseDto.ReviewFile.builder()
+                        .fileAddress("/xyz/xyz/xyz")
+                        .build()
+                ))
+                .build()
+        );
+
+        ReviewResponseDto.ReviewPage reviewPage = ReviewResponseDto.ReviewPage.builder()
+            .reviews(reviewList)
+            .pageNumber(0)
+            .pageSize(3)
+            .totalElements(10L)
+            .totalPages(4)
+            .last(false)
+            .build();
+
+        given(reviewService.getReviews(any(), any()))
+            .willReturn(reviewPage);
+
+        // when
+        // then
+        mockMvc.perform(get("/api/v1/reviews"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.result").value("SUCCESS"))
+            .andExpect(jsonPath("$.data.pageNumber").value(0))
+            .andExpect(jsonPath("$.data.pageSize").value(3))
+            .andExpect(jsonPath("$.data.totalElements").value(10))
+            .andExpect(jsonPath("$.data.totalPages").value(4))
+            .andExpect(jsonPath("$.data.last").value(false))
+
+            // Review 1
+            .andExpect(jsonPath("$.data.reviews[0].reviewId").value(1L))
+            .andExpect(jsonPath("$.data.reviews[0].postId").value(2L))
+            .andExpect(jsonPath("$.data.reviews[0].userId").value(3L))
+            .andExpect(jsonPath("$.data.reviews[0].continent").value(Continent.AFRICA.toString()))
+            .andExpect(jsonPath("$.data.reviews[0].country").value(Country.KR.toString()))
+            .andExpect(jsonPath("$.data.reviews[0].region").value("서울"))
+            .andExpect(jsonPath("$.data.reviews[0].title").value("서울 여행"))
+            .andExpect(jsonPath("$.data.reviews[0].contents").value("서울여행 좋아요."))
+            .andExpect(jsonPath("$.data.reviews[0].files[0].fileAddress").value("/asd/asd/asd"))
+
+            // Review 2
+            .andExpect(jsonPath("$.data.reviews[1].reviewId").value(2L))
+            .andExpect(jsonPath("$.data.reviews[1].postId").value(3L))
+            .andExpect(jsonPath("$.data.reviews[1].userId").value(4L))
+            .andExpect(jsonPath("$.data.reviews[1].continent").value(Continent.EUROPE.toString()))
+            .andExpect(jsonPath("$.data.reviews[1].country").value(Country.FR.toString()))
+            .andExpect(jsonPath("$.data.reviews[1].region").value("파리"))
+            .andExpect(jsonPath("$.data.reviews[1].title").value("파리 여행"))
+            .andExpect(jsonPath("$.data.reviews[1].contents").value("파리여행 추천해요."))
+            .andExpect(jsonPath("$.data.reviews[1].files[0].fileAddress").value("/qwe/qwe/qwe"))
+
+            // Review 3
+            .andExpect(jsonPath("$.data.reviews[2].reviewId").value(3L))
+            .andExpect(jsonPath("$.data.reviews[2].postId").value(4L))
+            .andExpect(jsonPath("$.data.reviews[2].userId").value(5L))
+            .andExpect(jsonPath("$.data.reviews[2].continent").value(Continent.ASIA.toString()))
+            .andExpect(jsonPath("$.data.reviews[2].country").value(Country.JP.toString()))
+            .andExpect(jsonPath("$.data.reviews[2].region").value("도쿄"))
+            .andExpect(jsonPath("$.data.reviews[2].title").value("도쿄 여행"))
+            .andExpect(jsonPath("$.data.reviews[2].contents").value("도쿄여행 최고에요."))
+            .andExpect(jsonPath("$.data.reviews[2].files[0].fileAddress").value("/xyz/xyz/xyz"));
+
+        verify(reviewService, times(1)).getReviews(any(), any());
+    }
 }

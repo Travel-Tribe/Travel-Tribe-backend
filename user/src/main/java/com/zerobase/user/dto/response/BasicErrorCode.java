@@ -21,7 +21,8 @@ public enum BasicErrorCode implements ErrorCode {
     AUTHENTICATION_CODE_EXPIRED_ERROR("E01026", "인증 코드가 만료되었습니다."),
     INVALID_AUTHENTICATION_CODE_ERROR("E01027", "인증 코드가 유효하지 않습니다."),
     ILLEGAL_EMAIL_ADDRESS_ERROR("E01028", "잘못된 이메일 주소"),
-    EMAIL_SENDING_ERROR("E01029", "이메일 전송 실패");
+    EMAIL_SENDING_ERROR("E01029", "이메일 전송 실패"),
+    CREATE_TOKEN_ERROR("E01030", "토큰 생성 중 오류가 발생했습니다.");
 
     private final String errorCode;
     private final String errorMessage;

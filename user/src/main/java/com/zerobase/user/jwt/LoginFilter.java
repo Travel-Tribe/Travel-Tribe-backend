@@ -1,6 +1,9 @@
 package com.zerobase.user.jwt;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.CREATE_TOKEN_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INTERNAL_SERVER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
@@ -8,12 +11,14 @@ import com.zerobase.user.dto.response.LoginSuccessDTO;
 import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.RefreshEntity;
 import com.zerobase.user.entity.UserEntity;
+import com.zerobase.user.exception.BizException;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.RefreshRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.util.CookieUtil;
 import com.zerobase.user.util.JWTUtil;
 import com.zerobase.user.util.ResponseUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -89,23 +94,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        //토큰 생성
-        String access = jwtUtil.createJwt("access", email, role, 1800000L);
-        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
-        log.info("Generated access and refresh tokens for user: {}", email);
-
-        //Refresh 토큰 저장
-        addRefreshEntity(email, refresh, 86400000L);
-
-        //응답 설정
-        response.setHeader("access", access);
-        response.addCookie(cookieUtil.createCookie("refresh", refresh));
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+        Long userEntityId = userEntity.getId();
 
         try {
+            //토큰 생성
+            String access = jwtUtil.createJwt("access", email, role, 1800000L, userEntityId);
+            String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);
+            log.info("Generated access and refresh tokens for user: {}", email);
+
+            //Refresh 토큰 저장
+            addRefreshEntity(email, refresh, 86400000L);
+
+            //응답 설정
+            response.setHeader("access", access);
+            response.addCookie(cookieUtil.createCookie("refresh", refresh));
+
             // JSON 응답 생성
-            Optional<UserEntity> OptionalUserEntity = userRepository.findByEmail(email);
-            UserEntity userEntity = OptionalUserEntity.get();
-            Long userEntityId = userEntity.getId();
 
             Optional<ProfileEntity> OptionalProfileEntity = profileRepository.findByUserId(
                 userEntityId);
@@ -118,8 +124,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .build();
 
             ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_OK, loginSuccessDTO);
-        } catch (IOException e) {
-            log.error("Failed to write the response", e);
+        } catch (JwtException e) { // jwtUtil.createJwt(...) 에서 발생할 수 있는 예외
+            log.error("Failed to create JWT token", e);
+            throw new BizException(CREATE_TOKEN_ERROR);
+        } catch (Exception e) { // 기타 모든 예외
+            log.error("Unexpected error during authentication", e);
+            throw new BizException(INTERNAL_SERVER_ERROR);
         }
 
         log.debug("Access and refresh tokens sent in response for user: {}", email);

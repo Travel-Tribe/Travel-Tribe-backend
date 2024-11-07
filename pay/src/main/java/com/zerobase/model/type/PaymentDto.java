@@ -25,6 +25,7 @@ public class PaymentDto {
             .referencialOrderType(paymentEntity.getReferencialOrderType())
             .referentialOrderId(paymentEntity.getReferentialOrderId())
             .userId(paymentEntity.getUserId())
+            .payKey(paymentEntity.getPaykey())
             .amount(paymentEntity.getAmount())
             .pgMethod(paymentEntity.getPgMethod())
             .paymentStatus(paymentEntity.getPaymentStatus())

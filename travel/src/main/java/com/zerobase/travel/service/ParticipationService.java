@@ -5,8 +5,12 @@ import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.entity.PostEntity;
-import com.zerobase.travel.repository.ParticipationRepository;
+
+import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
+import com.zerobase.travel.repository.ParticipationRepository;
+import com.zerobase.travel.type.RatingStatus;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,16 +27,20 @@ public class ParticipationService {
        1. 인당 최대 두개 참여가능
        2. 최대 개수를 넘겨서는 안될것
        3. 여러가지 취향에 따른 제한들
+              3. 게시글의 상태가 현재 모집중인지 확인
      */
     public void validateApplicant(String userId) {
         if(this.countParticipationsJoinByUserId(userId)>=2){
+                  log.info("participation validation service start ");
             throw new CustomException(ErrorCode.PARTICIPATION_LIMIT);
         }
 
 
     }
 
+    // 참여를 시키는 기능
     public ParticipationDto createParticipation(Long postId, String userId) {
+        log.info("participation creation service start ");
 
         this.validateApplicant(userId);
 
@@ -40,6 +48,8 @@ public class ParticipationService {
             .postEntity(PostEntity.builder().postId(postId).build())
             .userId(userId)
             .participationStatus(ParticipationStatus.JOIN)
+            .ratingStatus(RatingStatus.NOT_RATED)
+            .depositStatus(DepositStatus.DEPOSIT_PAID)
             .build();
 
         return ParticipationDto.fromEntity(
@@ -48,6 +58,7 @@ public class ParticipationService {
 
     public List<ParticipationDto> getParticipationsStatusOfJoin(
         Long postId) {
+        log.info("participation getParticipationsStatusOfJoinAndJoin");
 
 
         List<ParticipationEntity> participationEntities
@@ -57,6 +68,59 @@ public class ParticipationService {
         return participationEntities.stream().map(ParticipationDto::fromEntity)
             .toList();
     }
+
+    // 한명이 여행을 중도 포기하고 DEPOSIT을 반환받지못함
+    public void unjoinWithDepositPenaltyParticipation(Long postId, String userId) {
+        ParticipationEntity participationEntity = participationRepository.findByPostEntityPostIdAndUserId(
+                postId, userId)
+            .orElseThrow(
+                () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+        participationEntity.setParticipationStatus(ParticipationStatus.UNJOIN);
+        participationEntity.setDepositStatus(DepositStatus.DEPOSIT_TAKEN);
+        participationRepository.save(participationEntity);
+    }
+
+
+    // 한명이 rating을 주는 경우
+    public void giveRatingParticipation(Long postId, String userId) {
+        ParticipationEntity participationEntity = participationRepository.findByPostEntityPostIdAndUserId(
+                postId, userId)
+            .orElseThrow(
+                () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+        participationEntity.setRatingStatus(RatingStatus.RATED);
+        participationRepository.save(participationEntity);
+    }
+
+    // 모든 인원이 여행을 완료하는 경우 ; saveAll할시에 error 발생
+    public void travelFinishedParticipation(Long postId) {
+        List<ParticipationEntity> participationEntities = participationRepository
+            .findAllByPostEntityPostIdAndParticipationStatus(postId,
+                ParticipationStatus.JOIN);
+
+        for (ParticipationEntity participationEntity : participationEntities) {
+            participationEntity.setParticipationStatus(ParticipationStatus.TRAVEL_FINISHED);
+            participationRepository.save(participationEntity);
+        }
+    }
+
+    // 모든 인원이 합의하에 여행을 취소하는 경우 ; saveAll할시에 error 발생
+    public void unJoinAllWithouㅅPenalrtyParticipation(Long postId) {
+        List<ParticipationEntity> participationEntities = participationRepository
+            .findAllByPostEntityPostIdAndParticipationStatus(postId,
+                ParticipationStatus.JOIN);
+
+        for (ParticipationEntity participationEntity : participationEntities) {
+            participationEntity.setParticipationStatus(ParticipationStatus.UNJOIN);
+            participationEntity.setDepositStatus(DepositStatus.DEPOSIT_RETURNED);
+
+            participationRepository.save(participationEntity);
+        }
+    }
+
+
+
 
 
     public int countParticipationsCompletedByUserId(String userId) {

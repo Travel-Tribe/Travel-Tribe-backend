@@ -28,6 +28,11 @@ public class JWTUtil {
         return claims.get("email", String.class);
     }
 
+    public String getUserId(String token) {
+        Claims claims = parseToken(token);
+        return claims.get("userId", String.class);
+    }
+
     // 토큰에서 역할(Role)을 추출하는 메서드
     public String getRole(String token) {
         Claims claims = parseToken(token);

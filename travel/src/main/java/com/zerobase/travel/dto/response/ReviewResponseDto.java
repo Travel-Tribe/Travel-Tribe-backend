@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.domain.Page;
 
 public class ReviewResponseDto {
 
@@ -62,5 +63,21 @@ public class ReviewResponseDto {
         }
     }
 
+    @Getter
+    @Setter
+    @Builder
+    @ToString
+    public static class ReviewPage {
 
+        private Page<Review> reviews;
+
+        public static ReviewPage fromPageEntity(Page<ReviewEntity> entityPage) {
+            return ReviewPage.builder()
+                .reviews(
+                    entityPage.map(ReviewResponseDto.Review::fromEntity)
+                )
+                .build();
+        }
+
+    }
 }

@@ -17,7 +17,7 @@ import lombok.Setter;
 public class ResponseCommunityDto {
 
     long communityId;
-    long userId;
+    String userId;
     Continent continent;
     Country country;
     String region;

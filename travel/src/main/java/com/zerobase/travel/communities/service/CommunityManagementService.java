@@ -23,11 +23,12 @@ public class CommunityManagementService {
 
     // 포스트 생성
     @Transactional
-    public ResponseCommunityDto createPost(RequestCreateCommunity request) {
+    public ResponseCommunityDto createPost(RequestCreateCommunity request,
+        String userId) {
 
         CommunityDto communityDto = communityService.createPost(
             request.getContinent(),request.getCountry(),request.getRegion(),
-            request.getTitle(),request.getContent());
+            request.getTitle(),request.getContent(),userId);
 
         List<CommunityFileDto> communityFileDtos
             = communityFileService.saveFiles(communityDto.getCommunityId(),request.getFiles());
@@ -79,19 +80,21 @@ public class CommunityManagementService {
 
     //단건 삭제
     @Transactional
-    public void deletePost(long communityId) {
-        communityService.deletePost(communityId);
+    public void deletePost(long communityId, String userId) {
+        communityService.deletePost(communityId,userId);
         communityFileService.deleteAllByCommunityId(communityId);
 
 
     }
 
     @Transactional
-    public ResponseCommunityDto updatePost( RequestPostCommunity request) {
+    public ResponseCommunityDto updatePost( RequestPostCommunity request,
+        String userId) {
+
 
         CommunityDto communityDto = communityService.updatePost(request.getCommunityId(),
             request.getContinent(),request.getCountry(),request.getRegion(),
-            request.getTitle(),request.getContent());
+            request.getTitle(),request.getContent(),userId);
 
         communityFileService.deleteAllByCommunityId(request.getCommunityId());
 

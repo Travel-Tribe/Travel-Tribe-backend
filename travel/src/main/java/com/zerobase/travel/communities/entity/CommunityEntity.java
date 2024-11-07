@@ -33,7 +33,7 @@ public class CommunityEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long communityId;
     @Column(nullable = false)
-    private Long userId;
+    private String userId;
     @Enumerated(EnumType.STRING)
     private Continent continent;
     @Enumerated(EnumType.STRING)

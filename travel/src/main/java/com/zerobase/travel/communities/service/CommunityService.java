@@ -7,6 +7,7 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +22,13 @@ public class CommunityService {
 
     public CommunityDto createPost(Continent continent,
         Country country, String region,
-        String title, String content) {
+        String title, String content, String userId) {
 
         CommunityEntity entity = communityRepository.
             save(
                 CommunityEntity
                     .builder()
-                    .userId(123L)
+                    .userId(userId)
                     .continent(continent)
                     .country(country)
                     .region(region)
@@ -61,17 +62,24 @@ public class CommunityService {
 
 
 
-    public void deletePost(long communityId) {
+    public void deletePost(long communityId, String userId) {
+
+        communityRepository.findByUserId(userId).orElseThrow(()
+            -> new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST));
+
         communityRepository.deleteByCommunityId(communityId);
     }
 
     public CommunityDto updatePost(long communityId, Continent continent,
         Country country,
-        String region, String title, String content) {
+        String region, String title, String content, String userId) {
 
         CommunityEntity communityEntity = communityRepository.findByCommunityId(
             communityId).orElseThrow(()
             -> new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT));
+
+        if(!Objects.equals(communityEntity.getUserId(), userId))
+            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
 
         communityEntity.setContinent(continent);
         communityEntity.setCountry(country);

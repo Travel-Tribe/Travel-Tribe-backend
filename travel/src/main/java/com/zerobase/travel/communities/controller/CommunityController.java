@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,10 +34,10 @@ public class CommunityController {
     @PostMapping
     public ResponseEntity<ResponseCommunityDto> createCommunity(
         @Valid @RequestBody
-        RequestCreateCommunity request) {
+        RequestCreateCommunity request, @RequestHeader("X-User-Id") String userId) {
 
         return ResponseEntity.ok
-            (communityManagementService.createPost(request));
+            (communityManagementService.createPost(request,userId));
     }
 
     // 커뮤니티 페이지 항상 최신순으로 조회
@@ -60,8 +61,8 @@ public class CommunityController {
     // 커뮤니티 삭제
     @DeleteMapping(value = "/{communityId}")
     public ResponseEntity<ResponseCommunityDto> deleteCommunity(
-        @Min(1) @PathVariable long communityId) {
-        communityManagementService.deletePost(communityId);
+        @Min(1) @PathVariable long communityId,@RequestHeader("X-User-Id") String userId) {
+        communityManagementService.deletePost(communityId,userId);
 
         return ResponseEntity.ok().build();
     }
@@ -69,9 +70,9 @@ public class CommunityController {
     // 커뮤니티 수정
     @PutMapping(value = "/{communityId}")
     public ResponseEntity<ResponseCommunityDto> updateCommunity(
-        @Valid @RequestBody RequestPostCommunity request) {
+        @Valid @RequestBody RequestPostCommunity request,@RequestHeader("X-User-Id") String userId) {
         return ResponseEntity.ok(
-            communityManagementService.updatePost(request));
+            communityManagementService.updatePost(request,userId));
     }
 
 

@@ -21,7 +21,9 @@ public class ParticipationController {
 
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
-        @PathVariable Long postId, @RequestHeader(value="userId") String userId) {
+
+        @PathVariable Long postId, @RequestHeader("userId") String userId) {
+
 
         return participationService.createParticipation(postId, userId);
 

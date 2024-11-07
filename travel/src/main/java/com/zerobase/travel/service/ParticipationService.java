@@ -27,15 +27,16 @@ public class ParticipationService {
        2. 게시글에서의 제한조건을 검사하여 가져옴
        3. 게시글의 상태가 현재 모집중인지 확인
      */
-    // 참여조건을 검사하는 기능
-    public void validateApplicant( String userId) {
-        // user profile 로부터 게시글 개수를 검사해서 찾아옴
+
+    public void validateApplicant() {
+        log.info("participation validation service start ");
 
 
     }
 
     // 참여를 시키는 기능
     public ParticipationDto createParticipation(Long postId, String userId) {
+        log.info("participation creation service start ");
 
         this.validateApplicant(userId);
 
@@ -54,6 +55,7 @@ public class ParticipationService {
     // 게시글의 참여자 목록을 보는 기능
     public List<ParticipationDto> getParticipationsStatusOfJoinAndJoinReady(
         Long postId) {
+        log.info("participation getParticipationsStatusOfJoinAndJoinReady");
 
         List<ParticipationStatus> statuses =
             new ArrayList<>(

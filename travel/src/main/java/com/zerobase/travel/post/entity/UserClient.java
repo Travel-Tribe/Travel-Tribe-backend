@@ -1,5 +1,6 @@
 package com.zerobase.travel.post.entity;
 
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,5 +11,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface UserClient {
 
     @GetMapping("/internal/api/v1/users/{userEmail}")
-    UserInfoResponseDTO getUserInfoByEmail(@PathVariable("userEmail") String userEmail);
+    ResponseMessage<UserInfoResponseDTO> getUserInfoByEmail(@PathVariable("userEmail") String userEmail);
 }

@@ -14,10 +14,19 @@ import org.springframework.stereotype.Component;
 public class LockAopAspect {
     private final LockService lockService;
 
-    @Around("@annotation(com.zerobase.travel.redis.PostLock)")
-    public Object aroundMethod(ProceedingJoinPoint pjp) throws Throwable {
+    @Around("@annotation(com.zerobase.travel.redis.PostLock) && args(request)")
+    public Object aroundMethod(
+        ProceedingJoinPoint pjp, PostLockIdInterface request) throws Throwable {
+        // lock 취득시도
+        lockService.lock(request.getPostLockId());
 
-        return null;
+        try{
+            return pjp.proceed();
+        }finally{
+            // lock 해체
+            lockService.unlock(request.getPostLockId());
+
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.entity.PostEntity;
+
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.repository.ParticipationRepository;
@@ -24,12 +25,15 @@ public class ParticipationService {
 
     /*
        1. 인당 최대 두개 참여가능
-       2. 게시글에서의 제한조건을 검사하여 가져옴
-       3. 게시글의 상태가 현재 모집중인지 확인
+       2. 최대 개수를 넘겨서는 안될것
+       3. 여러가지 취향에 따른 제한들
+              3. 게시글의 상태가 현재 모집중인지 확인
      */
-
     public void validateApplicant(String userId) {
-        log.info("participation validation service start ");
+        if(this.countParticipationsJoinByUserId(userId)>=2){
+                  log.info("participation validation service start ");
+            throw new CustomException(ErrorCode.PARTICIPATION_LIMIT);
+        }
 
 
     }
@@ -52,18 +56,14 @@ public class ParticipationService {
             participationRepository.save(participationEntity));
     }
 
-    // 게시글의 참여자 목록을 보는 기능
-    public List<ParticipationDto> getParticipationsStatusOfJoinAndJoinReady(
+    public List<ParticipationDto> getParticipationsStatusOfJoin(
         Long postId) {
-        log.info("participation getParticipationsStatusOfJoinAndJoinReady");
+        log.info("participation getParticipationsStatusOfJoinAndJoin");
 
-        List<ParticipationStatus> statuses =
-            new ArrayList<>(
-                List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
 
         List<ParticipationEntity> participationEntities
-            = participationRepository.findByPostEntityPostIdAndParticipationStatusIn(
-            postId, statuses);
+            = participationRepository.findByPostEntityPostIdAndParticipationStatus(
+            postId, ParticipationStatus.JOIN);
 
         return participationEntities.stream().map(ParticipationDto::fromEntity)
             .toList();
@@ -123,4 +123,13 @@ public class ParticipationService {
 
 
 
+    public int countParticipationsCompletedByUserId(String userId) {
+
+        return participationRepository.countByParticipationStatusAndUserId(ParticipationStatus.TRAVEL_FINISHED,userId);
+    }
+
+    public int countParticipationsJoinByUserId(String userId) {
+
+        return participationRepository.countByParticipationStatusAndUserId(ParticipationStatus.JOIN,userId);
+    }
 }

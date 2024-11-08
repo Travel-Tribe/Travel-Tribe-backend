@@ -49,8 +49,8 @@ logging:
     org.hibernate.SQL: INFO # Hibernate의 SQL 로그를 INFO로 제한
     org.hibernate.type: OFF # Hibernate 타입 로그는 OFF로 설정하여 상세 로그 비활성화
 
-    post-service:
-      url: http://localhost:8081
+post-service:
+  url: http://localhost:8081
 
 #  file:
 #    name: logs/noticeboard.log

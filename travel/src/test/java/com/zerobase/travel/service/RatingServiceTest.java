@@ -2,11 +2,14 @@ package com.zerobase.travel.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.zerobase.travel.api.UserApi;
+import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.entity.RatingEntity;
 import com.zerobase.travel.exception.BizException;
@@ -26,6 +29,9 @@ class RatingServiceTest {
     @Mock
     private RatingRepository ratingRepository;
 
+    @Mock
+    private UserApi userApi;
+
     @InjectMocks
     private RatingService ratingService;
 
@@ -43,6 +49,11 @@ class RatingServiceTest {
             .build();
 
         ArgumentCaptor<RatingEntity> captor = ArgumentCaptor.forClass(RatingEntity.class);
+
+        given(userApi.updateUserRating(anyLong(), anyDouble()))
+            .willReturn(ResponseMessage.<Void>builder()
+                .result("SUCCSS")
+                .build());
 
         //when
         ratingService.giveRating(giveRatingDto, postId, senderUserId);

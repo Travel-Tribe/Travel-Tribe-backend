@@ -15,6 +15,7 @@ public class OtherUserInfoResponseDTO {
     private String username;
     private String nickname;
     private String email;
+    private Integer count; // 여행 횟수
     private Double ratingAvg;
     private Gender gender;
     private UserStatus status;

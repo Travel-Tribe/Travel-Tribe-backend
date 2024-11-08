@@ -5,7 +5,6 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.POST_NOT_FO
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_CALL_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FOUND_ERROR;
 
-import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
@@ -24,7 +23,6 @@ import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
 import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +31,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +70,6 @@ public class PostService {
             .limitMaxAge(postDTO.getLimitMaxAge())
             .limitSex(postDTO.getLimitSex())
             .limitSmoke(postDTO.getLimitSmoke())
-            .preferenceType(postDTO.getPreferenceType())
             .deadline(postDTO.getDeadline())
             .status(PostStatus.POSTING)
             .build();
@@ -166,7 +162,6 @@ public class PostService {
         existingPost.setLimitMaxAge(postDTO.getLimitMaxAge());
         existingPost.setLimitSex(postDTO.getLimitSex());
         existingPost.setLimitSmoke(postDTO.getLimitSmoke());
-        existingPost.setPreferenceType(postDTO.getPreferenceType());
         existingPost.setDeadline(postDTO.getDeadline());
         existingPost.setStatus(PostStatus.POSTING); // 필요에 따라 상태 변경
 
@@ -281,26 +276,28 @@ public class PostService {
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex())
             .limitSmoke(existingPost.getLimitSmoke())
-            .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
-                .dayDetails(dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
-                    .title(dayDetailEntity.getTitle())
-                    .description(dayDetailEntity.getDescription())
-                    .fileAddress(dayDetailEntity.getFileAddress())
-                    .build()).collect(Collectors.toList()))
-                .itineraryVisits(dayEntity.getItineraryVisits().stream().map(visitEntity -> ItineraryVisitDTO.builder()
-                    .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
-                    .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
-                    .orderNumber(visitEntity.getOrderNumber())
-                    .build()).collect(Collectors.toList()))
+                .dayDetails(
+                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
+                        .title(dayDetailEntity.getTitle())
+                        .description(dayDetailEntity.getDescription())
+                        .fileAddress(dayDetailEntity.getFileAddress())
+                        .build()).collect(Collectors.toList()))
+                .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                    .map(visitEntity -> ItineraryVisitDTO.builder()
+                        .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
+                        .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
+                        .orderNumber(visitEntity.getOrderNumber())
+                        .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
     }
 
 
     @Transactional(readOnly = true)
-    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail,  Pageable pageable) {
+    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail,
+        Pageable pageable) {
         // 사용자 정보 조회
         UserInfoResponseDTO userInfo;
         try {
@@ -315,7 +312,8 @@ public class PostService {
             throw new BizException(USER_NOT_FOUND_ERROR);
         }
 
-        Page<PostEntity> posts = postRepository.findAll(PostSpecification.getPosts(criteria), pageable);
+        Page<PostEntity> posts = postRepository.findAll(PostSpecification.getPosts(criteria),
+            pageable);
         return posts.map(this::mapToDTO);
     }
 
@@ -341,16 +339,18 @@ public class PostService {
             .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
-                .dayDetails(dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
-                    .title(dayDetailEntity.getTitle())
-                    .description(dayDetailEntity.getDescription())
-                    .fileAddress(dayDetailEntity.getFileAddress())
-                    .build()).collect(Collectors.toList()))
-                .itineraryVisits(dayEntity.getItineraryVisits().stream().map(visitEntity -> ItineraryVisitDTO.builder()
-                    .latitude(visitEntity.getPoint().getY())
-                    .longitude(visitEntity.getPoint().getX())
-                    .orderNumber(visitEntity.getOrderNumber())
-                    .build()).collect(Collectors.toList()))
+                .dayDetails(
+                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
+                        .title(dayDetailEntity.getTitle())
+                        .description(dayDetailEntity.getDescription())
+                        .fileAddress(dayDetailEntity.getFileAddress())
+                        .build()).collect(Collectors.toList()))
+                .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                    .map(visitEntity -> ItineraryVisitDTO.builder()
+                        .latitude(visitEntity.getPoint().getY())
+                        .longitude(visitEntity.getPoint().getX())
+                        .orderNumber(visitEntity.getOrderNumber())
+                        .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
     }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,24 +23,18 @@ public class VoteController {
     
     @PostMapping("/posts/{postId}/voting-starts")
     public ResponseEntity<ResponseMessage<Void>> createVote(
+        @RequestHeader("X-User-Id") long userId,
         @PathVariable long postId
     ) {
-
-        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
-        long userId = 1L;
         voteService.createVote(userId, postId);
-
         return ResponseEntity.ok(ResponseMessage.success());
     }
 
     @GetMapping("/posts/{postId}/voting-starts")
     public ResponseEntity<ResponseMessage<VoteResponseDto.VotingStart>> getVotingStart(
+        @RequestHeader("X-User-Id") long userId,
         @PathVariable long postId
     ) {
-
-        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
-        long userId = 1L;
-
         return ResponseEntity.ok(ResponseMessage.success(
             voteService.getVotingStart(userId, postId)
         ));
@@ -47,27 +42,22 @@ public class VoteController {
 
     @PostMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
     public ResponseEntity<ResponseMessage<Void>> voteVoting(
+        @RequestHeader("X-User-Id") long userId,
         @PathVariable long postId,
         @PathVariable long votingStartsId,
         @RequestBody VoteRequestDto.VoteVoting request
 
     ) {
-
-        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
-        long userId = 1L;
         voteService.voteVoting(userId, postId, votingStartsId, request.getApproval());
-
         return ResponseEntity.ok(ResponseMessage.success());
     }
 
     @GetMapping("/posts/{postId}/voting-starts/{votingStartsId}/votings")
     public ResponseEntity<ResponseMessage<VoteResponseDto.GetVote>> getVote(
+        @RequestHeader("X-User-Id") long userId,
         @PathVariable long postId,
         @PathVariable long votingStartsId
     ) {
-
-        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
-        long userId = 1L;
         return ResponseEntity.ok(ResponseMessage.success(
             voteService.getVote(userId, postId, votingStartsId)
         ));

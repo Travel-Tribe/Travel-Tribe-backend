@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(VoteController.class)
@@ -37,6 +39,7 @@ class VoteControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser
     void createVote() throws Exception {
 
         //given
@@ -44,7 +47,9 @@ class VoteControllerTest {
 
         //when
         //then
-        mockMvc.perform(post("/api/v1/posts/{postId}/voting-starts", postId))
+        mockMvc.perform(post("/api/v1/posts/{postId}/voting-starts", postId)
+                .with(csrf())
+                .header("X-User-Id", "1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("SUCCESS"));
 
@@ -52,8 +57,8 @@ class VoteControllerTest {
 
     }
 
-    //TODO 김용민 votingStart 조회 테스트 작성하기
     @Test
+    @WithMockUser
     void getVotingStart() throws Exception {
 
         //given
@@ -70,7 +75,9 @@ class VoteControllerTest {
 
         //when
         //then
-        mockMvc.perform(get("/api/v1/posts/{postId}/voting-starts", postId))
+        mockMvc.perform(get("/api/v1/posts/{postId}/voting-starts", postId)
+                .with(csrf())
+                .header("X-User-Id", "1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("SUCCESS"))
             .andExpect(jsonPath("$.data.votingStartsId").value(1L))
@@ -83,6 +90,7 @@ class VoteControllerTest {
 
 
     @Test
+    @WithMockUser
     void voteVoting() throws Exception {
 
         //given
@@ -96,8 +104,9 @@ class VoteControllerTest {
         //when
         //then
         mockMvc.perform(
-                post("/api/v1/posts/{postId}/voting-starts/{votingStartsId}/votings", postId,
-                    votingStartsId)
+                post("/api/v1/posts/{postId}/voting-starts/{votingStartsId}/votings", postId, votingStartsId)
+                    .with(csrf())
+                    .header("X-User-Id", "1")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(voteVoting)))
             .andExpect(status().isOk())
@@ -108,6 +117,7 @@ class VoteControllerTest {
     }
 
     @Test
+    @WithMockUser
     void getVote() throws Exception {
 
         //given
@@ -138,8 +148,9 @@ class VoteControllerTest {
 
         //when
         //then
-        mockMvc.perform(get("/api/v1/posts/{postId}/voting-starts/{votingStartsId}/votings", postId,
-                votingStartsId))
+        mockMvc.perform(get("/api/v1/posts/{postId}/voting-starts/{votingStartsId}/votings", postId, votingStartsId)
+                .with(csrf())
+                .header("X-User-Id", "1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("SUCCESS"))
             .andExpect(jsonPath("$.data.votings[0].votingId").value(1L))

@@ -24,6 +24,7 @@ public class ParticipationController {
     private final ParticipationService participationService;
     private final ParticipationManagementService participationManagementService;
 
+    // 참여
     @PostMapping("{postId}/participations")
     public ParticipationDto createParticipation(
         @PathVariable Long postId, @RequestHeader("X-User-Id") String userId) {
@@ -33,14 +34,14 @@ public class ParticipationController {
     }
 
     // 개인의 참여취소
-    @GetMapping("{postId}/participations{participationId}")
+    @DeleteMapping("{postId}/participations")
     public ResponseEntity<Object> deleteParticipations( @PathVariable Long postId,  @RequestHeader(value="userId") String userId ) {
 
-        participationManagementService.unjoinWithDepositReturnedParticipation(postId,userId);
+        log.info("deleteParticipations controller start");
+        participationManagementService.unjoinWithDepositTakenParticipation(postId,userId);
 
-        return null;
+        return ResponseEntity.ok().build();
     }
-
 
 
     // 참여자 조회시에 Status에 Join 상태의 유저 리스트 확인
@@ -61,12 +62,6 @@ public class ParticipationController {
             participationService.countParticipationsCompletedByUserId(userId));
     }
 
-    // 참여취소
-    @DeleteMapping("{postId}/participations{participationId}")
-    public ResponseEntity<Object> deleteParticipations() {
-        log.info("deleteParticipations controller start");
-        return ResponseEntity.ok().build();
-    }
 
 
 

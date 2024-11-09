@@ -22,7 +22,10 @@ import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
 import com.zerobase.travel.post.type.PostStatus;
+import com.zerobase.travel.post.constants.RepresentativeCountries;
+import com.zerobase.travel.typeCommon.Country;
 import feign.FeignException;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -312,9 +315,9 @@ public class PostService {
             throw new BizException(USER_NOT_FOUND_ERROR);
         }
 
-        Page<PostEntity> posts = postRepository.findAll(PostSpecification.getPosts(criteria),
-            pageable);
-        return posts.map(this::mapToDTO);
+        // 'others=true'인 경우, country는 이미 criteria에 반영됨
+        return postRepository.findAll(PostSpecification.getPosts(criteria), pageable)
+            .map(this::mapToDTO);
     }
 
     private ResponsePostsDTO mapToDTO(PostEntity existingPost) {

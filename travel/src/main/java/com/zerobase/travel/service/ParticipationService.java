@@ -10,16 +10,30 @@ import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.RatingStatus;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
+
+
+/* Participation Status를 변화시키는 모든 비즈니스 케이스
+1. 여행을 참가
+2. 여행을 투표를 통해서 전체 취소
+3. 여행을 자진, 신고를 통해서 개인 취소
+4. 여행을 전체 완료
+5. 여행을 왼료한 후에 평점을 매김
+6. 여행을 왼료한 후에 평점을 안매김
+ */
+
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ParticipationService {
+
 
     private final ParticipationRepository participationRepository;
 
@@ -29,20 +43,21 @@ public class ParticipationService {
        3. 여러가지 취향에 따른 제한들
               3. 게시글의 상태가 현재 모집중인지 확인
      */
-    public void validateApplicant(String userId) {
-        if(this.countParticipationsJoinByUserId(userId)>=2){
-                  log.info("participation validation service start ");
+    public void validateParticipationApplicant(String userId) {
+        if (this.countParticipationsJoinByUserId(userId) >= 2) {
+            log.info("participation validation service start ");
             throw new CustomException(ErrorCode.PARTICIPATION_LIMIT);
         }
 
 
     }
 
-    // 참여를 시키는 기능
+    // 참여를 초기화하고 생성시키는 기능
+    // todo : lock 잠금처리 할 것
     public ParticipationDto createParticipation(Long postId, String userId) {
         log.info("participation creation service start ");
 
-        this.validateApplicant(userId);
+        this.validateParticipationApplicant(userId);
 
         ParticipationEntity participationEntity = ParticipationEntity.builder()
             .postEntity(PostEntity.builder().postId(postId).build())
@@ -56,80 +71,89 @@ public class ParticipationService {
             participationRepository.save(participationEntity));
     }
 
-    public List<ParticipationDto> getParticipationsStatusOfJoin(
+    // participation 의 상태를 변화시킴
+    public void changeStatusOfParticipation(
+        ParticipationEntity participationEntity
+        , List<Enum<?>> changEnumFrom, List<Enum<?>> changEnumTo) {
+
+        // entity의 status들을 list에 담음
+        List<Enum<?>> statuses = participationEntity.getStatuses();
+
+        // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
+        for (Enum<?> status : statuses) {
+            for (Enum<?> enumElement : changEnumFrom) {
+                if (status.getClass() == enumElement.getClass()) {
+                    if (status != enumElement) {
+                        throw new CustomException(
+                            ErrorCode.PARTICIPATION_STATUS_ERROR);
+                    }
+                }
+            }
+        }
+
+        // entity의 enum type을 원하는 값으로 변경
+        for (Enum<?> enumElement : changEnumTo) {
+            if (enumElement instanceof ParticipationStatus) {
+                participationEntity.setParticipationStatus(
+                    (ParticipationStatus) enumElement);
+            } else if (enumElement instanceof DepositStatus) {
+                participationEntity.setDepositStatus(
+                    (DepositStatus) enumElement);
+            } else if (enumElement instanceof RatingStatus) {
+                participationEntity.setRatingStatus(
+                    (RatingStatus) enumElement);
+            }
+        }
+
+        participationRepository.save(participationEntity);
+    }
+
+    //--------------------------- 데이터 load 메소드 ---------------------------//
+
+    // 현재 여행을 참여하고 있는 개별인원 엔티티 반환
+    public ParticipationEntity getParticipationEntityStatusOfJoin(
+        Long postId, String userId) {
+        log.info("participation getParticipationsStatusOfJoinAndJoin");
+
+        return participationRepository.findByPostEntityPostIdAndUserId(
+            postId, userId).orElseThrow(
+            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+
+
+
+
+    }
+
+
+    // 현재 여행을 참여하고 있는 복수 인원리스트 반환
+    public List<ParticipationDto> getParticipationsDtosStatusOfJoin(
         Long postId) {
         log.info("participation getParticipationsStatusOfJoinAndJoin");
 
-
         List<ParticipationEntity> participationEntities
-            = participationRepository.findByPostEntityPostIdAndParticipationStatus(
+            = participationRepository.findAllByPostEntityPostIdAndParticipationStatus(
             postId, ParticipationStatus.JOIN);
 
         return participationEntities.stream().map(ParticipationDto::fromEntity)
             .toList();
     }
 
-    // 한명이 여행을 중도 포기하고 DEPOSIT을 반환받지못함
-    public void unjoinWithDepositPenaltyParticipation(Long postId, String userId) {
-        ParticipationEntity participationEntity = participationRepository.findByPostEntityPostIdAndUserId(
-                postId, userId)
-            .orElseThrow(
-                () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
-
-        participationEntity.setParticipationStatus(ParticipationStatus.UNJOIN);
-        participationEntity.setDepositStatus(DepositStatus.DEPOSIT_TAKEN);
-        participationRepository.save(participationEntity);
-    }
-
-
-    // 한명이 rating을 주는 경우
-    public void giveRatingParticipation(Long postId, String userId) {
-        ParticipationEntity participationEntity = participationRepository.findByPostEntityPostIdAndUserId(
-                postId, userId)
-            .orElseThrow(
-                () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
-
-        participationEntity.setRatingStatus(RatingStatus.RATED);
-        participationRepository.save(participationEntity);
-    }
-
-    // 모든 인원이 여행을 완료하는 경우 ; saveAll할시에 error 발생
-    public void travelFinishedParticipation(Long postId) {
-        List<ParticipationEntity> participationEntities = participationRepository
-            .findAllByPostEntityPostIdAndParticipationStatus(postId,
-                ParticipationStatus.JOIN);
-
-        for (ParticipationEntity participationEntity : participationEntities) {
-            participationEntity.setParticipationStatus(ParticipationStatus.TRAVEL_FINISHED);
-            participationRepository.save(participationEntity);
-        }
-    }
-
-    // 모든 인원이 합의하에 여행을 취소하는 경우 ; saveAll할시에 error 발생
-    public void unJoinAllWithouㅅPenalrtyParticipation(Long postId) {
-        List<ParticipationEntity> participationEntities = participationRepository
-            .findAllByPostEntityPostIdAndParticipationStatus(postId,
-                ParticipationStatus.JOIN);
-
-        for (ParticipationEntity participationEntity : participationEntities) {
-            participationEntity.setParticipationStatus(ParticipationStatus.UNJOIN);
-            participationEntity.setDepositStatus(DepositStatus.DEPOSIT_RETURNED);
-
-            participationRepository.save(participationEntity);
-        }
-    }
-
-
-
-
 
     public int countParticipationsCompletedByUserId(String userId) {
 
-        return participationRepository.countByParticipationStatusAndUserId(ParticipationStatus.TRAVEL_FINISHED,userId);
+        return participationRepository.countByParticipationStatusAndUserId(
+            ParticipationStatus.TRAVEL_FINISHED, userId);
     }
 
     public int countParticipationsJoinByUserId(String userId) {
 
-        return participationRepository.countByParticipationStatusAndUserId(ParticipationStatus.JOIN,userId);
+        return participationRepository.countByParticipationStatusAndUserId(
+            ParticipationStatus.JOIN, userId);
+    }
+
+    public void setDateToReturnDeposit(ParticipationEntity entity, LocalDateTime time) {
+        entity.setDepositReturnDate(time);
+
     }
 }

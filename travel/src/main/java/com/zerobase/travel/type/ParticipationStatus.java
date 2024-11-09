@@ -2,6 +2,6 @@ package com.zerobase.travel.type;
 
 public enum ParticipationStatus {
     JOIN,
-    UNJOIN,
+    JOIN_CANCEL,
     TRAVEL_FINISHED
 }

@@ -49,8 +49,8 @@ public class ParticipationManagementService {
     @Transactional
     public ParticipationDto createParticipation(Long postId, String userId) {
 
-
-        participationService.createParticipation(postId, userId);
+        ParticipationDto participation = participationService.createParticipation(
+            postId, userId);
 
         //보증금 지불준비 API호출
 
@@ -58,7 +58,7 @@ public class ParticipationManagementService {
 
         // 전체 트랙잭션 처리
 
-        return null;
+        return participation;
     }
 
 
@@ -114,7 +114,7 @@ public class ParticipationManagementService {
                 DepositStatus.DEPOSIT_TAKEN));
     }
 
-    // 4. 인원이 시간이 지나서 여행을 완료하는 경우 ;
+    // 4. 인원이 시간이 지나서 여행을 완료하는 경우;
     public void travelFinishedParticipation(Long postId, String userId) {
 
         // 매일 게시글의 여행완료 시점을 확인 로직 추가

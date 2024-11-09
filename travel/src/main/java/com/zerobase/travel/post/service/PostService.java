@@ -145,7 +145,6 @@ public class PostService {
         }
 
         Long userId = userInfo.getId();
-        MBTI userMbti = userClientService.getUserMbti(userId);
         // 게시글 소유자 확인
         if (!existingPost.getUserId().equals(userId)) {
             throw new BizException(PERMISSION_DENIED_ERROR);
@@ -153,7 +152,6 @@ public class PostService {
 
         // 게시글 업데이트
         existingPost.setTitle(postDTO.getTitle());
-        existingPost.setMbti(userMbti);
         existingPost.setTravelStartDate(postDTO.getTravelStartDate());
         existingPost.setTravelEndDate(postDTO.getTravelEndDate());
         existingPost.setMaxParticipants(postDTO.getMaxParticipants());

@@ -15,6 +15,7 @@ import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostsDTO;
 import com.zerobase.travel.post.service.PostService;
+import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.validation.Valid;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class PostController {
 
         if (continent != null && !continent.isEmpty()) {
             try {
-                criteria.setContinent(Enum.valueOf(com.zerobase.travel.typeCommon.Continent.class, continent.toUpperCase()));
+                criteria.setContinent(Enum.valueOf(Continent.class, continent.toUpperCase()));
             } catch (IllegalArgumentException e) {
                 log.error("Invalid continent value: {}", continent);
                 throw new BizException(INVALID_CONTINENT_VALUE);
@@ -116,7 +117,7 @@ public class PostController {
             Set<Country> representativeCountries = RepresentativeCountries.ALL_REPRESENTATIVE_COUNTRIES;
             if (representativeCountries.stream().anyMatch(c -> c.name().equals(countryUpper))) {
                 try {
-                    criteria.setCountry(Enum.valueOf(com.zerobase.travel.typeCommon.Country.class, countryUpper));
+                    criteria.setCountry(Enum.valueOf(Country.class, countryUpper));
                 } catch (IllegalArgumentException e) {
                     log.error("Invalid country value: {}", country);
                     throw new BizException(INVALID_COUNTRY_VALUE);

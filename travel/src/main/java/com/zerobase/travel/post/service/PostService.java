@@ -21,6 +21,7 @@ import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
+import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.post.constants.RepresentativeCountries;
 import com.zerobase.travel.typeCommon.Country;
@@ -43,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserClient userClient; // FeignClient 주입
     private final UserClientService userClientService;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -53,11 +53,13 @@ public class PostService {
         // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
         // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
         UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
+        MBTI userMbti = userClientService.getUserMbti(userInfo.getId());
         log.info(userInfo.toString());
         Long userId = userInfo.getId();
 
         PostEntity postEntity = PostEntity.builder()
             .title(postDTO.getTitle())
+            .mbti(userMbti)
             .userId(userId)
             .travelStartDate(postDTO.getTravelStartDate())
             .travelEndDate(postDTO.getTravelEndDate())
@@ -143,7 +145,6 @@ public class PostService {
         }
 
         Long userId = userInfo.getId();
-
         // 게시글 소유자 확인
         if (!existingPost.getUserId().equals(userId)) {
             throw new BizException(PERMISSION_DENIED_ERROR);

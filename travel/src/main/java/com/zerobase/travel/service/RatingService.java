@@ -1,5 +1,6 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.entity.RatingEntity;
 import com.zerobase.travel.exception.BizException;
@@ -7,6 +8,7 @@ import com.zerobase.travel.exception.errorcode.RatingErrorCode;
 import com.zerobase.travel.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +19,9 @@ public class RatingService {
     private final static double SCORE_UNIT = 0.5;
 
     private final RatingRepository ratingRepository;
+    private final UserApi userApi;
 
+    @Transactional
     public void giveRating(GiveRatingDto giveRatingDto, long postId, long senderUserId) {
 
         validationRegisterRating(postId, senderUserId, giveRatingDto.getReceiverId(), giveRatingDto.getScore());
@@ -32,8 +36,10 @@ public class RatingService {
 
         ratingRepository.save(rating);
 
-        //TODO 김용민 받은사람 프로필에 반영해주기
-        // 평점반영 api 필요
+        Double avgReceiverRating = ratingRepository.getAvgReceiverRating(giveRatingDto.getReceiverId());
+        double avrRating = Math.ceil(avgReceiverRating * 10) / 10.0;
+        userApi.updateUserRating(giveRatingDto.getReceiverId(), avrRating);
+
     }
 
     //TODO 김용민 validationRegisterRating 작성하기

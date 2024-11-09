@@ -89,9 +89,6 @@ public class PostEntity {
     @Column(name = "limit_smoke")
     private LimitSmoke limitSmoke;
 
-    @Column(name = "preference_type")
-    private String preferenceType;
-
     private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)

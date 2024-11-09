@@ -15,6 +15,7 @@ public class ReviewSpecification {
             .and(likeContent(dto.getContent()))
             .and(equalContinent(dto.getContinent()))
             .and(equalCountry(dto.getCountry()))
+            .and(equalUserId(dto.getUserId()))
             .and(orderByIdDesc());
     }
 
@@ -56,6 +57,15 @@ public class ReviewSpecification {
         }
 
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("country"), Country.valueOf(country));
+    }
+
+    private static Specification<ReviewEntity> equalUserId(final Long userId) {
+
+        if (userId == null) {
+            return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+        }
+
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("userId"), userId);
     }
 
     private static Specification<ReviewEntity> orderByIdDesc() {

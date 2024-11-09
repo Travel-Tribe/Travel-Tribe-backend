@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class ParticipationEntity {
     @Enumerated(EnumType.STRING)
     private RatingStatus ratingStatus;
 
-    LocalDateTime depositReturnDate;
+    LocalDate depositReturnDate;
 
     @CreatedDate
     private LocalDateTime createdAt;

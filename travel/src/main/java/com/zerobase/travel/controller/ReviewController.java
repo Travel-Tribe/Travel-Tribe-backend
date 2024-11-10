@@ -83,7 +83,8 @@ public class ReviewController {
         @RequestParam(required = false) String title,
         @RequestParam(required = false) String content,
         @RequestParam(required = false) String continent,
-        @RequestParam(required = false) String country
+        @RequestParam(required = false) String country,
+        @RequestParam(required = false) Long userId
     ) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -92,6 +93,7 @@ public class ReviewController {
             .content(content)
             .continent(continent)
             .country(country)
+            .userId(userId)
             .build();
 
         return ResponseEntity.ok(ResponseMessage.success(

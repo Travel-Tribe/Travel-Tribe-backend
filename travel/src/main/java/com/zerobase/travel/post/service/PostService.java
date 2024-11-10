@@ -336,7 +336,6 @@ public class PostService {
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex().name())
             .limitSmoke(existingPost.getLimitSmoke().name())
-            .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
                 .dayDetails(
@@ -353,5 +352,18 @@ public class PostService {
                         .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
+    }
+
+    @Transactional
+    public void updatePostsMbti(Long userId, String newMbti) {
+        MBTI mbtiEnum;
+        try {
+            mbtiEnum = MBTI.valueOf(newMbti.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // 예외 처리
+            return;
+        }
+
+        postRepository.updateMbtiByUserId(mbtiEnum, userId);
     }
 }

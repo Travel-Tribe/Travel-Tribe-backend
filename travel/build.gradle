@@ -46,6 +46,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'org.redisson:redisson:3.22.0'
 
@@ -53,6 +54,7 @@ dependencies {
     // Hibernate Spatial, Point
     implementation 'org.hibernate:hibernate-spatial:6.6.1.Final'
     implementation 'org.locationtech.jts:jts-core:1.18.2'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     runtimeOnly 'com.h2database:h2'
 

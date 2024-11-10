@@ -44,6 +44,7 @@ public class PostEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     private MBTI mbti;
 
     private String title;

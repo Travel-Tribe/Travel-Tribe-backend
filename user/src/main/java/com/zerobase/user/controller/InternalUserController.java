@@ -5,7 +5,10 @@ import static org.springframework.http.HttpStatus.OK;
 import com.zerobase.user.dto.request.UserProfileAvgRating;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
+import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.service.ProfileService;
 import com.zerobase.user.service.UserService;
+import com.zerobase.user.type.MBTI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,20 +24,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class InternalUserController {
 
     private final UserService userService;
+    private final ProfileService profileService;
 
     // 프로필 조회
     @GetMapping("/{userEmail}")
-    public ResponseEntity<UserInfoResponseDTO> getUserEmail(@PathVariable String userEmail) {
+    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserEmail(
+        @PathVariable String userEmail) {
         UserInfoResponseDTO byUserWithEmail = userService.findByUserWithEmail(userEmail);
-        return ResponseEntity.status(OK).body(byUserWithEmail);
+        return ResponseEntity.status(OK).body(ResponseMessage.success(byUserWithEmail));
     }
 
     // 사용자 평균평점을 업데이트 시켜주는 기능
     @PutMapping("/{userId}/profile-rating")
     public ResponseEntity<?> updateUserProfileAvgRating(@PathVariable Long userId, @RequestBody
-        UserProfileAvgRating userProfileAvgRating){
+    UserProfileAvgRating userProfileAvgRating) {
         Double avgRating = userProfileAvgRating.getAvgRating();
         userService.updateUserProfileAvgRating(userId, avgRating);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
+    }
+
+    // 사용자 MBTI 보내주는 기능
+    @GetMapping("/{userId}/mbti")
+    public ResponseEntity<ResponseMessage<MBTI>> getUserProfile(@PathVariable Long userId) {
+        return ResponseEntity.status(OK)
+            .body(ResponseMessage.success(profileService.getProfile(userId).getMbti()));
     }
 }

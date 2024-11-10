@@ -41,6 +41,7 @@ public class UserService {
     private final EmailService emailService;
     private final ProfileRepository profileRepository;
     private final PasswordResetService passwordResetService;
+    private final UserParticipationService userParticipationService;
 
     public void joinProcess(JoinDTO joinDTO) {
         log.info("Processing registration for email: {}", joinDTO.getEmail());
@@ -114,6 +115,7 @@ public class UserService {
     public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
 
         Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
+        Integer completedTripsCount = userParticipationService.getCompletedTripsCount(String.valueOf(userId));
         if (!optionalUserEntity.isPresent()) {
             throw new BizException(USER_NOT_FOUND_ERROR);
         } else {
@@ -123,6 +125,7 @@ public class UserService {
             return OtherUserInfoResponseDTO.builder()
                 .username(userEntity.getUsername())
                 .nickname(userEntity.getNickname())
+                .count(completedTripsCount)
                 .email(userEntity.getEmail())
                 .ratingAvg(profileEntity.getRatingAvg())
                 .gender(profileEntity.getGender())

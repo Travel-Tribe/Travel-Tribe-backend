@@ -16,7 +16,10 @@ public enum BasicErrorCode implements ErrorCode {
     POST_NOT_FOUND_ERROR("E01019", "게시글을 찾을 수 없습니다."),
     USER_NOT_FOUND_ERROR("E01020", "사용자를 찾을 수 없습니다."),
     USER_INFO_CALL_ERROR("E01021", "사용자 정보를 호출하는 데 실패했습니다."),
-    PERMISSION_DENIED_ERROR("E01022", "권한이 없습니다.");
+    PERMISSION_DENIED_ERROR("E01022", "권한이 없습니다."),
+    INVALID_COUNTRY_VALUE("E01023", "국가명이 부적절합니다."),
+    INVALID_CONTINENT_VALUE("E01024", "대륙명이 부적절합니다."),
+    INVALID_MBTI_VALUE("E01025", "MBTI가 부적절합니다.");
 
     private final String errorCode;
     private final String errorMessage;

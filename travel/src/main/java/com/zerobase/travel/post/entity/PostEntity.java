@@ -2,6 +2,7 @@ package com.zerobase.travel.post.entity;
 
 import com.zerobase.travel.post.type.LimitSex;
 import com.zerobase.travel.post.type.LimitSmoke;
+import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
@@ -33,6 +34,8 @@ public class PostEntity {
     // User와의 직접적인 매핑 관계 제거
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    private MBTI mbti;
 
     private String title;
 

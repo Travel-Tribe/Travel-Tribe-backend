@@ -4,6 +4,7 @@ import com.zerobase.travel.post.dto.request.PostSearchCriteria;
 import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
 import com.zerobase.travel.post.entity.PostEntity;
+import com.zerobase.travel.post.constants.RepresentativeCountries;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -43,16 +44,20 @@ public class PostSpecification {
                     cb.equal(root.get("continent"), criteria.getContinent()));
             }
 
-            // 국가 필터링 (Enum 직접 비교)
-            if (criteria.getCountry() != null) {
-                predicate = cb.and(predicate,
-                    cb.equal(root.get("travelCountry"), criteria.getCountry()));
-            }
-
             // MBTI 필터링 (Enum 직접 비교)
             if (criteria.getMbti() != null) {
                 predicate = cb.and(predicate,
                     cb.equal(root.get("mbti"), criteria.getMbti()));
+            }
+
+            // '기타' 국가 필터링
+            if (Boolean.TRUE.equals(criteria.getOthers())) {
+                predicate = cb.and(predicate,
+                    cb.not(root.get("travelCountry").in(RepresentativeCountries.ALL_REPRESENTATIVE_COUNTRIES)));
+            } else if (criteria.getCountry() != null) {
+                // 대표 국가로 필터링
+                predicate = cb.and(predicate,
+                    cb.equal(root.get("travelCountry"), criteria.getCountry()));
             }
 
             return predicate;

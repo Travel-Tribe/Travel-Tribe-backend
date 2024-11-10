@@ -1,6 +1,5 @@
 package com.zerobase.entity;
 
-import com.zerobase.model.type.DepositStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +24,4 @@ public class DepositEntity {
     private Long postId;
     private Long participationId;
     private String userId;
-
-    private DepositStatus depositStatus;
 }

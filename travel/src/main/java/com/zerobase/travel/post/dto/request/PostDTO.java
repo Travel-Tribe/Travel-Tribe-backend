@@ -2,7 +2,6 @@ package com.zerobase.travel.post.dto.request;
 
 import com.zerobase.travel.post.type.LimitSex;
 import com.zerobase.travel.post.type.LimitSmoke;
-import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.validation.constraints.Min;
@@ -68,9 +67,6 @@ public class PostDTO {
 
     @NotNull(message = "흡연 여부는 필수입니다.")
     private LimitSmoke limitSmoke;
-
-    @NotBlank(message = "선호 유형은 필수입니다.")
-    private String preferenceType;
 
     @NotNull(message = "마감 날짜는 필수입니다.")
     private LocalDate deadline;

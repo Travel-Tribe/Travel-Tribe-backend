@@ -3,6 +3,10 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.dto.request.ReviewRequestDto.CreateReview;
 import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview;
 import com.zerobase.travel.dto.request.ReviewRequestDto.ModifyReview.File;
+import com.zerobase.travel.dto.response.ReviewResponseDto;
+import com.zerobase.travel.dto.response.ReviewResponseDto.ReviewPage;
+import com.zerobase.travel.post.service.UserClientService;
+import com.zerobase.travel.repository.specification.ReviewSearchDto;
 import com.zerobase.travel.entity.ReviewEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReviewErrorCode;
@@ -10,9 +14,12 @@ import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.repository.ReviewFileRepository;
 import com.zerobase.travel.repository.ReviewRepository;
+import com.zerobase.travel.repository.specification.ReviewSpecification;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +29,11 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewFileRepository reviewFileRepository;
-    private final UserClient userClient;
+    private final UserClientService userClientService;
 
     public void createReview(CreateReview request, String userEmail, long postId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationCreateReview(userId, postId);
@@ -37,7 +44,7 @@ public class ReviewService {
     @Transactional
     public void modifyReview(ModifyReview request, String userEmail, long postId, long reviewId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationModifyReview(reviewId, userId, postId);
@@ -64,7 +71,7 @@ public class ReviewService {
 
     public void deleteReview(String userEmail, long postId, long reviewId) {
 
-        UserInfoResponseDTO userInfo = userClient.getUserInfoByEmail(userEmail);
+        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
         long userId = userInfo.getId();
 
         validationDeleteReview(reviewId, userId, postId);
@@ -73,6 +80,31 @@ public class ReviewService {
             .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
 
         reviewRepository.delete(review);
+    }
+
+    public ReviewResponseDto.Review getReview(long postId, long reviewId) {
+
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new BizException(ReviewErrorCode.NOT_FOUND_REVIEW));
+
+        validationGetReview(reviewId, postId);
+        
+        return ReviewResponseDto.Review.fromEntity(review);
+
+    }
+
+    public ReviewPage getReviews(ReviewSearchDto reviewSearchDto, PageRequest pageRequest) {
+
+        return ReviewPage.fromPageEntity(
+            reviewRepository.findAll(ReviewSpecification.filter(reviewSearchDto), pageRequest)
+        );
+    }
+
+    private void validationGetReview(long reviewId, long postId) {
+        //가져오려는 후기가 postid에 해당하는 후기인지
+        if (!reviewRepository.existsByIdAndPostId(reviewId, postId)) {
+            throw new BizException(ReviewErrorCode.THIS_REVIEW_NOT_IN_POST);
+        }
     }
 
     private void validationCreateReview(long userId, long postId) {
@@ -110,5 +142,4 @@ public class ReviewService {
         }
 
     }
-
 }

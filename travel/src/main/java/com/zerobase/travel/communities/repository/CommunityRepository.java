@@ -19,5 +19,7 @@ public interface CommunityRepository extends JpaRepository<CommunityEntity, Long
 
 
     Optional<CommunityEntity> findByCommunityId(long communityId);
+
+    Optional<CommunityEntity> findByUserId(String userId);
 }
 

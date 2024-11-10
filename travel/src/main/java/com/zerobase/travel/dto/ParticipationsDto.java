@@ -16,26 +16,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ParticipationDto {
+public class ParticipationsDto {
     private Long participationId;
     private Long postId;
     private String userId;
-    private ParticipationStatus participationStatus;
-    private DepositStatus depositStatus;
-    private RatingStatus ratingStatus;
-    private LocalDate depositReturnDate;
 
 
 
-    public static ParticipationDto fromEntity(ParticipationEntity participationEntity) {
-        return ParticipationDto.builder()
+    public static ParticipationsDto fromEntity(ParticipationEntity participationEntity) {
+        return ParticipationsDto.builder()
             .participationId(participationEntity.getParticipationId())
             .postId(participationEntity.getPostEntity().getPostId())
             .userId(participationEntity.getUserId())
-            .participationStatus(participationEntity.getParticipationStatus())
-            .depositStatus(participationEntity.getDepositStatus())
-            .ratingStatus(participationEntity.getRatingStatus())
-            .depositReturnDate(participationEntity.getDepositReturnDate())
             .build();
 
     }

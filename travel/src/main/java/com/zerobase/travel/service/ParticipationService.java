@@ -3,14 +3,14 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
+import com.zerobase.travel.dto.ParticipationsDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.entity.PostEntity;
-
+import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
-import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.RatingStatus;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +71,8 @@ public class ParticipationService {
             participationRepository.save(participationEntity));
     }
 
-    // participation 의 상태를 변화시킴
-    public void changeStatusOfParticipation(
+    // participation 의 상태를 검증하고 상태를 변화시켜서 그대로 저장함
+    public void checkAndChangeStatusToSaveParticipation(
         ParticipationEntity participationEntity
         , List<Enum<?>> changEnumFrom, List<Enum<?>> changEnumTo) {
 
@@ -110,10 +110,10 @@ public class ParticipationService {
 
     //--------------------------- 데이터 load 메소드 ---------------------------//
 
-    // 현재 여행을 참여하고 있는 개별인원 엔티티 반환
-    public ParticipationEntity getParticipationEntityStatusOfJoin(
+    // 현재 개별인원 엔티티 반환
+    public ParticipationEntity getParticipationEntityByPostIdAndUserId(
         Long postId, String userId) {
-        log.info("participation getParticipationsStatusOfJoinAndJoin");
+        log.info("participation getParticipationEntityByPostIdAndUserId");
 
         return participationRepository.findByPostEntityPostIdAndUserId(
             postId, userId).orElseThrow(
@@ -127,7 +127,7 @@ public class ParticipationService {
 
 
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ParticipationDto> getParticipationsDtosStatusOfJoin(
+    public List<ParticipationsDto> getParticipationsDtosStatusOfJoin(
         Long postId) {
         log.info("participation getParticipationsStatusOfJoinAndJoin");
 
@@ -135,7 +135,7 @@ public class ParticipationService {
             = participationRepository.findAllByPostEntityPostIdAndParticipationStatus(
             postId, ParticipationStatus.JOIN);
 
-        return participationEntities.stream().map(ParticipationDto::fromEntity)
+        return participationEntities.stream().map(ParticipationsDto::fromEntity)
             .toList();
     }
 
@@ -152,7 +152,7 @@ public class ParticipationService {
             ParticipationStatus.JOIN, userId);
     }
 
-    public void setDateToReturnDeposit(ParticipationEntity entity, LocalDateTime time) {
+    public void setDateToReturnDeposit(ParticipationEntity entity, LocalDate time) {
         entity.setDepositReturnDate(time);
 
     }

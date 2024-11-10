@@ -42,17 +42,13 @@ public class PostDTO {
     @Min(value = 0, message = "숙박비는 0 이상이어야 합니다.")
     private Integer accommodationFee;
 
-    @NotNull(message = "교통비는 필수입니다.")
-    @Min(value = 0, message = "교통비는 0 이상이어야 합니다.")
-    private Integer transportationFee;
+    @NotNull(message = "기타 경비는 필수입니다.")
+    @Min(value = 0, message = "기타 경비는 0 이상이어야 합니다.")
+    private Integer otherExpenses;
 
     @NotNull(message = "비행기표는 필수입니다.")
     @Min(value = 0, message = "비행기표는 0 이상이어야 합니다.")
     private Integer airplaneFee;
-
-    @NotNull(message = "식대는 필수입니다.")
-    @Min(value = 0, message = "식대는 0 이상이어야 합니다.")
-    private Integer foodFee;
 
     @NotNull(message = "최대 나이는 필수입니다.")
     @Min(value = 0, message = "최대 나이는 0 이상이어야 합니다.")

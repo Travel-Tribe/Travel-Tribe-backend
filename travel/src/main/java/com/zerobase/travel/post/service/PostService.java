@@ -68,9 +68,8 @@ public class PostService {
             .continent(postDTO.getContinent())
             .region(postDTO.getRegion())
             .accommodationFee(postDTO.getAccommodationFee())
-            .transportationFee(postDTO.getTransportationFee())
+            .otherExpenses(postDTO.getOtherExpenses())
             .airplaneFee(postDTO.getAirplaneFee())
-            .foodFee(postDTO.getFoodFee())
             .limitMinAge(postDTO.getLimitMinAge())
             .limitMaxAge(postDTO.getLimitMaxAge())
             .limitSex(postDTO.getLimitSex())
@@ -159,9 +158,8 @@ public class PostService {
         existingPost.setContinent(postDTO.getContinent());
         existingPost.setRegion(postDTO.getRegion());
         existingPost.setAccommodationFee(postDTO.getAccommodationFee());
-        existingPost.setTransportationFee(postDTO.getTransportationFee());
+        existingPost.setOtherExpenses(postDTO.getOtherExpenses());
         existingPost.setAirplaneFee(postDTO.getAirplaneFee());
-        existingPost.setFoodFee(postDTO.getFoodFee());
         existingPost.setLimitMinAge(postDTO.getLimitMinAge());
         existingPost.setLimitMaxAge(postDTO.getLimitMaxAge());
         existingPost.setLimitSex(postDTO.getLimitSex());
@@ -273,9 +271,8 @@ public class PostService {
             .continent(existingPost.getContinent())
             .region(existingPost.getRegion())
             .accommodationFee(existingPost.getAccommodationFee())
-            .transportationFee(existingPost.getTransportationFee())
+            .otherExpenses(existingPost.getOtherExpenses())
             .airplaneFee(existingPost.getAirplaneFee())
-            .foodFee(existingPost.getFoodFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex())
@@ -333,9 +330,8 @@ public class PostService {
             .continent(existingPost.getContinent().name())
             .region(existingPost.getRegion())
             .accommodationFee(existingPost.getAccommodationFee())
-            .transportationFee(existingPost.getTransportationFee())
+            .otherExpenses(existingPost.getOtherExpenses())
             .airplaneFee(existingPost.getAirplaneFee())
-            .foodFee(existingPost.getFoodFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex().name())

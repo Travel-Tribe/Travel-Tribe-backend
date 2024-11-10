@@ -23,9 +23,8 @@ public class ResponsePostDTO {
     private Continent continent;
     private String region;
     private Integer accommodationFee;
-    private Integer transportationFee;
     private Integer airplaneFee;
-    private Integer foodFee;
+    private Integer otherExpenses;
     private Integer limitMaxAge;
     private Integer limitMinAge;
     private LimitSex limitSex;

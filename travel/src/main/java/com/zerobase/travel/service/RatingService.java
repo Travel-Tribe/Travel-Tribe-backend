@@ -5,6 +5,8 @@ import com.zerobase.travel.dto.request.GiveRatingDto;
 import com.zerobase.travel.entity.RatingEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.RatingErrorCode;
+import com.zerobase.travel.exception.errorcode.VoteErrorCode;
+import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class RatingService {
     private final static double SCORE_UNIT = 0.5;
 
     private final RatingRepository ratingRepository;
+    private final ParticipationRepository participationRepository;
     private final UserApi userApi;
 
     @Transactional
@@ -42,10 +45,15 @@ public class RatingService {
 
     }
 
-    //TODO 김용민 validationRegisterRating 작성하기
     private void validationRegisterRating(long postId, long senderUserId, long receiverUserId, double score) {
         //점수 준 사람, 받은 사람이 해당 여행에 참여 하였는지
-        // join 테이블 생성시 작성
+        if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(receiverUserId)).isEmpty()) {
+            throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
+        }
+
+        if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(senderUserId)).isEmpty()) {
+            throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
+        }
 
         //이미 해당 사람에게 점수를 주었는지
         if (ratingRepository.existsByPostIdAndSenderUserIdAndReceiverUserId(postId, senderUserId, receiverUserId)) {
@@ -60,8 +68,6 @@ public class RatingService {
         if (score % SCORE_UNIT != 0) {
             throw new BizException(RatingErrorCode.SCORE_OUT_OF_UNIT);
         }
-
-        //여행이 종료 되었는지
     }
 
 }

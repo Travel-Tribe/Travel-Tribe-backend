@@ -15,6 +15,5 @@ import lombok.Setter;
 public class RequestReadyPayDeposit {
     Long postId;
     Long participationId;
-    String userId;
     PGMethod pgMethod;
 }

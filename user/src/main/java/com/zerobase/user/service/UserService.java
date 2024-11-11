@@ -77,8 +77,37 @@ public class UserService {
 
     @Transactional
     public void editUserInfoProcess(EditUserInfoDTO editUserInfoDTO, UserEntity currentUser) {
+        String cacheKey = "userInfo:" + currentUser.getId();
+
         currentUser.setNickname(editUserInfoDTO.getNickname());
         currentUser.setPhone(editUserInfoDTO.getPhone());
+
+        // 기존 캐시 삭제
+        redisTemplate.delete(cacheKey);
+        log.info("Cache deleted for user ID: {}", currentUser.getId());
+
+        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+        // 변경된 UserInfoResponseDTO 생성
+        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
+            .id(currentUser.getId())
+            .username(currentUser.getUsername())
+            .nickname(currentUser.getNickname())
+            .phone(currentUser.getPhone())
+            .email(currentUser.getEmail())
+            .status(currentUser.getStatus())
+            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
+            .introduction(profileEntity.getIntroduction())
+            .mbti(profileEntity.getMbti())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .build();
+
+        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
+        log.info("Cache updated for user ID: {}", currentUser.getId());
     }
 
 

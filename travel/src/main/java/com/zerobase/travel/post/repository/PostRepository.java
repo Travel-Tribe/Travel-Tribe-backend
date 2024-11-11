@@ -2,6 +2,9 @@ package com.zerobase.travel.post.repository;
 
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.type.MBTI;
+import com.zerobase.travel.post.type.PostStatus;
+import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,4 +20,6 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, JpaSpec
     @Modifying
     @Query("UPDATE PostEntity p SET p.mbti = :mbti WHERE p.userId = :userId")
     void updateMbtiByUserId(@Param("mbti") MBTI mbti, @Param("userId") Long userId);
+
+    List<PostEntity> findByDeadlineBeforeAndStatus(LocalDate deadline, PostStatus status);
 }

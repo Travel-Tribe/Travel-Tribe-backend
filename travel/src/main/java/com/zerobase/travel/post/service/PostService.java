@@ -26,6 +26,8 @@ import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.post.constants.RepresentativeCountries;
 import com.zerobase.travel.typeCommon.Country;
 import feign.FeignException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,15 +71,14 @@ public class PostService {
             .continent(postDTO.getContinent())
             .region(postDTO.getRegion())
             .accommodationFee(postDTO.getAccommodationFee())
-            .transportationFee(postDTO.getTransportationFee())
+            .otherExpenses(postDTO.getOtherExpenses())
             .airplaneFee(postDTO.getAirplaneFee())
-            .foodFee(postDTO.getFoodFee())
             .limitMinAge(postDTO.getLimitMinAge())
             .limitMaxAge(postDTO.getLimitMaxAge())
             .limitSex(postDTO.getLimitSex())
             .limitSmoke(postDTO.getLimitSmoke())
             .deadline(postDTO.getDeadline())
-            .status(PostStatus.POSTING)
+            .status(PostStatus.RECRUITING)
             .build();
 
         // Days 처리
@@ -159,15 +161,14 @@ public class PostService {
         existingPost.setContinent(postDTO.getContinent());
         existingPost.setRegion(postDTO.getRegion());
         existingPost.setAccommodationFee(postDTO.getAccommodationFee());
-        existingPost.setTransportationFee(postDTO.getTransportationFee());
+        existingPost.setOtherExpenses(postDTO.getOtherExpenses());
         existingPost.setAirplaneFee(postDTO.getAirplaneFee());
-        existingPost.setFoodFee(postDTO.getFoodFee());
         existingPost.setLimitMinAge(postDTO.getLimitMinAge());
         existingPost.setLimitMaxAge(postDTO.getLimitMaxAge());
         existingPost.setLimitSex(postDTO.getLimitSex());
         existingPost.setLimitSmoke(postDTO.getLimitSmoke());
         existingPost.setDeadline(postDTO.getDeadline());
-        existingPost.setStatus(PostStatus.POSTING); // 필요에 따라 상태 변경
+        existingPost.setStatus(PostStatus.RECRUITING); // 필요에 따라 상태 변경
 
         // Days 업데이트
         // 기존의 Days 및 관련 엔티티를 모두 삭제하고 새로 추가하는 방식으로 간단하게 처리
@@ -236,8 +237,8 @@ public class PostService {
             throw new BizException(PERMISSION_DENIED_ERROR);
         }
 
-        // 게시글 삭제
-        postRepository.delete(existingPost);
+        // 게시글 삭제 Soft Delete로 변경
+        existingPost.setStatus(PostStatus.DELETED);
     }
 
     @Transactional
@@ -273,9 +274,8 @@ public class PostService {
             .continent(existingPost.getContinent())
             .region(existingPost.getRegion())
             .accommodationFee(existingPost.getAccommodationFee())
-            .transportationFee(existingPost.getTransportationFee())
+            .otherExpenses(existingPost.getOtherExpenses())
             .airplaneFee(existingPost.getAirplaneFee())
-            .foodFee(existingPost.getFoodFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex())
@@ -333,14 +333,12 @@ public class PostService {
             .continent(existingPost.getContinent().name())
             .region(existingPost.getRegion())
             .accommodationFee(existingPost.getAccommodationFee())
-            .transportationFee(existingPost.getTransportationFee())
+            .otherExpenses(existingPost.getOtherExpenses())
             .airplaneFee(existingPost.getAirplaneFee())
-            .foodFee(existingPost.getFoodFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex().name())
             .limitSmoke(existingPost.getLimitSmoke().name())
-            .preferenceType(existingPost.getPreferenceType())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
                 .dayDetails(
@@ -357,5 +355,34 @@ public class PostService {
                         .build()).collect(Collectors.toList()))
                 .build()).collect(Collectors.toList()))
             .build();
+    }
+
+    @Transactional
+    public void updatePostsMbti(Long userId, String newMbti) {
+        MBTI mbtiEnum;
+        try {
+            mbtiEnum = MBTI.valueOf(newMbti.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // 예외 처리
+            return;
+        }
+
+        postRepository.updateMbtiByUserId(mbtiEnum, userId);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    @Transactional
+    public void updatePostStatus() {
+        LocalDate now = LocalDate.now();
+
+        // 마감일이 지났고, 상태가 RECRUITING인 게시물 조회
+        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(now, PostStatus.RECRUITING);
+
+        for (PostEntity post : postsToUpdate) {
+            post.setStatus(PostStatus.RECRUITMENT_COMPLETED);
+            // 필요한 경우 추가 로직 수행( 더티 체킹으로 변경내영 저장)
+        }
+
+        log.info("마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}", postsToUpdate.size());
     }
 }

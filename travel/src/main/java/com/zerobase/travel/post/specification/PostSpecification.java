@@ -1,10 +1,13 @@
 package com.zerobase.travel.post.specification;
 
+import static com.zerobase.travel.post.type.PostStatus.*;
+
 import com.zerobase.travel.post.dto.request.PostSearchCriteria;
 import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.constants.RepresentativeCountries;
+import com.zerobase.travel.post.type.PostStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -59,6 +62,14 @@ public class PostSpecification {
                 predicate = cb.and(predicate,
                     cb.equal(root.get("travelCountry"), criteria.getCountry()));
             }
+
+            // 상태가 RECRUITMENT_COMPLETED 또는 DELETED가 아닌 게시글만 조회
+            predicate = cb.and(predicate,
+                cb.not(root.get("status").in(
+                    RECRUITMENT_COMPLETED,
+                    DELETED
+                ))
+            );
 
             return predicate;
         };

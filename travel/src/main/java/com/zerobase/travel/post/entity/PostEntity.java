@@ -6,7 +6,16 @@ import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +44,7 @@ public class PostEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     private MBTI mbti;
 
     private String title;
@@ -60,14 +70,11 @@ public class PostEntity {
     @Column(name = "accommodation_fee")
     private Integer accommodationFee;
 
-    @Column(name = "transportation_fee")
-    private Integer transportationFee;
-
     @Column(name = "airplane_fee")
     private Integer airplaneFee;
 
-    @Column(name = "food_fee")
-    private Integer foodFee;
+    @Column(name = "other_expenses")
+    private Integer otherExpenses;
 
     @Column(name = "limit_max_age")
     private Integer limitMaxAge;
@@ -82,9 +89,6 @@ public class PostEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "limit_smoke")
     private LimitSmoke limitSmoke;
-
-    @Column(name = "preference_type")
-    private String preferenceType;
 
     private LocalDate deadline;
 

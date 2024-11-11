@@ -11,6 +11,7 @@ import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.entity.VisitedCountryEntity;
 import com.zerobase.user.exception.BizException;
+import com.zerobase.user.kafka.UserMbtiChangedEvent;
 import com.zerobase.user.repository.LangAbilityRepository;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
@@ -21,6 +22,8 @@ import com.zerobase.user.type.Smoking;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,10 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final VisitedCountryRepository visitedCountryRepository;
     private final LangAbilityRepository langAbilityRepository;
+    private final KafkaTemplate<String, UserMbtiChangedEvent> kafkaTemplate;
+
+    @Value("${app.kafka.topics.user-mbti-changed}")
+    private String userMbtiChangedTopic;
 
     @Transactional
     public void createProfile(ProfileRequestDTO request, UserEntity currentUser) {
@@ -85,12 +92,14 @@ public class ProfileService {
         ProfileEntity profile = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
+        String mbtiString = profileRequest.getMbti().toUpperCase();
+
         // 프로필 정보 업데이트
         if (profileRequest.getIntroduction() != null) {
             profile.setIntroduction(profileRequest.getIntroduction());
         }
         if (profileRequest.getMbti() != null) {
-            profile.setMbti(MBTI.valueOf(profileRequest.getMbti().toUpperCase()));
+            profile.setMbti(MBTI.valueOf(mbtiString));
         }
         if (profileRequest.getSmoking() != null) {
             profile.setSmoking(Smoking.valueOf(profileRequest.getSmoking().toUpperCase()));
@@ -123,6 +132,10 @@ public class ProfileService {
         }
 
         // 변경된 프로필 정보를 DB에 반영 (더티 체킹에 의해 자동 반영)
+
+        // 이벤트 발행
+        UserMbtiChangedEvent event = new UserMbtiChangedEvent(currentUser.getId(), mbtiString);
+        kafkaTemplate.send(userMbtiChangedTopic, event);
     }
 
 

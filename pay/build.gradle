@@ -21,6 +21,7 @@ ext {
     springCloudVersion = "2023.0.3"
 }
 
+
 // profile의 기본값 local로 설정
 ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
 

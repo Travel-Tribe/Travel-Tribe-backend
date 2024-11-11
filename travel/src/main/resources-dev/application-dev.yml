@@ -44,8 +44,8 @@ file:
     path: C:\travel\upload
 
 user-service:
-
   url: http://10.178.0.4:8080
 
-
+pay-service:
+  url : http://10.178.0.4:8082
 

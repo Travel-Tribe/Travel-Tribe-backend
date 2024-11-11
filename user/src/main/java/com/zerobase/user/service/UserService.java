@@ -24,9 +24,11 @@ import com.zerobase.user.type.Role;
 import com.zerobase.user.type.UserStatus;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,7 @@ public class UserService {
     private final ProfileRepository profileRepository;
     private final PasswordResetService passwordResetService;
     private final UserParticipationService userParticipationService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void joinProcess(JoinDTO joinDTO) {
         log.info("Processing registration for email: {}", joinDTO.getEmail());
@@ -103,25 +106,52 @@ public class UserService {
     }
 
     public UserInfoResponseDTO getUserInfo(UserEntity currentUser) {
-        return UserInfoResponseDTO.builder()
+
+        String cacheKey = "userInfo:" + currentUser.getId();
+        // Redis에서 캐시된 데이터 조회
+        UserInfoResponseDTO cachedData = (UserInfoResponseDTO) redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            log.info("Cache hit for user ID: {}", currentUser.getId());
+            return cachedData;
+        }
+
+        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        // 데이터베이스에서 조회
+        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
             .id(currentUser.getId())
             .username(currentUser.getUsername())
             .nickname(currentUser.getNickname())
             .phone(currentUser.getPhone())
             .email(currentUser.getEmail())
             .status(currentUser.getStatus())
+            .introduction(profileEntity.getIntroduction())
+            .mbti(profileEntity.getMbti())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
+            //.birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
             .build();
+
+        // Redis에 캐시 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
+        log.info("Cache miss for user ID: {}. Data cached.", currentUser.getId());
+
+        return userInfo;
     }
 
     public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
 
         Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
-        Integer completedTripsCount = userParticipationService.getCompletedTripsCount(String.valueOf(userId));
+        Integer completedTripsCount = userParticipationService.getCompletedTripsCount(
+            String.valueOf(userId));
         if (!optionalUserEntity.isPresent()) {
             throw new BizException(USER_NOT_FOUND_ERROR);
         } else {
             UserEntity userEntity = optionalUserEntity.get();
-            Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(userEntity.getId());
+            Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(
+                userEntity.getId());
             ProfileEntity profileEntity = optionalProfileEntity.get();
             return OtherUserInfoResponseDTO.builder()
                 .username(userEntity.getUsername())

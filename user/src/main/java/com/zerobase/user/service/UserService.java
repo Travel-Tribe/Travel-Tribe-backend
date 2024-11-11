@@ -109,10 +109,10 @@ public class UserService {
 
         String cacheKey = "userInfo:" + currentUser.getId();
         // Redis에서 캐시된 데이터 조회
-        UserInfoResponseDTO cachedData = (UserInfoResponseDTO) redisTemplate.opsForValue().get(cacheKey);
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
         if (cachedData != null) {
             log.info("Cache hit for user ID: {}", currentUser.getId());
-            return cachedData;
+            return (UserInfoResponseDTO) cachedData;
         }
 
         ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
@@ -130,7 +130,7 @@ public class UserService {
             .mbti(profileEntity.getMbti())
             .gender(profileEntity.getGender())
             .smoking(profileEntity.getSmoking())
-            //.birth(profileEntity.getBirth())
+            .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
 

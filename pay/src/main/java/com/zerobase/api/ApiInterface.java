@@ -1,8 +1,8 @@
-package com.zerobase.service;
+package com.zerobase.api;
 
 import com.zerobase.model.ResponseApi.PayReadyApiDto;
 
-public interface ApiService {
+public interface ApiInterface {
 
     public PayReadyApiDto sendPayReadySign(Long orderId, String userId);
 

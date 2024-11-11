@@ -1,4 +1,4 @@
-package com.zerobase.service;
+package com.zerobase.api;
 
 import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
 import static com.zerobase.config.Constants.ITEM_NAME;
@@ -23,7 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class KakaopayApiService implements ApiService {
+public class KakaopayApi implements ApiInterface {
 
 
 

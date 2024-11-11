@@ -237,8 +237,8 @@ public class PostService {
             throw new BizException(PERMISSION_DENIED_ERROR);
         }
 
-        // 게시글 삭제
-        postRepository.delete(existingPost);
+        // 게시글 삭제 Soft Delete로 변경
+        existingPost.setStatus(PostStatus.DELETED);
     }
 
     @Transactional
@@ -370,7 +370,7 @@ public class PostService {
         postRepository.updateMbtiByUserId(mbtiEnum, userId);
     }
 
-    @Scheduled(cron = "0 0 * * * *") // 매 시간마다 실행
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
     @Transactional
     public void updatePostStatus() {
         LocalDate now = LocalDate.now();

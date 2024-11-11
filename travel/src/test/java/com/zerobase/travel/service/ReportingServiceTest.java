@@ -3,15 +3,19 @@ package com.zerobase.travel.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.dto.request.ReportingRequestDto;
+import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.entity.ReportingEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReportingErrorCode;
+import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.repository.ReportingRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +29,9 @@ class ReportingServiceTest {
 
     @Mock
     private ReportingRepository reportingRepository;
+
+    @Mock
+    private ParticipationRepository participationRepository;
 
     @InjectMocks
     private ReportingService reportingService;
@@ -42,6 +49,15 @@ class ReportingServiceTest {
             .build();
 
         ArgumentCaptor<ReportingEntity> captor = ArgumentCaptor.forClass(ReportingEntity.class);
+
+        given(participationRepository.findByPostEntityPostIdAndUserId(anyLong(), anyString()))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
+        given(participationRepository.findByPostEntityPostIdAndUserId(anyLong(), anyString()))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
+        given(reportingRepository.existsByPostIdAndSenderUserIdAndReceiverUserId(anyLong(), anyLong(), anyLong()))
+            .willReturn(false);
 
         //when
         reportingService.reportingUser(reportUser, postId, senderUserId);
@@ -67,6 +83,12 @@ class ReportingServiceTest {
         ReportingRequestDto.ReportUser reportUser = ReportingRequestDto.ReportUser.builder()
             .receiverUserId(1L)
             .build();
+
+        given(participationRepository.findByPostEntityPostIdAndUserId(anyLong(), anyString()))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
+        given(participationRepository.findByPostEntityPostIdAndUserId(anyLong(), anyString()))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
 
         //when
         given(reportingRepository.existsByPostIdAndSenderUserIdAndReceiverUserId(anyLong(), anyLong(), anyLong()))

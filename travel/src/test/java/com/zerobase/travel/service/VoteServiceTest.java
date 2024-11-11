@@ -13,11 +13,13 @@ import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.dto.response.VoteResponseDto.GetVote;
 import com.zerobase.travel.dto.response.VoteResponseDto.VotingStart;
+import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
 import com.zerobase.travel.post.repository.PostRepository;
+import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
@@ -42,6 +44,9 @@ class VoteServiceTest {
 
     @Mock
     private VotingRepository votingRepository;
+
+    @Mock
+    private ParticipationRepository participationRepository;
 
     @InjectMocks
     private VoteService voteService;
@@ -82,6 +87,9 @@ class VoteServiceTest {
             .votingStatus(VotingStatus.STARTING)
             .build();
 
+        given(participationRepository.findByPostEntityPostIdAndUserId(anyLong(), any()))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
@@ -108,13 +116,16 @@ class VoteServiceTest {
 
         ArgumentCaptor<VotingEntity> captor = ArgumentCaptor.forClass(VotingEntity.class);
 
-        //when
+        given(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(userId)))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
         given(votingStartRepository.findByPostId(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
         given(votingStartRepository.existsByIdAndPostId(anyLong(), anyLong()))
             .willReturn(true);
 
+        //when
         voteService.voteVoting(userId, postId, votingStartsId, approval);
 
         //then
@@ -151,13 +162,19 @@ class VoteServiceTest {
                 .build()
         );
 
-        //when
+        given(votingStartRepository.existsByIdAndPostId(votingStartsId, postId))
+            .willReturn(true);
+
+        given(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(userId)))
+            .willReturn(Optional.of(ParticipationEntity.builder().build()));
+
         given(votingStartRepository.findById(anyLong()))
             .willReturn(Optional.of(votingStartEntity));
 
         given(votingRepository.findAllByVotingStartEntity(any()))
             .willReturn(votingEntityList);
 
+        //when
         GetVote vote = voteService.getVote(userId, postId, votingStartsId);
 
         //then

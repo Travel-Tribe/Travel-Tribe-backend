@@ -2,6 +2,7 @@ package com.zerobase.user.service;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.AUTHENTICATION_CODE_EXPIRED_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
 
@@ -196,13 +197,11 @@ public class UserService {
     }
 
     public UserInfoResponseDTO findByUserWithEmail(String userEmail) {
-        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(userEmail);
+        UserEntity userEntity = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
 
-        if (!optionalUserEntity.isPresent()) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        }
-
-        UserEntity userEntity = optionalUserEntity.get();
+        ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
         return UserInfoResponseDTO.builder()
             .id(userEntity.getId())
@@ -211,6 +210,12 @@ public class UserService {
             .email(userEntity.getEmail())
             .status(userEntity.getStatus())
             .phone(userEntity.getPhone())
+            .introduction(profileEntity.getIntroduction())
+            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender())
+            .mbti(profileEntity.getMbti())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
             .build();
     }
 

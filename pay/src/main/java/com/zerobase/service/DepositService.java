@@ -18,17 +18,15 @@ public class DepositService {
 
 
     // depositId를 생성하기 위해서
-    public DepositDto createDepositOrder(Long postId, Long participationId,
+    public DepositEntity createDepositOrder(Long postId, Long participationId,
         String userId) {
         log.info("DepositRepository initial save start");
 
-        DepositEntity depositEntity = DepositEntity.builder()
+        return DepositEntity.builder()
             .postId(postId)
             .participationId(participationId)
             .userId(userId)
             .build();
-
-        return DepositDto.fromEntity(depositRepository.save(depositEntity));
     }
 
 
@@ -36,5 +34,9 @@ public class DepositService {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
             CustomException::new));
+    }
+
+    public void save(DepositEntity depositEntity) {
+        depositRepository.save(depositEntity);
     }
 }

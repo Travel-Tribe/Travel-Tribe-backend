@@ -35,3 +35,14 @@ user-service:
 travel-service:
   url: http://10.178.0.4:8081
 
+kakaopay:
+  cid: TC0ONETIME
+  approval-url: http://localhost:8080/api/v1/pay/deposit/success
+  fail-url: http://localhost:8080/api/v1/pay/deposit/fail
+  cancel-url: http://localhost:8080/api/v1/pay/deposit/refund
+  item-name: "여행참여 보증금"
+  quantity: 1
+  deposit-amount: 100000
+  tax-free-amount: 9090
+  secret-key: DEVBB2EC55AEA5209485B283C6EAC15502C4B307
+

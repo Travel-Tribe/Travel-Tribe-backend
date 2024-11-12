@@ -11,9 +11,13 @@ public class PayApi {
 
     private final com.zerobase.travel.api.PayClient payClient;
 
-    public ResponseEntity<Object> payDepositRefund(@PathVariable long participationId) {
+    public ResponseEntity<Object> payDepositRefund( long participationId, String userId) {
 
-        payClient.payDepositRefund(participationId);
+        payClient.payDepositRefund(
+            RequestpayDepositRefund
+                .builder()
+                    .participationId(participationId)
+                        .userId(userId).build());
 
         return ResponseEntity.ok().build();
     }

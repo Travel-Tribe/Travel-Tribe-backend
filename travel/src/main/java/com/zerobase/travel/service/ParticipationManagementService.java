@@ -13,7 +13,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /*
@@ -106,7 +105,7 @@ public class ParticipationManagementService {
             List.of(ParticipationStatus.JOIN_CANCEL, DepositStatus.RETURNED));
 
         // pay모듈에 취소요청
-        payApi.payDepositRefund(participationEntity.getParticipationId());
+        payApi.payDepositRefund(participationEntity.getParticipationId(),participationEntity.getUserId());
 
         // deposit 반환시점 기록
         participationService.setDateToReturnDeposit(participationEntity,
@@ -247,7 +246,7 @@ public class ParticipationManagementService {
         );
 
         // 배당금 반환 API 호출
-        payApi.payDepositRefund(participationEntity.getParticipationId());
+        payApi.payDepositRefund(participationEntity.getParticipationId(),participationEntity.getUserId());
 
         participationService.saveParticipation(participationEntity);
 

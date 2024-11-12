@@ -1,5 +1,6 @@
 package com.zerobase.controller;
 
+import com.zerobase.model.RequestPayDepositFail;
 import com.zerobase.model.RequestPayDepositSuccess;
 import com.zerobase.model.RequestReadyPayDeposit;
 import com.zerobase.model.ResponseDepositPayDto;
@@ -38,7 +39,7 @@ public class PayController {
     public ResponseEntity<List<ResponsePaymentDto>> getPayHistory(
         @RequestHeader("X-User-Id") String userId) {
 
-        List<PaymentDto> paymentDtos = paymentService.getPayments(userId);
+        List<PaymentDto> paymentDtos = paymentService.getPaymentsByUserId(userId);
         return ResponseEntity.ok(
             paymentDtos.stream().map(ResponsePaymentDto::fromDto).toList());
     }
@@ -46,7 +47,8 @@ public class PayController {
     // 결제시도후 payDeposit 생성하기
     @PostMapping(value = "/deposit/ready")
     public ResponseEntity<ResponseDepositPayDto> readyPayDeposit(
-        @RequestBody RequestReadyPayDeposit request, @RequestHeader("X-User-Id") String userId) {
+        @RequestBody RequestReadyPayDeposit request,
+        @RequestHeader("X-User-Id") String userId) {
         log.info("request ready pay deposit ");
         return ResponseEntity.ok(
             payManagmentService.createDepositOrderAndInitiatePay(
@@ -63,21 +65,20 @@ public class PayController {
         @RequestHeader("X-User-Id") String userId) {
         log.info(" pay deposit success sign from client");
         payManagmentService.clientSuccessDepositPay(
-            request.getParticipationId(),userId, request.getPg_token());
+            request.getOrderId(),userId, request.getPg_token());
 
         return ResponseEntity.ok().build();
     }
 
 
     // client 결제실패시 url 신호받기
-    // todo: frontend와 회의후 결과에 따라 코드 재작성하기
     @PutMapping(value = "/deposit/fail")
     public ResponseEntity<Object> PayDepositFail(
         @RequestBody RequestPayDepositFail request,
         @RequestHeader("X-User-Id") String userId
     ) {
         log.info(" pay deposit fail sign from client");
-        payManagmentService.failedDepositPay(userId);
+        payManagmentService.clientFailedDepositPay(userId,request.getParticipationId());
 
         return ResponseEntity.ok().build();
     }

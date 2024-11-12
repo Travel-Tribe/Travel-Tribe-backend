@@ -5,6 +5,7 @@ import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,4 +23,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, JpaSpec
     void updateMbtiByUserId(@Param("mbti") MBTI mbti, @Param("userId") Long userId);
 
     List<PostEntity> findByDeadlineBeforeAndStatus(LocalDate deadline, PostStatus status);
+
+
+    Optional<PostEntity> findByPostId(long postId);
 }

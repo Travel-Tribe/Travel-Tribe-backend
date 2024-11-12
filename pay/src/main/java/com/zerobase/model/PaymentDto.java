@@ -35,4 +35,33 @@ public class PaymentDto {
 
 
     }
+
+    @Builder
+    @Getter
+    @Setter
+    public static class PaymentDto {
+        private Long paymentId;
+        private OrderType referencialOrderType;
+        private Long referentialOrderId;
+        private String userId;
+        private String payKey;
+        private Long amount;
+        private PaymentStatus paymentStatus;
+        private PGMethod pgMethod;
+
+        public static PaymentDto fromEntity(PaymentEntity paymentEntity) {
+            return PaymentDto.builder()
+                .paymentId(paymentEntity.getPaymentId())
+                .referencialOrderType(paymentEntity.getReferencialOrderType())
+                .referentialOrderId(paymentEntity.getReferentialOrderId())
+                .userId(paymentEntity.getUserId())
+                .payKey(paymentEntity.getPaykey())
+                .amount(paymentEntity.getAmount())
+                .pgMethod(paymentEntity.getPgMethod())
+                .paymentStatus(paymentEntity.getPaymentStatus())
+                .build();
+
+
+        }
+    }
 }

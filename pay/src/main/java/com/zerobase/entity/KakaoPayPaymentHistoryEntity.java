@@ -4,7 +4,6 @@ import com.zerobase.model.type.KaKaoPayStatus;
 import com.zerobase.model.type.PayMethod;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -11,7 +11,7 @@ import com.zerobase.model.DepositDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.type.PGMethod;
-import com.zerobase.model.type.PaymentDto;
+import com.zerobase.model.PaymentDto.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

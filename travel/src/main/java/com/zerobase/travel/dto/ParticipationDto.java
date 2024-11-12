@@ -1,7 +1,6 @@
 package com.zerobase.travel.dto;
 
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
@@ -20,9 +19,9 @@ public class ParticipationDto {
     private Long participationId;
     private Long postId;
     private String userId;
-    private ParticipationStatus participationStatus;
-    private DepositStatus depositStatus;
-    private RatingStatus ratingStatus;
+    private String participationStatus;
+    private String depositStatus;
+    private String ratingStatus;
     private LocalDate depositReturnDate;
 
 
@@ -32,9 +31,9 @@ public class ParticipationDto {
             .participationId(participationEntity.getParticipationId())
             .postId(participationEntity.getPostEntity().getPostId())
             .userId(participationEntity.getUserId())
-            .participationStatus(participationEntity.getParticipationStatus())
-            .depositStatus(participationEntity.getDepositStatus())
-            .ratingStatus(participationEntity.getRatingStatus())
+            .participationStatus(participationEntity.getParticipationStatus().getKorean())
+            .depositStatus(participationEntity.getDepositStatus().getKorean())
+            .ratingStatus(participationEntity.getRatingStatus().getKorean())
             .depositReturnDate(participationEntity.getDepositReturnDate())
             .build();
 

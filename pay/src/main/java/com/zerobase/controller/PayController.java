@@ -4,7 +4,7 @@ import com.zerobase.model.RequestPayDepositSuccess;
 import com.zerobase.model.RequestReadyPayDeposit;
 import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.ResponsePaymentDto;
-import com.zerobase.model.type.PaymentDto;
+import com.zerobase.model.PaymentDto.PaymentDto;
 import com.zerobase.service.PayManagementService;
 import com.zerobase.service.PaymentService;
 import java.util.List;

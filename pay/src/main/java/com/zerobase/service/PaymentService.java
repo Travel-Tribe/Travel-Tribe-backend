@@ -6,7 +6,7 @@ import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.OrderType;
 import com.zerobase.model.type.PGMethod;
-import com.zerobase.model.type.PaymentDto;
+import com.zerobase.model.PaymentDto.PaymentDto;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.PaymentRepository;
 import java.util.List;

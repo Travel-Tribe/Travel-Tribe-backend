@@ -21,6 +21,8 @@ import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
+import com.zerobase.travel.post.type.LimitSex;
+import com.zerobase.travel.post.type.LimitSmoke;
 import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import com.zerobase.travel.post.constants.RepresentativeCountries;
@@ -278,8 +280,9 @@ public class PostService {
             .airplaneFee(existingPost.getAirplaneFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
-            .limitSex(existingPost.getLimitSex())
-            .limitSmoke(existingPost.getLimitSmoke())
+            .status(existingPost.getStatus().getPostStatus())
+            .limitSex(existingPost.getLimitSex().getSex())
+            .limitSmoke(existingPost.getLimitSmoke().getSmoke())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
                 .dayDetails(
@@ -337,8 +340,9 @@ public class PostService {
             .airplaneFee(existingPost.getAirplaneFee())
             .limitMinAge(existingPost.getLimitMinAge())
             .limitMaxAge(existingPost.getLimitMaxAge())
-            .limitSex(existingPost.getLimitSex().name())
-            .limitSmoke(existingPost.getLimitSmoke().name())
+            .limitSex(existingPost.getLimitSex().getSex())
+            .limitSmoke(existingPost.getLimitSmoke().getSmoke())
+            .status(existingPost.getStatus().getPostStatus())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
                 .dayDetails(

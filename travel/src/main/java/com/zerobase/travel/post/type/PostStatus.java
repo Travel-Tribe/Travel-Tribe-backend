@@ -1,5 +1,8 @@
 package com.zerobase.travel.post.type;
 
+import lombok.Getter;
+
+@Getter
 public enum PostStatus {
     RECRUITING("모집중"),
     RECRUITMENT_COMPLETED("모집완료"),

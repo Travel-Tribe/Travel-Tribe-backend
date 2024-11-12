@@ -101,12 +101,12 @@ public class ProfileService {
             .nickname(currentUser.getNickname())
             .phone(currentUser.getPhone())
             .email(currentUser.getEmail())
-            .status(currentUser.getStatus())
+            .status(currentUser.getStatus().getUserStatus())
             // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
             .introduction(profileEntity.getIntroduction())
             .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender())
-            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender().getGender())
+            .smoking(profileEntity.getSmoking().getSmoke())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
@@ -181,12 +181,12 @@ public class ProfileService {
             .nickname(currentUser.getNickname())
             .phone(currentUser.getPhone())
             .email(currentUser.getEmail())
-            .status(currentUser.getStatus())
+            .status(currentUser.getStatus().getUserStatus())
             // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
             .introduction(profileEntity.getIntroduction())
             .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender())
-            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender().getGender())
+            .smoking(profileEntity.getSmoking().getSmoke())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();

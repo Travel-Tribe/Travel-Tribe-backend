@@ -20,8 +20,8 @@ public class OtherUserInfoResponseDTO {
     private String email;
     private Integer count; // 여행 횟수
     private Double ratingAvg;
-    private Gender gender;
-    private UserStatus status;
+    private String gender;
+    private String status;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class OtherUserInfoResponseDTOBuilder {

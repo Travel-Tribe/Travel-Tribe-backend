@@ -1,18 +1,21 @@
 package com.zerobase.user.type;
 
+import lombok.Getter;
+
+@Getter
 public enum UserStatus {
     ACTIVE("활동중"),
     INACTIVE("활동정지"),
     DEACTIVATED("탈퇴");
 
-    private final String description;
+    private final String status;
 
-    UserStatus(String description) {
-        this.description = description;
+    UserStatus(String status) {
+        this.status = status;
     }
 
-    public String getDescription() {
-        return description;
+    public String getUserStatus() {
+        return status;
     }
 }
 

@@ -27,8 +27,9 @@ public class ResponsePostDTO {
     private Integer otherExpenses;
     private Integer limitMaxAge;
     private Integer limitMinAge;
-    private LimitSex limitSex;
-    private LimitSmoke limitSmoke;
+    private String limitSex;
+    private String limitSmoke;
+    private String status;
     private LocalDate deadline;
     private List<DayDTO> days;
 }

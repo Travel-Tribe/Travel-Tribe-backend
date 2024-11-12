@@ -1,5 +1,8 @@
 package com.zerobase.travel.post.type;
 
+import lombok.Getter;
+
+@Getter
 public enum LimitSex {
     MALE("남"),
     FEMALE("여"),

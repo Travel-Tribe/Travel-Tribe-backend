@@ -126,8 +126,6 @@ public class UserController {
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
 
-
-
     // 회원 탈퇴
     @DeleteMapping
     public ResponseEntity<?> deleteProcess(Authentication authentication) {

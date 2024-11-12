@@ -49,9 +49,9 @@ public class KakaopayApi implements ApiInterface {
             .quantity(String.valueOf(QUANTITY))
             .totalAmount(String.valueOf(DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(TAX_FREE_AMOUNT))
-            .approvalUrl(KAKAO_APPROVAL_URL)
-            .cancelUrl(KAKAO_CANCEL_URL)
-            .failUrl(KAKAO_FAIL_URL)
+            .approvalUrl(KAKAO_APPROVAL_URL+"?"+orderId)
+            .cancelUrl(KAKAO_CANCEL_URL+"?"+orderId)
+            .failUrl(KAKAO_FAIL_URL+"?orderId="+orderId)
             .build();
         //
         ResponseApi.PayReadyApiDto payReadyApiDto = webclient.post()

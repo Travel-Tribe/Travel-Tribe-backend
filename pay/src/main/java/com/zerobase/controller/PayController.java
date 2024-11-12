@@ -65,7 +65,7 @@ public class PayController {
         @RequestHeader("X-User-Id") String userId) {
         log.info(" pay deposit success sign from client");
         payManagmentService.clientSuccessDepositPay(
-            request.getOrderId(),userId, request.getPg_token());
+            request.getParticipationId(),userId, request.getPg_token());
 
         return ResponseEntity.ok().build();
     }

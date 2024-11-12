@@ -6,6 +6,7 @@ import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR
 
 import com.zerobase.user.dto.request.ProfileRequestDTO;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
+import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.LangAbilityEntity;
 import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.UserEntity;
@@ -20,14 +21,18 @@ import com.zerobase.user.type.Gender;
 import com.zerobase.user.type.MBTI;
 import com.zerobase.user.type.Smoking;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ProfileService {
 
@@ -36,6 +41,7 @@ public class ProfileService {
     private final VisitedCountryRepository visitedCountryRepository;
     private final LangAbilityRepository langAbilityRepository;
     private final KafkaTemplate<String, UserMbtiChangedEvent> kafkaTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${app.kafka.topics.user-mbti-changed}")
     private String userMbtiChangedTopic;
@@ -44,6 +50,12 @@ public class ProfileService {
     public void createProfile(ProfileRequestDTO request, UserEntity currentUser) {
         UserEntity user = userRepository.findById(currentUser.getId())
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        String cacheKey = "userInfo:" + currentUser.getId();
+
+        // 기존 캐시 삭제
+        redisTemplate.delete(cacheKey);
+        log.info("Cache deleted for user ID: {}", currentUser.getId());
 
         // MBTI, Smoking, Gender 변환 중 발생할 수 있는 예외를 처리
         MBTI mbti;
@@ -82,6 +94,30 @@ public class ProfileService {
             .map(lang -> new LangAbilityEntity(profile, lang))
             .collect(Collectors.toList());
         langAbilityRepository.saveAll(languages);
+
+        // Redis 캐시에 사용자 정보 저장.
+        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
+            .id(currentUser.getId())
+            .username(currentUser.getUsername())
+            .nickname(currentUser.getNickname())
+            .phone(currentUser.getPhone())
+            .email(currentUser.getEmail())
+            .status(currentUser.getStatus())
+            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
+            .introduction(profileEntity.getIntroduction())
+            .mbti(profileEntity.getMbti())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .build();
+
+        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
+        log.info("Cache updated for user ID: {}", currentUser.getId());
     }
 
     @Transactional
@@ -91,6 +127,12 @@ public class ProfileService {
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
         ProfileEntity profile = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        String cacheKey = "userInfo:" + currentUser.getId();
+
+        // 기존 캐시 삭제
+        redisTemplate.delete(cacheKey);
+        log.info("Cache deleted for user ID: {}", currentUser.getId());
 
         String mbtiString = profileRequest.getMbti().toUpperCase();
 
@@ -132,6 +174,30 @@ public class ProfileService {
         }
 
         // 변경된 프로필 정보를 DB에 반영 (더티 체킹에 의해 자동 반영)
+
+        // 변경된 UserInfoResponseDTO 생성
+        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
+            .id(currentUser.getId())
+            .username(currentUser.getUsername())
+            .nickname(currentUser.getNickname())
+            .phone(currentUser.getPhone())
+            .email(currentUser.getEmail())
+            .status(currentUser.getStatus())
+            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
+            .introduction(profileEntity.getIntroduction())
+            .mbti(profileEntity.getMbti())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .build();
+
+        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
+        log.info("Cache updated for user ID: {}", currentUser.getId());
 
         // 이벤트 발행
         UserMbtiChangedEvent event = new UserMbtiChangedEvent(currentUser.getId(), mbtiString);

@@ -1,6 +1,5 @@
 package com.zerobase.model;
 
-import com.zerobase.model.PaymentDto.PaymentDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

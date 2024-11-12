@@ -12,6 +12,7 @@ import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentDto;
+import com.zerobase.model.type.PaymentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,12 +77,13 @@ public class PayManagementService {
         String userId, String pgToken) {
         log.info("success customer DepositPay");
 
-        PaymentEntity paymentEntity = paymentService.ChangeStatusToCompleteByUserId(
-            userId);
+        PaymentEntity paymentEntity = paymentService.getPaymentsInProgressByOrderId(
+            userId, participationId);
 
-        kakaopayApi.sendPayConfirmSign(
-            paymentEntity.getPaykey(), paymentEntity.getReferentialOrderId(),
-            userId, pgToken);
+        paymentService.changeStatus(paymentEntity, PaymentStatus.PAY_COMPLETED);
+
+        kakaopayApi.sendPayConfirmSign(paymentEntity.getPaykey(),
+            paymentEntity.getReferentialOrderId(), userId, pgToken);
 
         travelApi.confirmParticipation(participationId,userId);
 
@@ -93,9 +95,11 @@ public class PayManagementService {
     2. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
 */
 
-    public void failedDepositPay(String userId) {
+    public void clientFailedDepositPay(String userId, long orderId) {
         log.info("fail customer DepositPay");
-        PaymentEntity paymentEntity = paymentService.ChangeStatusToFailByUserId(userId);
+        PaymentEntity paymentEntity = paymentService.getPaymentsInProgressByOrderId(
+            userId, orderId);
+        paymentService.changeStatus(paymentEntity, PaymentStatus.PAY_FAILED);
         paymentService.savePayments(paymentEntity);
     }
 
@@ -107,14 +111,13 @@ public class PayManagementService {
     */
 
     public void refundDepositPay(
-        Long participationId) {
+        long participationId, String userId) {
         log.info("refund customer DepositPay");
 
-        DepositDto depositDto = depositService.findByParticipationId(
-            participationId);
+        PaymentEntity paymentEntity = paymentService.getPaymentsInPayCompletedByOrderId(
+            userId, participationId);
 
-        PaymentEntity paymentEntity = paymentService.
-            ChangeStatusToRefundedByOrderId(depositDto.getDepositId());
+        paymentService.changeStatus(paymentEntity, PaymentStatus.PAY_REFUNDED);
 
         kakaopayApi.sendPayRefundSign(
                 paymentEntity.getPaykey(), DEPOSIT_AMOUNT, TAX_FREE_AMOUNT);

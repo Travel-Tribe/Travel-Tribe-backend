@@ -10,6 +10,7 @@ import com.zerobase.model.type.PaymentDto;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.PaymentRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class PaymentService {
 
         PaymentEntity paymentEntity = paymentRepository.save(
             PaymentEntity.builder()
-                .referencialOrderType(OrderType.DEPOSIT)
+                .referentialOrderType(OrderType.DEPOSIT)
                 .referentialOrderId(depositId)
                 .userId(userId)
                 .paykey(payKey)
@@ -41,44 +42,37 @@ public class PaymentService {
 
     }
 
-    public PaymentEntity ChangeStatusToCompleteByUserId(String userId) {
-        log.info("change status to complete by userId : {}", userId);
 
-        PaymentEntity paymentEntity =
-            paymentRepository.findByUserIdAndPaymentStatus(userId,PaymentStatus.PAY_IN_PROGRESS)
-            .orElseThrow(() -> new CustomException());
-
-        paymentEntity.setPaymentStatus(PaymentStatus.PAY_COMPLETED);
-
+    public PaymentEntity changeStatus(PaymentEntity paymentEntity,
+        PaymentStatus payFailed) {
+        paymentEntity.setPaymentStatus(payFailed);
         return paymentEntity;
     }
 
-    public PaymentEntity ChangeStatusToFailByUserId(String userId) {
-        log.info("change status to fail by userId : {}", userId);
-        PaymentEntity paymentEntity =
-            paymentRepository.findByUserIdAndPaymentStatus(userId,PaymentStatus.PAY_IN_PROGRESS)
-                .orElseThrow(() -> new CustomException());
-
-        paymentEntity.setPaymentStatus(PaymentStatus.PAY_FAILED);
-
-        return paymentEntity;
-    }
-
-    public PaymentEntity ChangeStatusToRefundedByOrderId(Long referencialOrderId) {
-        log.info("change status to refunded by orderId : {}", referencialOrderId);
-        PaymentEntity paymentEntity = paymentRepository
-            .findByReferentialOrderId(referencialOrderId)
-            .orElseThrow(() -> new CustomException());
-
-        paymentEntity.setPaymentStatus(PaymentStatus.PAY_REFUNDED);
-
-        return paymentEntity;
-    }
-
-    public List<PaymentDto> getPayments(String userId) {
+    public List<PaymentDto> getPaymentsByUserId(String userId) {
         return paymentRepository.findAllByUserId(userId).stream().map(
             PaymentDto::fromEntity).toList();
     }
+
+    public PaymentEntity getPaymentsInProgressByOrderId( String userId,long orderId) {
+        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
+            orderId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException());
+
+        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException();
+
+        return paymentEntity;
+    }
+
+    public PaymentEntity getPaymentsInPayCompletedByOrderId( String userId,long orderId) {
+        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
+            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new CustomException());
+
+        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException();
+
+        return paymentEntity;
+    }
+
+
 
     public void savePayments(PaymentEntity paymentEntity) {
          paymentRepository.save(paymentEntity);

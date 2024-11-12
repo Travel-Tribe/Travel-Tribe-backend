@@ -7,6 +7,7 @@ import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
 import com.zerobase.travel.post.repository.PostRepository;
+import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.repository.VotingRepository;
 import com.zerobase.travel.repository.VotingStartRepository;
 import com.zerobase.travel.type.VotingStatus;
@@ -21,6 +22,7 @@ public class VoteService {
     private final PostRepository postRepository;
     private final VotingStartRepository votingStartRepository;
     private final VotingRepository votingRepository;
+    private final ParticipationRepository participationRepository;
 
     public void createVote(long userId, long postId) {
 
@@ -70,7 +72,7 @@ public class VoteService {
         validationGetVote(userId, postId, votingStartsId);
 
         VotingStartEntity votingStartEntity = votingStartRepository.findById(votingStartsId)
-            .orElseThrow(() -> new RuntimeException());
+            .orElseThrow(() -> new BizException(VoteErrorCode.NOT_READY_VOTING_START));
 
         return VoteResponseDto.GetVote.fromEntity(
             votingRepository.findAllByVotingStartEntity(votingStartEntity)
@@ -91,13 +93,14 @@ public class VoteService {
 
     }
 
-    //TODO 김용민 validationRegisterRating 작성하기
     private void validationGetVotingStart(long userId, long postId) {
         // userId가 postId 여행에 참가한 사람 인지
+        if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(userId)).isEmpty()) {
+            throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
+        }
 
     }
 
-    //TODO 김용민 validationRegisterRating 작성하기
     private void validationVoteVoting(long userId, long postId, long votingStartsId, VotingStartEntity votingStartEntity) {
         //votingStartsId가 postId의 투표인지
         if (!votingStartRepository.existsByIdAndPostId(votingStartsId, postId)) {
@@ -110,12 +113,20 @@ public class VoteService {
         }
 
         //userId가 postId 여행에 참여하였는지
+        if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(userId)).isEmpty()) {
+            throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
+        }
     }
 
-    //TODO 김용민 validationRegisterRating 작성하기
     private void validationGetVote(long userId, long postId, long votingStartsId) {
         //votingStartsId가 postId의 투표인지
+        if(!votingStartRepository.existsByIdAndPostId(votingStartsId, postId)) {
+            throw new BizException(VoteErrorCode.VOTE_NOT_ALLOW_THIS_POST);
+        }
 
         //userId가 postId 여행에 참여하였는지
+        if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(userId)).isEmpty()) {
+            throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
+        }
     }
 }

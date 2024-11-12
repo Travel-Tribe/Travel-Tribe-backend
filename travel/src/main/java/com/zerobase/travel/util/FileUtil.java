@@ -1,5 +1,7 @@
 package com.zerobase.travel.util;
 
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.BasicErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,8 +28,7 @@ public class FileUtil {
             }
 
         } catch (IOException e) {
-            //TODO 김용민 공통 에러처리 추가하기
-            throw new RuntimeException(e);
+            throw new BizException(BasicErrorCode.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -56,8 +57,7 @@ public class FileUtil {
             return file;
 
         } catch (IOException e) {
-            //TODO 김용민 공통 에러처리 추가하기
-            throw new RuntimeException(e);
+            throw new BizException(BasicErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -29,11 +29,11 @@ public class UserInfoResponseDTO {
     private String nickname;
     private String phone;
     private String email;
-    private UserStatus status;
+    private String status;
     private MBTI mbti;
-    private Smoking smoking;
+    private String smoking;
     private String introduction;
-    private Gender gender;
+    private String gender;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)

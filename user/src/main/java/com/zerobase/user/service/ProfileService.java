@@ -53,10 +53,6 @@ public class ProfileService {
 
         String cacheKey = "userInfo:" + currentUser.getId();
 
-        // 기존 캐시 삭제
-        redisTemplate.delete(cacheKey);
-        log.info("Cache deleted for user ID: {}", currentUser.getId());
-
         // MBTI, Smoking, Gender 변환 중 발생할 수 있는 예외를 처리
         MBTI mbti;
         Smoking smoking;
@@ -99,7 +95,7 @@ public class ProfileService {
         ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
+        UserInfoResponseDTO UserInfo = UserInfoResponseDTO.builder()
             .id(currentUser.getId())
             .username(currentUser.getUsername())
             .nickname(currentUser.getNickname())
@@ -116,7 +112,7 @@ public class ProfileService {
             .build();
 
         // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(cacheKey, UserInfo, 1, TimeUnit.HOURS);
         log.info("Cache updated for user ID: {}", currentUser.getId());
     }
 
@@ -212,6 +208,20 @@ public class ProfileService {
         ProfileEntity profile = profileRepository.findByUserId(userId)
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        return ProfileResponseDTO.fromEntity(profile);
+        String cacheKey = "userProfile:" + userId;
+
+        // Redis에서 캐시된 데이터 조회
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            log.info("Cache hit for user ID: {}", userId);
+            return (ProfileResponseDTO) cachedData;
+        }
+
+        ProfileResponseDTO userProfile = ProfileResponseDTO.fromEntity(profile);
+        // Redis에 캐시 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, userProfile, 1, TimeUnit.HOURS);
+        log.info("Cache miss for user ID: {}. Data cached.", userId);
+
+        return userProfile;
     }
 }

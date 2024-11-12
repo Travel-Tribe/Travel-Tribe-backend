@@ -27,20 +27,19 @@ public class ParticipationController {
 
     // 참여
     @PostMapping("{postId}/participations")
-    public ParticipationDto readyParticipation(
+    public ParticipationDto createParticipation(
         @PathVariable Long postId, @RequestHeader("X-User-Id") String userId) {
         log.info("createParticipation controller start");
-        return participationManagementService.readyParticipation(postId, userId);
+        return participationService.createParticipation(postId, userId);
+
     }
-
-
 
     // 개인의 참여취소
     @DeleteMapping("{postId}/participations")
     public ResponseEntity<Object> deleteParticipations( @PathVariable Long postId,  @RequestHeader(value="userId") String userId ) {
 
         log.info("deleteParticipations controller start");
-        participationManagementService.unjoinParticipationWithDepositForfeited(postId,userId);
+        participationManagementService.unjoinWithDepositTakenParticipation(postId,userId);
 
         return ResponseEntity.ok().build();
     }

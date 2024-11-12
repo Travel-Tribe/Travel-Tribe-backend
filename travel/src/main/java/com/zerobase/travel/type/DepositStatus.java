@@ -1,10 +1,8 @@
 package com.zerobase.travel.type;
 
 public enum DepositStatus {
-
-    UNPAID,
-    PAID,
-    FORFEITED,
-    RETURNED
+    DEPOSIT_PAID,
+    DEPOSIT_TAKEN,
+    DEPOSIT_RETURNED
 
 }

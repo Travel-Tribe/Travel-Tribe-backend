@@ -11,12 +11,12 @@ import org.springframework.stereotype.Repository;
 public interface ParticipationRepository extends JpaRepository<ParticipationEntity,Long> {
 
 
-    int countByUserIdAndParticipationStatusIn(String userId, List<ParticipationStatus> participationStatuses);
+    int countByParticipationStatusAndUserId(ParticipationStatus participationStatus, String userId);
   
     Optional<ParticipationEntity> findByPostEntityPostIdAndUserId(Long postId, String userId);
 
     List<ParticipationEntity> findAllByPostEntityPostIdAndParticipationStatus(Long postId, ParticipationStatus participationStatus);
 
 
-    int countByPostEntityPostIdAndParticipationStatusIn(Long postId, List<ParticipationStatus> join);
+
 }

@@ -1,5 +1,7 @@
 package com.zerobase.user.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.zerobase.user.type.Gender;
 import com.zerobase.user.type.UserStatus;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
+@JsonDeserialize(builder = OtherUserInfoResponseDTO.OtherUserInfoResponseDTOBuilder.class)
 public class OtherUserInfoResponseDTO {
 
     private String username;
@@ -19,4 +22,9 @@ public class OtherUserInfoResponseDTO {
     private Double ratingAvg;
     private Gender gender;
     private UserStatus status;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class OtherUserInfoResponseDTOBuilder {
+
+    }
 }

@@ -171,27 +171,38 @@ public class UserService {
     }
 
     public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
+        String cacheKey = "otheruserInfo:" + userId;
+        // Redis에서 캐시된 데이터 조회
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            log.info("Cache hit for user ID: {}", userId);
+            return (OtherUserInfoResponseDTO) cachedData;
+        }
 
-        Optional<UserEntity> optionalUserEntity = userRepository.findById(userId);
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
         Integer completedTripsCount = userParticipationService.getCompletedTripsCount(
             String.valueOf(userId));
-        if (!optionalUserEntity.isPresent()) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        } else {
-            UserEntity userEntity = optionalUserEntity.get();
-            Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(
-                userEntity.getId());
-            ProfileEntity profileEntity = optionalProfileEntity.get();
-            return OtherUserInfoResponseDTO.builder()
-                .username(userEntity.getUsername())
-                .nickname(userEntity.getNickname())
-                .count(completedTripsCount)
-                .email(userEntity.getEmail())
-                .ratingAvg(profileEntity.getRatingAvg())
-                .gender(profileEntity.getGender())
-                .status(userEntity.getStatus())
-                .build();
-        }
+
+        ProfileEntity profileEntity = profileRepository.findByUserId(
+            userEntity.getId()).orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        OtherUserInfoResponseDTO otherUserInfo = OtherUserInfoResponseDTO.builder()
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .count(completedTripsCount)
+            .email(userEntity.getEmail())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .gender(profileEntity.getGender())
+            .status(userEntity.getStatus())
+            .build();
+
+        // Redis에 캐시 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, otherUserInfo, 1, TimeUnit.HOURS);
+        log.info("Cache miss for user ID: {}. Data cached.", userId);
+
+        return otherUserInfo;
     }
 
     public void deleteProcess(UserEntity currentUser) {
@@ -202,6 +213,10 @@ public class UserService {
         } else {
             userRepository.delete(optionalUserEntity.get());
         }
+        String cacheKey = "userInfo:" + currentUser.getId();
+        // 기존 캐시 삭제
+        redisTemplate.delete(cacheKey);
+        log.info("Cache deleted for user ID: {}", currentUser.getId());
     }
 
     @Transactional
@@ -262,7 +277,16 @@ public class UserService {
         ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        return UserInfoResponseDTO.builder()
+        Long userId = userEntity.getId();
+        String cacheKey = "userInfo:" + userId;
+        // Redis에서 캐시된 데이터 조회
+        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+        if (cachedData != null) {
+            log.info("Cache hit for user ID: {}", userId);
+            return (UserInfoResponseDTO) cachedData;
+        }
+
+        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
             .id(userEntity.getId())
             .username(userEntity.getUsername())
             .nickname(userEntity.getNickname())
@@ -276,12 +300,50 @@ public class UserService {
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
+
+        // Redis에 캐시 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
+        log.info("Cache miss for user ID: {}. Data cached.", userId);
+
+        return userInfo;
     }
 
     @Transactional
     public void updateUserProfileAvgRating(Long userId, Double avg) {
-        Optional<ProfileEntity> optionalProfileEntity = profileRepository.findByUserId(userId);
-        ProfileEntity profileEntity = optionalProfileEntity.get();
+
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        ProfileEntity profileEntity = profileRepository.findByUserId(userId)
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
         profileEntity.setRatingAvg(avg);
+
+        String cacheKey = "userInfo:" + userId;
+        // 기존 캐시 삭제
+        redisTemplate.delete(cacheKey);
+        log.info("Cache deleted for user ID: {}", userId);
+
+
+        // 변경된 UserInfoResponseDTO 생성
+        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .phone(userEntity.getPhone())
+            .email(userEntity.getEmail())
+            .status(userEntity.getStatus())
+            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
+            .introduction(profileEntity.getIntroduction())
+            .mbti(profileEntity.getMbti())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .build();
+
+        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
+        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
+        log.info("Cache updated for user ID: {}", userId);
     }
 }

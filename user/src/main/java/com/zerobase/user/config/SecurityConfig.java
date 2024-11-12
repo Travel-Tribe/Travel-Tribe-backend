@@ -89,7 +89,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         // 경로별 접근 권한 설정
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("api/**", "/login", "/", "/join", "/reissue", "internal/**").permitAll()
+                .requestMatchers("api/**", "/login","/logout", "/", "/join", "/reissue", "internal/**").permitAll()
 
 //                .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 //                .requestMatchers(HttpMethod.POST, "/posts/**").hasAnyRole("USER", "ADMIN")

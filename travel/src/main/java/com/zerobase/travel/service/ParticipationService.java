@@ -6,12 +6,14 @@ import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ParticipationsDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.entity.PostEntity;
+import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,43 +38,63 @@ public class ParticipationService {
 
 
     private final ParticipationRepository participationRepository;
+    private final PostRepository postRepository;
 
     /*
-       1. 인당 최대 두개 참여가능
-       2. 최대 개수를 넘겨서는 안될것
+       1. 인당 최대 두개까지만 참여가능
+       2. 포스트당 최대 참여자수를 넘겨서는 안될것
        3. 여러가지 취향에 따른 제한들
-              3. 게시글의 상태가 현재 모집중인지 확인
+       4. 게시글의 상태가 현재 모집중인지 확인
      */
-    public void validateParticipationApplicant(String userId) {
-        if (this.countParticipationsJoinByUserId(userId) >= 2) {
+
+    // 참여를 초기화하고 생성시키는 기능
+    // todo : lock 잠금처리 할 것
+
+    public void validateParticipationApplicant(Long postId, String userId) {
+        // 1. 인당 최대 두개까지만 참여가능
+
+        if (this.countParticipationsJoinAndJoinReadyByUserId(userId) >= 2) {
             log.info("participation validation service start ");
-            throw new CustomException(ErrorCode.PARTICIPATION_LIMIT);
+            throw new CustomException(ErrorCode.USER_PARTICIPATION_LIMIT);
         }
+
+        PostEntity postEntity = postRepository.findByPostId(postId).orElseThrow(
+            () -> new CustomException(ErrorCode.POST_NOT_EXISTING));
+
+        // 2. 포스트당 최대 참여자수를 넘겨서는 안될것
+        if (this.countParticipationsJoinAndJoinReadyByPostId(postId)
+            <= postEntity.getMaxParticipants()) {
+            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+        }
+
+        // 3. 여러가지 취향에 따른 제한들 - user 의 정보를 호출
+
+        // 4. 게시글의 상태가 현재 모집중인지 확인
+
 
 
     }
 
-    // 참여를 초기화하고 생성시키는 기능
-    // todo : lock 잠금처리 할 것
-    public ParticipationDto createParticipation(Long postId, String userId) {
+    public ParticipationDto createParticipationReady(Long postId,
+        String userId) {
         log.info("participation creation service start ");
-
-        this.validateParticipationApplicant(userId);
 
         ParticipationEntity participationEntity = ParticipationEntity.builder()
             .postEntity(PostEntity.builder().postId(postId).build())
             .userId(userId)
-            .participationStatus(ParticipationStatus.JOIN)
+            .participationStatus(ParticipationStatus.JOIN_READY)
             .ratingStatus(RatingStatus.NOT_RATED)
-            .depositStatus(DepositStatus.DEPOSIT_PAID)
+            .depositStatus(DepositStatus.UNPAID)
             .build();
 
-        return ParticipationDto.fromEntity(
-            participationRepository.save(participationEntity));
+        ParticipationEntity entity = participationRepository.save(
+            participationEntity);
+
+        return ParticipationDto.fromEntity(entity);
     }
 
     // participation 의 상태를 검증하고 상태를 변화시켜서 그대로 저장함
-    public void checkAndChangeStatusToSaveParticipation(
+    public void checkAndChangeStatusParticipation(
         ParticipationEntity participationEntity
         , List<Enum<?>> changEnumFrom, List<Enum<?>> changEnumTo) {
 
@@ -84,6 +106,7 @@ public class ParticipationService {
             for (Enum<?> enumElement : changEnumFrom) {
                 if (status.getClass() == enumElement.getClass()) {
                     if (status != enumElement) {
+                        log.error("status is not as expected :" + status);
                         throw new CustomException(
                             ErrorCode.PARTICIPATION_STATUS_ERROR);
                     }
@@ -105,6 +128,9 @@ public class ParticipationService {
             }
         }
 
+    }
+
+    public void saveParticipation(ParticipationEntity participationEntity) {
         participationRepository.save(participationEntity);
     }
 
@@ -140,20 +166,39 @@ public class ParticipationService {
     }
 
 
+    //--------------------------- 데이터 count 메소드 ---------------------------//
+
     public int countParticipationsCompletedByUserId(String userId) {
 
-        return participationRepository.countByParticipationStatusAndUserId(
-            ParticipationStatus.TRAVEL_FINISHED, userId);
+        return participationRepository.countByUserIdAndParticipationStatusIn(
+            userId, List.of(ParticipationStatus.TRAVEL_FINISHED));
+    }
+    public int countParticipationsJoinAndJoinReadyByUserId(String userId) {
+        return participationRepository.countByUserIdAndParticipationStatusIn(
+            userId,
+            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY)
+        );
+    }
+    private int countParticipationsJoinAndJoinReadyByPostId(long postId) {
+        return participationRepository.countByPostEntityPostIdAndParticipationStatusIn(
+            postId,
+            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
     }
 
-    public int countParticipationsJoinByUserId(String userId) {
-
-        return participationRepository.countByParticipationStatusAndUserId(
-            ParticipationStatus.JOIN, userId);
-    }
-
-    public void setDateToReturnDeposit(ParticipationEntity entity, LocalDate time) {
+    public void setDateToReturnDeposit(ParticipationEntity entity,
+        LocalDate time) {
         entity.setDepositReturnDate(time);
 
+    }
+
+
+    public ParticipationEntity validateParticipationUserId(long participationId, String userId) {
+        ParticipationEntity participationEntity = participationRepository.findById(
+            participationId).orElseThrow(()->new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+        if(!Objects.equals(participationEntity.getUserId(), userId))
+            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
+
+        return participationEntity;
     }
 }

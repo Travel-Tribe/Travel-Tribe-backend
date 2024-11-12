@@ -7,7 +7,7 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/travel_travel?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/zerobase_travel?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
     username: root
     password: "*seoksm1017*"
 
@@ -76,3 +76,4 @@ kakaopay:
   deposit-amount: 100000
   tax-free-amount: 9090
   secret-key: DEVBB2EC55AEA5209485B283C6EAC15502C4B307
+

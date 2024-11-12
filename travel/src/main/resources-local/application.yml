@@ -62,3 +62,6 @@ file:
 
 user-service:
   url: http://localhost:8080
+
+pay-service:
+  url: http://localhost:8082

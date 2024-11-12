@@ -3,16 +3,18 @@ package com.zerobase.service;
 import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
 import static com.zerobase.config.Constants.TAX_FREE_AMOUNT;
 
+import com.zerobase.api.KakaopayApi;
+import com.zerobase.api.TravelApi;
+import com.zerobase.entity.DepositEntity;
+import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
-import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PayManagementService {
 
     private final DepositService depositService;
-    private final KakaopayApiService kakaopayApiService;
+    private final KakaopayApi kakaopayApi;
     private final PaymentService paymentService;
+    private final TravelApi travelApi;
 
     /*
     1. travel 모듈에서 여행참가(participationId) 데이터가 생성될 때 pay module로 참가 데이터를 발송함.
@@ -30,29 +33,32 @@ public class PayManagementService {
     3. 결제 Id역시 생성함
     4. 이중 url은 client로 발송하며 tid는 내부저장함
      */
-    @Transactional
+
+
     public ResponseDepositPayDto createDepositOrderAndInitiatePay(
-        Long postId, Long participationId, String userId, PGMethod pgMethod) {
+        long postId, long participationId, String userId, PGMethod pgMethod) {
         log.info("readyDepositPay");
 
         // deposit 생성
-        DepositDto depositDto = depositService.createDepositOrder(postId,
+        DepositEntity depositEntity = depositService.createDepositOrder(postId,
             participationId, userId);
 
         // pg 사와 통신을 통해 tid 추출
-        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApiService.sendPayReadySign(
-            depositDto.getDepositId(), userId);
+        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApi.sendPayReadySign(
+            depositEntity.getDepositId(), userId);
 
         // tid를 기반으로 결제데이터 생성 & 카카오페이 결제 이력 저장
-        PaymentDto payment = paymentService.createPayment(
-            depositDto.getDepositId(), userId, payReadyApiDto.getTid(),
+        PaymentDto payment = paymentService.createPaymentAndSave(
+            depositEntity.getDepositId(), userId, payReadyApiDto.getTid(),
             pgMethod);
 
+        depositService.save(depositEntity);
+
         return ResponseDepositPayDto.builder()
-            .depositId(depositDto.getDepositId())
-            .postId(depositDto.getPostId())
-            .participationId(depositDto.getParticipationId())
-            .userId(depositDto.getUserId())
+            .depositId(depositEntity.getDepositId())
+            .postId(depositEntity.getPostId())
+            .participationId(depositEntity.getParticipationId())
+            .userId(depositEntity.getUserId())
             .amount(payment.getAmount())
             .next_redirect_pc_url(payReadyApiDto.getNext_redirect_pc_url())
             .build();
@@ -66,35 +72,31 @@ public class PayManagementService {
 
      */
 
-    @Transactional
-    public void successDepositPay(
+    public void clientSuccessDepositPay(long participationId,
         String userId, String pgToken) {
         log.info("success customer DepositPay");
 
-        PaymentDto paymentDto = paymentService.ChangeStatusToCompleteByUserId(
+        PaymentEntity paymentEntity = paymentService.ChangeStatusToCompleteByUserId(
             userId);
 
-        try {
-            kakaopayApiService.sendPayConfirmSign(
-                paymentDto.getPayKey(), paymentDto.getReferentialOrderId(),
-                userId, pgToken);
-        } catch (Exception e) {
-            throw new CustomException();
-        }
+        kakaopayApi.sendPayConfirmSign(
+            paymentEntity.getPaykey(), paymentEntity.getReferentialOrderId(),
+            userId, pgToken);
 
+        travelApi.confirmParticipation(participationId,userId);
 
+        paymentService.savePayments(paymentEntity);
     }
 
     /*
-    1. 사용자는 pg사 로부터 결제 인증을 성공하면 성공 url로 연결되어 서버에 tid와 pg token을 전송함
+    1. 사용자는 pg사 로부터 결제 인증을 실패하면 실패 url로 연결되어
     2. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
 */
 
-    public void failedDepositPay(String tid) {
+    public void failedDepositPay(String userId) {
         log.info("fail customer DepositPay");
-
-        paymentService.ChangeStatusToFailByUserId(tid);
-
+        PaymentEntity paymentEntity = paymentService.ChangeStatusToFailByUserId(userId);
+        paymentService.savePayments(paymentEntity);
     }
 
 
@@ -104,8 +106,6 @@ public class PayManagementService {
     client 측에서는 participation을 기준으로 취소요청을 할 것으로 생각됨.
     */
 
-
-    @Transactional
     public void refundDepositPay(
         Long participationId) {
         log.info("refund customer DepositPay");
@@ -113,17 +113,13 @@ public class PayManagementService {
         DepositDto depositDto = depositService.findByParticipationId(
             participationId);
 
-        PaymentDto paymentDto = paymentService.
+        PaymentEntity paymentEntity = paymentService.
             ChangeStatusToRefundedByOrderId(depositDto.getDepositId());
 
-        try {
-            kakaopayApiService.sendPayRefundSign(
-                paymentDto.getPayKey(), DEPOSIT_AMOUNT, TAX_FREE_AMOUNT);
-        } catch (Exception e) {
-            throw new CustomException();
-        }
+        kakaopayApi.sendPayRefundSign(
+                paymentEntity.getPaykey(), DEPOSIT_AMOUNT, TAX_FREE_AMOUNT);
 
-
+        paymentService.savePayments(paymentEntity);
     }
 }
 

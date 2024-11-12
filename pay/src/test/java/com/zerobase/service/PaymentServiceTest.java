@@ -37,7 +37,7 @@ class PaymentServiceTest {
 
 
     @Test
-    void createPayment_ShouldReturnPaymentDto() {
+    void createPayment_ShouldReturnPaymentAndSaveDto() {
         //given
         PaymentEntity paymentEntity = PaymentEntity.builder()
             .referencialOrderType(OrderType.DEPOSIT)
@@ -54,7 +54,7 @@ class PaymentServiceTest {
 
         //when
 
-        PaymentDto result = paymentService.createPayment(REFERENCIAL_ORDER_ID,
+        PaymentDto result = paymentService.createPaymentAndSave(REFERENCIAL_ORDER_ID,
             USER_ID, PAY_KEY, pgMethod);
 
         //then

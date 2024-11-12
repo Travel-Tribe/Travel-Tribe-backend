@@ -22,7 +22,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository ;
 
 
-    public PaymentDto createPayment(Long depositId, String userId, String payKey,
+    public PaymentDto createPaymentAndSave(Long depositId, String userId, String payKey,
         PGMethod pgMethod) {
         log.info(" create payment servicea start ");
 
@@ -41,7 +41,7 @@ public class PaymentService {
 
     }
 
-    public PaymentDto ChangeStatusToCompleteByUserId(String userId) {
+    public PaymentEntity ChangeStatusToCompleteByUserId(String userId) {
         log.info("change status to complete by userId : {}", userId);
 
         PaymentEntity paymentEntity =
@@ -49,37 +49,38 @@ public class PaymentService {
             .orElseThrow(() -> new CustomException());
 
         paymentEntity.setPaymentStatus(PaymentStatus.PAY_COMPLETED);
-        paymentRepository.save(paymentEntity);
 
-        return PaymentDto.fromEntity(paymentEntity);
+        return paymentEntity;
     }
 
-    public PaymentDto ChangeStatusToFailByUserId(String userId) {
+    public PaymentEntity ChangeStatusToFailByUserId(String userId) {
         log.info("change status to fail by userId : {}", userId);
         PaymentEntity paymentEntity =
             paymentRepository.findByUserIdAndPaymentStatus(userId,PaymentStatus.PAY_IN_PROGRESS)
                 .orElseThrow(() -> new CustomException());
 
         paymentEntity.setPaymentStatus(PaymentStatus.PAY_FAILED);
-        paymentRepository.save(paymentEntity);
 
-        return PaymentDto.fromEntity(paymentEntity);
+        return paymentEntity;
     }
 
-    public PaymentDto ChangeStatusToRefundedByOrderId(Long referencialOrderId) {
+    public PaymentEntity ChangeStatusToRefundedByOrderId(Long referencialOrderId) {
         log.info("change status to refunded by orderId : {}", referencialOrderId);
         PaymentEntity paymentEntity = paymentRepository
             .findByReferentialOrderId(referencialOrderId)
             .orElseThrow(() -> new CustomException());
 
         paymentEntity.setPaymentStatus(PaymentStatus.PAY_REFUNDED);
-        paymentRepository.save(paymentEntity);
 
-        return PaymentDto.fromEntity(paymentEntity);
+        return paymentEntity;
     }
 
     public List<PaymentDto> getPayments(String userId) {
         return paymentRepository.findAllByUserId(userId).stream().map(
             PaymentDto::fromEntity).toList();
+    }
+
+    public void savePayments(PaymentEntity paymentEntity) {
+         paymentRepository.save(paymentEntity);
     }
 }

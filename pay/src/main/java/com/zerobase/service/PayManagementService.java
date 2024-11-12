@@ -1,10 +1,8 @@
 package com.zerobase.service;
 
-import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
-import static com.zerobase.config.Constants.TAX_FREE_AMOUNT;
-
 import com.zerobase.api.KakaopayApi;
 import com.zerobase.api.TravelApi;
+import com.zerobase.config.Constants;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.DepositDto;
@@ -25,6 +23,7 @@ public class PayManagementService {
     private final KakaopayApi kakaopayApi;
     private final PaymentService paymentService;
     private final TravelApi travelApi;
+    private final Constants constants;
 
     /*
     1. travel 모듈에서 여행참가(participationId) 데이터가 생성될 때 pay module로 참가 데이터를 발송함.
@@ -117,7 +116,7 @@ public class PayManagementService {
             ChangeStatusToRefundedByOrderId(depositDto.getDepositId());
 
         kakaopayApi.sendPayRefundSign(
-                paymentEntity.getPaykey(), DEPOSIT_AMOUNT, TAX_FREE_AMOUNT);
+                paymentEntity.getPaykey(), constants.DEPOSIT_AMOUNT, constants.TAX_FREE_AMOUNT);
 
         paymentService.savePayments(paymentEntity);
     }

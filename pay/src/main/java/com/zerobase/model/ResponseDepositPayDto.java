@@ -1,8 +1,5 @@
 package com.zerobase.model;
 
-import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
-
-import com.zerobase.model.ResponseApi.PayReadyApiDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseDepositPayDto {
 
+
+
     private Long postId;
     private Long participationId;
     private Long depositId;
@@ -24,17 +23,7 @@ public class ResponseDepositPayDto {
     private String next_redirect_pc_url;
 
 
-    public static ResponseDepositPayDto from
-        (DepositDto depositDto, PayReadyApiDto payReadyApiDto) {
-        return ResponseDepositPayDto.builder()
-            .depositId(depositDto.getDepositId())
-            .postId(depositDto.getPostId())
-            .participationId(depositDto.getParticipationId())
-            .userId(depositDto.getUserId())
-            .amount(DEPOSIT_AMOUNT)
-            .next_redirect_pc_url(payReadyApiDto.getNext_redirect_pc_url())
-            .build();
 
 
-    }
+
 }

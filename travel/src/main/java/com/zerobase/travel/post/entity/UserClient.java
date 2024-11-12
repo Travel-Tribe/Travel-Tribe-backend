@@ -1,7 +1,5 @@
 package com.zerobase.travel.post.entity;
 
-import static org.springframework.http.HttpStatus.OK;
-
 import com.zerobase.travel.api.UserApiRequestDto.UpdateUserRating;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
@@ -29,4 +27,8 @@ public interface UserClient {
     // 프로필 조회
     @GetMapping("/internal/api/v1/users/{userId}/mbti")
     ResponseMessage<MBTI> getUserMbti(@PathVariable Long userId);
+
+    @GetMapping("/internal/api/v1/users/{userEmail}")
+    ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfoByUserEmail(
+        @PathVariable String userEmail);
 }

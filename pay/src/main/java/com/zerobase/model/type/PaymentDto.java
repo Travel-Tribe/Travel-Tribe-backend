@@ -22,7 +22,7 @@ public class PaymentDto {
     public static PaymentDto fromEntity(PaymentEntity paymentEntity) {
         return PaymentDto.builder()
             .paymentId(paymentEntity.getPaymentId())
-            .referencialOrderType(paymentEntity.getReferencialOrderType())
+            .referencialOrderType(paymentEntity.getReferentialOrderType())
             .referentialOrderId(paymentEntity.getReferentialOrderId())
             .userId(paymentEntity.getUserId())
             .payKey(paymentEntity.getPaykey())

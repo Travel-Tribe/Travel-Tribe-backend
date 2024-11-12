@@ -33,7 +33,7 @@ public class PaymentEntity {
     private PGMethod pgMethod;
 
     // 여기서는 deposit
-    private OrderType referencialOrderType;
+    private OrderType referentialOrderType;
     // 여기서는 deposit_id
     private Long referentialOrderId;
 

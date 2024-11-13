@@ -109,7 +109,7 @@ public class ParticipationService {
         // 성별검증
 
         if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
-           if(userInfo.getGender().equals(Gender.FEMALE){
+           if(userInfo.getGender().equals(Gender.FEMALE)){
                 throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
             }
         } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {

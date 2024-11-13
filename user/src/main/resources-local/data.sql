@@ -1,26 +1,28 @@
     -- Clear existing data
+    DELETE FROM visited_country_entity;
     DELETE FROM lang_ability_entity;
     DELETE FROM profile_entity;
     DELETE FROM user_entity;
 
     -- Reset auto-increment counters (optional)
     ALTER TABLE lang_ability_entity AUTO_INCREMENT = 1;
+    ALTER TABLE visited_country_entity AUTO_INCREMENT = 1;
     ALTER TABLE profile_entity AUTO_INCREMENT = 1;
     ALTER TABLE user_entity AUTO_INCREMENT = 1;
 
     -- Insert data into user_entity
     INSERT INTO user_entity ( username, nickname, phone, password, email, role, status)
     VALUES
-        ( 'user1', 'User One', '111-111-1111', 'password1', 'user1@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user2', 'User Two', '222-222-2222', 'password2', 'user2@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user3', 'User Three', '333-333-3333', 'password3', 'user3@example.com', 'ROLE_USER', 'INACTIVE'),
-        ( 'user4', 'User Four', '444-444-4444', 'password4', 'user4@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user5', 'User Five', '555-555-5555', 'password5', 'user5@example.com', 'ROLE_ADMIN', 'ACTIVE'),
-        ( 'user6', 'User Six', '666-666-6666', 'password6', 'user6@example.com', 'ROLE_USER', 'INACTIVE'),
-        ( 'user7', 'User Seven', '777-777-7777', 'password7', 'user7@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user8', 'User Eight', '888-888-8888', 'password8', 'user8@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user9', 'User Nine', '999-999-9999', 'password9', 'user9@example.com', 'ROLE_USER', 'ACTIVE'),
-        ( 'user10', 'User Ten', '101-010-1010', 'password10', 'user10@example.com', 'ROLE_USER', 'INACTIVE');
+        ( 'user1', 'User One', '111-111-1111', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user1@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user2', 'User Two', '222-222-2222', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user2@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user3', 'User Three', '333-333-3333', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user3@example.com', 'ROLE_USER', 'INACTIVE'),
+        ( 'user4', 'User Four', '444-444-4444', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user4@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user5', 'User Five', '555-555-5555', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user5@example.com', 'ROLE_ADMIN', 'ACTIVE'),
+        ( 'user6', 'User Six', '666-666-6666', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user6@example.com', 'ROLE_USER', 'INACTIVE'),
+        ( 'user7', 'User Seven', '777-777-7777', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user7@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user8', 'User Eight', '888-888-8888', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user8@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user9', 'User Nine', '999-999-9999', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user9@example.com', 'ROLE_USER', 'ACTIVE'),
+        ( 'user10', 'User Ten', '101-010-1010', '$2a$10$XL8lSNnaAkAemYUjgGfGLOAp9apDNOUQE04GxUkeW7F..KFjZ/x7G', 'user10@example.com', 'ROLE_USER', 'INACTIVE');
 
     -- Insert data into profile_entity
     INSERT INTO profile_entity (user_id, introduction, mbti, smoking, gender, birth, rating_avg, file_address)

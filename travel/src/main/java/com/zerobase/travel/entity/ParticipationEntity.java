@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,10 +50,13 @@ public class ParticipationEntity {
      */
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private ParticipationStatus participationStatus;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private DepositStatus depositStatus;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private RatingStatus ratingStatus;
 
     LocalDate depositReturnDate;

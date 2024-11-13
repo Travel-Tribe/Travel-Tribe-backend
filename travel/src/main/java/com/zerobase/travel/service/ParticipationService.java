@@ -63,7 +63,7 @@ public class ParticipationService {
 
         // 2. 포스트당 최대 참여자수를 넘겨서는 안될것
         if (this.countParticipationsJoinAndJoinReadyByPostId(postId)
-            <= postEntity.getMaxParticipants()) {
+            >= postEntity.getMaxParticipants()) {
             throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
         }
 

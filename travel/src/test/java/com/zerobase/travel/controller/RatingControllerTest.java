@@ -41,7 +41,6 @@ class RatingControllerTest {
         GiveRatingDto giveRatingDto = GiveRatingDto.builder()
             .score(5.0)
             .receiverId(2L)
-            .comment("좋아요")
             .build();
 
         //when

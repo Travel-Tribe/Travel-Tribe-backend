@@ -51,7 +51,6 @@ class RatingServiceTest {
 
         GiveRatingDto giveRatingDto = GiveRatingDto.builder()
             .score(5.0)
-            .comment("좋아요")
             .receiverId(3L)
             .build();
 
@@ -80,7 +79,6 @@ class RatingServiceTest {
         assertEquals(2L, captor.getValue().getSenderUserId());
         assertEquals(3L, captor.getValue().getReceiverUserId());
         assertEquals(5.0, captor.getValue().getScore());
-        assertEquals("좋아요", captor.getValue().getComment());
 
     }
 

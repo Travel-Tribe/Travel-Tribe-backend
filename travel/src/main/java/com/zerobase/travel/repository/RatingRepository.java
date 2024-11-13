@@ -2,10 +2,8 @@ package com.zerobase.travel.repository;
 
 import com.zerobase.travel.entity.RatingEntity;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
 
@@ -18,5 +16,5 @@ public interface RatingRepository extends JpaRepository<RatingEntity, Long> {
     )
     Double getAvgReceiverRating(long userId);
 
-    List<RatingEntity> findByReceiverUserId(Long userId);
+    List<RatingEntity> findAllByReceiverUserId(Long userId);
 }

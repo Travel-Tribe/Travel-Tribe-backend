@@ -1,5 +1,6 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.dto.response.VoteResponseDto;
 import com.zerobase.travel.dto.response.VoteResponseDto.VotingStart;
 import com.zerobase.travel.entity.MinusRatingEntity;
@@ -8,7 +9,6 @@ import com.zerobase.travel.entity.VotingEntity;
 import com.zerobase.travel.entity.VotingStartEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.BasicErrorCode;
-import com.zerobase.travel.exception.errorcode.RatingErrorCode;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.repository.PostRepository;
@@ -36,6 +36,7 @@ public class VoteService {
     private final ParticipationManagementService participationManagementService;
     private final RatingRepository ratingRepository;
     private final MinusRatingRepository minusRatingRepository;
+    private final UserApi userApi;
 
     public void createVote(long userId, long postId) {
 
@@ -111,7 +112,7 @@ public class VoteService {
             postRepository.save(postEntity);
 
             //평점 0.5점 하락
-            List<RatingEntity> byReceiverUserId = ratingRepository.findByReceiverUserId(postEntity.getUserId());
+            List<RatingEntity> byReceiverUserId = ratingRepository.findAllByReceiverUserId(postEntity.getUserId());
             int size = byReceiverUserId.size();
 
             minusRatingRepository.save(
@@ -121,6 +122,18 @@ public class VoteService {
                     .minusScore(size * 0.5)
                     .build()
             );
+
+            List<MinusRatingEntity> allByReceiverUserId = minusRatingRepository.findAllByReceiverUserId(postEntity.getUserId());
+
+            double sum = byReceiverUserId.stream()
+                .mapToDouble(RatingEntity::getScore)
+                .sum();
+
+            double minusSum = allByReceiverUserId.stream()
+                .mapToDouble(MinusRatingEntity::getMinusScore)
+                .sum();
+
+            userApi.updateUserRating(postEntity.getUserId(), (sum - minusSum) / size);
 
         } else {
             // post RECRUITMENT_COMPLETED

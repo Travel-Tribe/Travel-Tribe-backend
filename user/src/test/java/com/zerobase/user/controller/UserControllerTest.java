@@ -113,7 +113,7 @@ class UserControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.result").value("FAIL"))
             .andExpect(jsonPath("$.errors").isArray())
-            .andExpect(jsonPath("$.errors[0].errorCode").value("E01011")) // @Email 어노테이션의 message 값
+            .andExpect(jsonPath("$.errors[0].errorCode").value("USER-ERROR-VALID-00011")) // @Email 어노테이션의 message 값
             .andExpect(jsonPath("$.data").doesNotExist());
 
         // 4. 서비스 메소드 호출이 없었는지 검증
@@ -147,7 +147,7 @@ class UserControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.result").value("FAIL"))
             .andExpect(jsonPath("$.errors").isArray())
-            .andExpect(jsonPath("$.errors[0].errorCode").value("E01003")) // 예외 처리에 따라 다를 수 있음
+            .andExpect(jsonPath("$.errors[0].errorCode").value("USER-ERROR-VALID-00003")) // 예외 처리에 따라 다를 수 있음
             .andExpect(jsonPath("$.data").doesNotExist());
 
         // 추가 검증: userService.joinProcess가 정확한 인자로 호출되었는지 확인

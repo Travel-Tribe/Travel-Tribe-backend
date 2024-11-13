@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditUserInfoDTO {
 
-    @NotBlank(message = "E01007")
+    @NotBlank(message = "USER-ERROR-VALID-00007")
     private String nickname;
 
-    @NotBlank(message = "E01008")
+    @NotBlank(message = "USER-ERROR-VALID-00008")
     private String phone;
 
 }

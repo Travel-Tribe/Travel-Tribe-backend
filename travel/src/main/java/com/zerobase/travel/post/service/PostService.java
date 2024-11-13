@@ -53,7 +53,7 @@ public class PostService {
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Transactional
-    public void createPost(PostDTO postDTO, String userEmail) {
+    public PostEntity createPost(PostDTO postDTO, String userEmail) {
 
         // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
         // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
@@ -125,7 +125,7 @@ public class PostService {
         }
 
         // Post 저장
-        postRepository.save(postEntity);
+        return postRepository.save(postEntity);
     }
 
     @Transactional

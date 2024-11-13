@@ -7,7 +7,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.zerobase.user.application.OtherUserInfoFacadeDto;
+import com.zerobase.user.application.UserInfoFacadeDto;
 import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
@@ -27,7 +27,6 @@ import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.service.ProfileService;
 import com.zerobase.user.service.ReissueService;
 import com.zerobase.user.service.UserService;
-import com.zerobase.user.service.dto.UserServiceDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -149,9 +148,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo(
         Authentication authentication) {
-        UserServiceDto userInfo = userService.getUserInfo(getCurrentUser(authentication).getId());
+        UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(getCurrentUser(authentication).getId());
         return ResponseEntity.status(OK)
-            .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(userInfo)));
+            .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(otherUserInfo)));
     }
 
     // 다른 회원 정보 조회
@@ -159,7 +158,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<OtherUserInfoResponseDTO>> getOtherUserInfo(
         @PathVariable Long userId) {
 
-        OtherUserInfoFacadeDto otherUserInfo = userInfoFacade.getOtherUserInfo(userId);
+        UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(userId);
         return ResponseEntity.status(OK)
             .body(ResponseMessage.success(OtherUserInfoResponseDTO.fromDto(otherUserInfo)));
     }

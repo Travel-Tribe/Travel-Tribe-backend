@@ -1,6 +1,7 @@
 package com.zerobase.user.application;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
@@ -14,7 +15,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class OtherUserInfoFacadeDto {
+@JsonDeserialize(builder = UserInfoFacadeDto.UserInfoFacadeDtoBuilder.class)
+public class UserInfoFacadeDto {
 
     private Long id;
     private String username;
@@ -26,8 +28,15 @@ public class OtherUserInfoFacadeDto {
     private Smoking smoking;
     private String introduction;
     private Gender gender;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birth;
     private Double ratingAvg;
     private int count;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class UserInfoFacadeDtoBuilder {
+
+    }
 
 }

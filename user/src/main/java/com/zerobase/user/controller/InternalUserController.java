@@ -28,6 +28,7 @@ public class InternalUserController {
     private final UserService userService;
     private final ProfileService profileService;
 
+
     // 프로필 조회
     @GetMapping("/{userEmail}")
     public ResponseEntity<ResponseMessage<InternalUserInfoResponseDTO>> getUserEmail(

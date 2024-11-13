@@ -4,14 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.zerobase.user.service.dto.UserServiceDto;
-import com.zerobase.user.type.Gender;
+import com.zerobase.user.application.UserInfoFacadeDto;
 import com.zerobase.user.type.MBTI;
-import com.zerobase.user.type.Smoking;
-import com.zerobase.user.type.UserStatus;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,20 +36,20 @@ public class UserInfoResponseDTO {
     private LocalDate birth;
     private Double ratingAvg;
 
-    public static UserInfoResponseDTO fromDto(UserServiceDto userServiceDto) {
+    public static UserInfoResponseDTO fromDto(UserInfoFacadeDto userInfoFacadeDto) {
         return UserInfoResponseDTO.builder()
-            .id(userServiceDto.getId())
-            .username(userServiceDto.getUsername())
-            .nickname(userServiceDto.getNickname())
-            .phone(userServiceDto.getPhone())
-            .email(userServiceDto.getEmail())
-            .mbti(userServiceDto.getMbti())
-            .introduction(userServiceDto.getIntroduction())
-            .birth(userServiceDto.getBirth())
-            .ratingAvg(userServiceDto.getRatingAvg())
-            .smoking(userServiceDto.getSmoking().getSmoke())
-            .gender(userServiceDto.getGender().getGender())
-            .status(userServiceDto.getStatus().getStatus())
+            .id(userInfoFacadeDto.getId())
+            .username(userInfoFacadeDto.getUsername())
+            .nickname(userInfoFacadeDto.getNickname())
+            .phone(userInfoFacadeDto.getPhone())
+            .email(userInfoFacadeDto.getEmail())
+            .mbti(userInfoFacadeDto.getMbti())
+            .introduction(userInfoFacadeDto.getIntroduction())
+            .birth(userInfoFacadeDto.getBirth())
+            .ratingAvg(userInfoFacadeDto.getRatingAvg())
+            .smoking(userInfoFacadeDto.getSmoking().getSmoke())
+            .gender(userInfoFacadeDto.getGender().getGender())
+            .status(userInfoFacadeDto.getStatus().getStatus())
             .build();
     }
 

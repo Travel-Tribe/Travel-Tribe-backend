@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.post.application.PostFacade;
 import com.zerobase.travel.post.constants.RepresentativeCountries;
 import com.zerobase.travel.post.dto.request.PostDTO;
 import com.zerobase.travel.post.dto.request.PostSearchCriteria;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
     private final PostService postService;
+    private final PostFacade postFacade;
 
     // 여행참여 게시글 등록
     @PostMapping
@@ -52,7 +54,7 @@ public class PostController {
         @Valid @RequestBody PostDTO postDTO,
         @RequestHeader("X-User-Email") String userEmail) { // 이메일 추출
         log.info("email: " + userEmail);
-        postService.createPost(postDTO, userEmail);
+        postFacade.createPost(postDTO, userEmail);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
 

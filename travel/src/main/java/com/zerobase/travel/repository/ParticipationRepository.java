@@ -1,6 +1,7 @@
 package com.zerobase.travel.repository;
 
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.type.ParticipationStatus;
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,5 @@ public interface ParticipationRepository extends JpaRepository<ParticipationEnti
 
     int countByPostEntityPostIdAndParticipationStatusIn(Long postId, List<ParticipationStatus> join);
 
+    int countByParticipationStatusAndPostEntity(ParticipationStatus participationStatus, PostEntity postEntity);
 }

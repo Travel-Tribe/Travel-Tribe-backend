@@ -10,4 +10,8 @@ public interface VotingRepository extends JpaRepository<VotingEntity, Long> {
     List<VotingEntity> findAllByVotingStartEntity(VotingStartEntity votingStartsId);
 
     boolean existsByUserIdAndVotingStartEntity(long userId, VotingStartEntity entity);
+
+    int countByVotingStartEntity(VotingStartEntity votingStartEntity);
+
+    int countByVotingStartEntityAndApproval(VotingStartEntity votingStartEntity, boolean approval);
 }

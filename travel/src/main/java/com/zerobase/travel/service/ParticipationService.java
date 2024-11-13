@@ -1,17 +1,26 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ParticipationsDto;
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.repository.PostRepository;
+import com.zerobase.travel.post.type.Gender;
+import com.zerobase.travel.post.type.LimitSex;
+import com.zerobase.travel.post.type.LimitSmoke;
+import com.zerobase.travel.post.type.PostStatus;
+import com.zerobase.travel.post.type.Smoking;
 import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +48,7 @@ public class ParticipationService {
 
     private final ParticipationRepository participationRepository;
     private final PostRepository postRepository;
+    private final UserApi userApi;
 
     /*
        1. 인당 최대 두개까지만 참여가능
@@ -50,16 +60,21 @@ public class ParticipationService {
     // 참여를 초기화하고 생성시키는 기능
     // todo : lock 잠금처리 할 것
 
-    public void validateParticipationApplicant(Long postId, String userId) {
-        // 1. 인당 최대 두개까지만 참여가능
+    public void validateParticipationApplicant(Long postId, String userId,
+        String userEmail) {
 
+        // 비교대상인 postentity 와 userinfo 호출
+        PostEntity postEntity = postRepository.findByPostId(postId).orElseThrow(
+            () -> new CustomException(ErrorCode.POST_NOT_EXISTING));
+
+        UserInfoResponseDTO userInfo = userApi.getUserInfoByUserEmail(userEmail)
+            .getBody().getData();
+
+        // 1. 인당 최대 두개까지만 참여가능
         if (this.countParticipationsJoinAndJoinReadyByUserId(userId) >= 2) {
             log.info("participation validation service start ");
             throw new CustomException(ErrorCode.USER_PARTICIPATION_LIMIT);
         }
-
-        PostEntity postEntity = postRepository.findByPostId(postId).orElseThrow(
-            () -> new CustomException(ErrorCode.POST_NOT_EXISTING));
 
         // 2. 포스트당 최대 참여자수를 넘겨서는 안될것
         if (this.countParticipationsJoinAndJoinReadyByPostId(postId)
@@ -67,11 +82,52 @@ public class ParticipationService {
             throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
         }
 
-        // 3. 여러가지 취향에 따른 제한들 - user 의 정보를 호출
+        // 3. post 제한사항과 user 프로필 필터링 여러가지 취향에 따른 제한들 - user 의 정보를 호출
+
+        validatePostLimitAndUserProfile(userInfo, postEntity);
 
         // 4. 게시글의 상태가 현재 모집중인지 확인
 
+        if (postEntity.getStatus() != PostStatus.RECRUITING) {
+            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
+        }
 
+
+    }
+
+    private static void validatePostLimitAndUserProfile(
+        UserInfoResponseDTO userInfo, PostEntity postEntity) {
+
+        // 나이검증
+        int userAge = Period.between(userInfo.getBirth(), LocalDate.now()).getYears();
+
+
+        if (postEntity.getLimitMinAge() > userAge
+            || postEntity.getLimitMaxAge() < userAge)
+            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+
+        // 성별검증
+
+        if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
+           if(userInfo.getGender().equals(Gender.FEMALE)){
+                throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            }
+        } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {
+            if(userInfo.getGender().equals(Gender.MALE)){
+                throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            }
+        }
+
+        // 흡연자 검증
+        if(postEntity.getLimitSmoke().equals(LimitSmoke.SMOKER)){
+            if(userInfo.getSmoking().equals(Smoking.YES)){
+                throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            }
+        }else if(postEntity.getLimitSmoke().equals(LimitSmoke.NON_SMOKER)){
+            if(userInfo.getSmoking().equals(Smoking.NO)){
+                throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            }
+        }
 
     }
 

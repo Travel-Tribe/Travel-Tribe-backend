@@ -13,7 +13,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /*
@@ -50,9 +49,10 @@ public class ParticipationManagementService {
     private final PayApi payApi;
     // 1. 여행을 참가 ; 여행참가 ~ 지불까지를 하나의 트랜잭션으로 묶기에는 과도하게 길어서 분리.
     // JoinReady 상태 임시저장 -> client 에서 결제준비요청 -> 결제완료/실패시 서버에 응답
-    public ParticipationDto readyParticipation(Long postId, String userId) {
+    public ParticipationDto readyParticipation(Long postId, String userId,
+        String userEmail) {
 
-        participationService.validateParticipationApplicant(postId,userId);
+        participationService.validateParticipationApplicant(postId,userId,userEmail);
 
         return participationService.createParticipationReady(
             postId, userId);

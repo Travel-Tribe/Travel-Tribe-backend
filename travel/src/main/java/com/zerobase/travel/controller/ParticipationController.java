@@ -28,9 +28,10 @@ public class ParticipationController {
     // 참여
     @PostMapping("{postId}/participations")
     public ParticipationDto readyParticipation(
-        @PathVariable Long postId, @RequestHeader("X-User-Id") String userId) {
+        @PathVariable Long postId, @RequestHeader("X-User-Id") String userId,
+        @RequestHeader("X-User-Email") String userEmail ) {
         log.info("createParticipation controller start");
-        return participationManagementService.readyParticipation(postId, userId);
+        return participationManagementService.readyParticipation(postId, userId,userEmail);
     }
 
     // 개인의 참여취소

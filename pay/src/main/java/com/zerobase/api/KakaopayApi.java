@@ -49,8 +49,8 @@ public class KakaopayApi implements ApiInterface {
             .quantity(String.valueOf(QUANTITY))
             .totalAmount(String.valueOf(DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(TAX_FREE_AMOUNT))
-            .approvalUrl(KAKAO_APPROVAL_URL+"?"+orderId)
-            .cancelUrl(KAKAO_CANCEL_URL+"?"+orderId)
+            .approvalUrl(KAKAO_APPROVAL_URL+"?orderId="+orderId)
+            .cancelUrl(KAKAO_CANCEL_URL+"?orderId="+orderId)
             .failUrl(KAKAO_FAIL_URL+"?orderId="+orderId)
             .build();
         //

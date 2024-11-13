@@ -7,7 +7,6 @@ import com.zerobase.api.KakaopayApi;
 import com.zerobase.api.TravelApi;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.entity.PaymentEntity;
-import com.zerobase.model.DepositDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.type.PGMethod;

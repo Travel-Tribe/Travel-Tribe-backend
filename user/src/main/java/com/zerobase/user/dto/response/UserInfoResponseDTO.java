@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.zerobase.user.type.Gender;
+import com.zerobase.user.application.UserInfoFacadeDto;
 import com.zerobase.user.type.MBTI;
-import com.zerobase.user.type.Smoking;
-import com.zerobase.user.type.UserStatus;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +35,23 @@ public class UserInfoResponseDTO {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birth;
     private Double ratingAvg;
+
+    public static UserInfoResponseDTO fromDto(UserInfoFacadeDto userInfoFacadeDto) {
+        return UserInfoResponseDTO.builder()
+            .id(userInfoFacadeDto.getId())
+            .username(userInfoFacadeDto.getUsername())
+            .nickname(userInfoFacadeDto.getNickname())
+            .phone(userInfoFacadeDto.getPhone())
+            .email(userInfoFacadeDto.getEmail())
+            .mbti(userInfoFacadeDto.getMbti())
+            .introduction(userInfoFacadeDto.getIntroduction())
+            .birth(userInfoFacadeDto.getBirth())
+            .ratingAvg(userInfoFacadeDto.getRatingAvg())
+            .smoking(userInfoFacadeDto.getSmoking().getSmoke())
+            .gender(userInfoFacadeDto.getGender().getGender())
+            .status(userInfoFacadeDto.getStatus().getStatus())
+            .build();
+    }
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class UserInfoResponseDTOBuilder {

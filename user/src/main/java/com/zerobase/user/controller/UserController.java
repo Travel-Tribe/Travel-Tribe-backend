@@ -3,8 +3,12 @@ package com.zerobase.user.controller;
 import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_AUTHENTICATION_CODE_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
+import com.zerobase.user.application.UserInfoFacadeDto;
+import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.EmailVerificationDTO;
@@ -12,15 +16,17 @@ import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
 import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
 import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
+import com.zerobase.user.dto.response.OtherUserInfoResponseDTO;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.ResponseMessage;
+import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
 import com.zerobase.user.jwt.CustomUserDetails;
 import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.service.ProfileService;
 import com.zerobase.user.service.ReissueService;
 import com.zerobase.user.service.UserService;
-import com.zerobase.user.service.ProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -49,6 +55,7 @@ public class UserController {
     private final ProfileService profileService;
     private final UserRepository userRepository;
     private final ReissueService reissueService;
+    private final UserInfoFacade userInfoFacade;
 
     private UserEntity getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -95,9 +102,12 @@ public class UserController {
     // 회원 이메일 인증 코드 검증
     @PostMapping("/change-email/verify")
     @Transactional
-    public ResponseEntity<?> verifyEmailCode(@RequestBody @Valid EmailVerificationDTO emailVerificationDTO,  Authentication authentication) {
+    public ResponseEntity<?> verifyEmailCode(
+        @RequestBody @Valid EmailVerificationDTO emailVerificationDTO,
+        Authentication authentication) {
         UserEntity currentUser = getCurrentUser(authentication);
-        boolean isVerified = userService.verifyEmailCode(emailVerificationDTO.getEmail(), emailVerificationDTO.getCode());
+        boolean isVerified = userService.verifyEmailCode(emailVerificationDTO.getEmail(),
+            emailVerificationDTO.getCode());
 
         if (isVerified) {
             currentUser.setEmail(emailVerificationDTO.getEmail());
@@ -121,7 +131,7 @@ public class UserController {
     // 회원 비밀번호 초기화
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(
-        @RequestBody @Valid ResetPasswordEmailDTO resetPasswordDTO){
+        @RequestBody @Valid ResetPasswordEmailDTO resetPasswordDTO) {
         userService.resetPasswordProcess(resetPasswordDTO);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -136,16 +146,21 @@ public class UserController {
 
     // 나의 회원정보 조회
     @GetMapping
-    public ResponseEntity<?> getUserInfo(Authentication authentication) {
+    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo(
+        Authentication authentication) {
+        UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(getCurrentUser(authentication).getId());
         return ResponseEntity.status(OK)
-            .body(ResponseMessage.success(userService.getUserInfo(getCurrentUser(authentication))));
+            .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(otherUserInfo)));
     }
 
     // 다른 회원 정보 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getOtherUserInfo(@PathVariable Long userId) {
+    public ResponseEntity<ResponseMessage<OtherUserInfoResponseDTO>> getOtherUserInfo(
+        @PathVariable Long userId) {
+
+        UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(userId);
         return ResponseEntity.status(OK)
-            .body(ResponseMessage.success(userService.getOtherUserInfo(userId)));
+            .body(ResponseMessage.success(OtherUserInfoResponseDTO.fromDto(otherUserInfo)));
     }
 
     @PostMapping("/duplicate")

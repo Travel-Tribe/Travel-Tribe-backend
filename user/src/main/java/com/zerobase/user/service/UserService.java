@@ -5,13 +5,14 @@ import static com.zerobase.user.dto.response.BasicErrorCode.NOT_FOUND_EMAIL_AUTH
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
+import static com.zerobase.user.type.UserStatus.DEACTIVATED;
 
+import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
 import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
-import com.zerobase.user.dto.response.OtherUserInfoResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.EmailVerificationEntity;
 import com.zerobase.user.entity.ProfileEntity;
@@ -20,6 +21,7 @@ import com.zerobase.user.exception.BizException;
 import com.zerobase.user.repository.EmailVerificationRepository;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.service.dto.UserServiceDto;
 import com.zerobase.user.type.Role;
 import com.zerobase.user.type.UserStatus;
 import java.time.LocalDateTime;
@@ -44,7 +46,6 @@ public class UserService {
     private final EmailService emailService;
     private final ProfileRepository profileRepository;
     private final PasswordResetService passwordResetService;
-    private final UserParticipationService userParticipationService;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public void joinProcess(JoinDTO joinDTO) {
@@ -77,37 +78,18 @@ public class UserService {
 
     @Transactional
     public void editUserInfoProcess(EditUserInfoDTO editUserInfoDTO, UserEntity currentUser) {
-        String cacheKey = "userInfo:" + currentUser.getId();
+
+        String userKey = "userInfo:" + currentUser.getId();
+        String profileKey = "userProfile:" + currentUser.getId();
 
         currentUser.setNickname(editUserInfoDTO.getNickname());
         currentUser.setPhone(editUserInfoDTO.getPhone());
 
         // 기존 캐시 삭제
-        redisTemplate.delete(cacheKey);
+        redisTemplate.delete(userKey);
+        redisTemplate.delete(profileKey);
+
         log.info("Cache deleted for user ID: {}", currentUser.getId());
-
-        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
-            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-        // 변경된 UserInfoResponseDTO 생성
-        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
-            .id(currentUser.getId())
-            .username(currentUser.getUsername())
-            .nickname(currentUser.getNickname())
-            .phone(currentUser.getPhone())
-            .email(currentUser.getEmail())
-            .status(currentUser.getStatus().getUserStatus())
-            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
-            .introduction(profileEntity.getIntroduction())
-            .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .birth(profileEntity.getBirth())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .build();
-
-        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache updated for user ID: {}", currentUser.getId());
     }
 
 
@@ -134,85 +116,49 @@ public class UserService {
         };
     }
 
-    public UserInfoResponseDTO getUserInfo(UserEntity currentUser) {
+    public UserServiceDto getUserInfo(long userId) {
 
-        String cacheKey = "userInfo:" + currentUser.getId();
+        String cacheKey = "userInfo:" + userId;
         // Redis에서 캐시된 데이터 조회
         Object cachedData = redisTemplate.opsForValue().get(cacheKey);
         if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", currentUser.getId());
-            return (UserInfoResponseDTO) cachedData;
+            log.info("Cache hit for user ID: {}", userId);
+            return (UserServiceDto) cachedData;
         }
-
-        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(()->new BizException(USER_NOT_FOUND_ERROR));
+        ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
         // 데이터베이스에서 조회
-        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
-            .id(currentUser.getId())
-            .username(currentUser.getUsername())
-            .nickname(currentUser.getNickname())
-            .phone(currentUser.getPhone())
-            .email(currentUser.getEmail())
-            .status(currentUser.getStatus().getUserStatus())
+        UserServiceDto userInfo = UserServiceDto.builder()
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .phone(userEntity.getPhone())
+            .email(userEntity.getEmail())
+            .status(userEntity.getStatus())
             .introduction(profileEntity.getIntroduction())
             .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
 
         // Redis에 캐시 저장 (만료 시간 1시간 설정)
         redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", currentUser.getId());
+        log.info("Cache miss for user ID: {}. Data cached.", userEntity.getId());
 
         return userInfo;
     }
 
-    public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
-        String cacheKey = "otheruserInfo:" + userId;
-        // Redis에서 캐시된 데이터 조회
-        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
-        if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", userId);
-            return (OtherUserInfoResponseDTO) cachedData;
-        }
-
-        UserEntity userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
-
-        Integer completedTripsCount = userParticipationService.getCompletedTripsCount(
-            String.valueOf(userId));
-
-        ProfileEntity profileEntity = profileRepository.findByUserId(
-            userEntity.getId()).orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-
-        OtherUserInfoResponseDTO otherUserInfo = OtherUserInfoResponseDTO.builder()
-            .username(userEntity.getUsername())
-            .nickname(userEntity.getNickname())
-            .count(completedTripsCount)
-            .email(userEntity.getEmail())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .gender(profileEntity.getGender().getGender())
-            .status(userEntity.getStatus().getUserStatus())
-            .build();
-
-        // Redis에 캐시 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, otherUserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", userId);
-
-        return otherUserInfo;
-    }
-
+    @Transactional
     public void deleteProcess(UserEntity currentUser) {
-        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(
-            currentUser.getEmail());
-        if (!optionalUserEntity.isPresent()) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        } else {
-            userRepository.delete(optionalUserEntity.get());
-        }
+        UserEntity userEntity = userRepository.findByEmail(
+            currentUser.getEmail()).orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        userEntity.setStatus(DEACTIVATED);
+
         String cacheKey = "userInfo:" + currentUser.getId();
         // 기존 캐시 삭제
         redisTemplate.delete(cacheKey);
@@ -270,40 +216,27 @@ public class UserService {
         emailService.sendResetPassword(email, generateRandomPassword);
     }
 
-    public UserInfoResponseDTO findByUserWithEmail(String userEmail) {
+    public UserServiceDto findByUserWithEmail(String userEmail) {
         UserEntity userEntity = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
 
         ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        Long userId = userEntity.getId();
-        String cacheKey = "userInfo:" + userId;
-        // Redis에서 캐시된 데이터 조회
-        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
-        if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", userId);
-            return (UserInfoResponseDTO) cachedData;
-        }
-
-        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
+        UserServiceDto userInfo = UserServiceDto.builder()
             .id(userEntity.getId())
             .username(userEntity.getUsername())
             .nickname(userEntity.getNickname())
             .email(userEntity.getEmail())
-            .status(userEntity.getStatus().getUserStatus())
+            .status(userEntity.getStatus())
             .phone(userEntity.getPhone())
             .introduction(profileEntity.getIntroduction())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .gender(profileEntity.getGender().getGender())
+            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender())
             .mbti(profileEntity.getMbti())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
-
-        // Redis에 캐시 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", userId);
 
         return userInfo;
     }
@@ -323,7 +256,6 @@ public class UserService {
         // 기존 캐시 삭제
         redisTemplate.delete(cacheKey);
         log.info("Cache deleted for user ID: {}", userId);
-
 
         // 변경된 UserInfoResponseDTO 생성
         UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()

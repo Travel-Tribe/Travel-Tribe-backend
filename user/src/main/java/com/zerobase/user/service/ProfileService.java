@@ -4,6 +4,7 @@ import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ER
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 
+import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
 import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
@@ -51,8 +52,6 @@ public class ProfileService {
         UserEntity user = userRepository.findById(currentUser.getId())
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
 
-        String cacheKey = "userInfo:" + currentUser.getId();
-
         // MBTI, Smoking, Gender 변환 중 발생할 수 있는 예외를 처리
         MBTI mbti;
         Smoking smoking;
@@ -90,30 +89,6 @@ public class ProfileService {
             .map(lang -> new LangAbilityEntity(profile, lang))
             .collect(Collectors.toList());
         langAbilityRepository.saveAll(languages);
-
-        // Redis 캐시에 사용자 정보 저장.
-        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
-            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-
-        UserInfoResponseDTO UserInfo = UserInfoResponseDTO.builder()
-            .id(currentUser.getId())
-            .username(currentUser.getUsername())
-            .nickname(currentUser.getNickname())
-            .phone(currentUser.getPhone())
-            .email(currentUser.getEmail())
-            .status(currentUser.getStatus().getUserStatus())
-            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
-            .introduction(profileEntity.getIntroduction())
-            .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .birth(profileEntity.getBirth())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .build();
-
-        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, UserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache updated for user ID: {}", currentUser.getId());
     }
 
     @Transactional
@@ -124,10 +99,12 @@ public class ProfileService {
         ProfileEntity profile = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        String cacheKey = "userInfo:" + currentUser.getId();
+        String userKey = "userInfo:" + currentUser.getId();
+        String profileKey = "userProfile:" + currentUser.getId();
 
         // 기존 캐시 삭제
-        redisTemplate.delete(cacheKey);
+        redisTemplate.delete(userKey);
+        redisTemplate.delete(profileKey);
         log.info("Cache deleted for user ID: {}", currentUser.getId());
 
         String mbtiString = profileRequest.getMbti().toUpperCase();
@@ -174,26 +151,6 @@ public class ProfileService {
         // 변경된 UserInfoResponseDTO 생성
         ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-
-        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
-            .id(currentUser.getId())
-            .username(currentUser.getUsername())
-            .nickname(currentUser.getNickname())
-            .phone(currentUser.getPhone())
-            .email(currentUser.getEmail())
-            .status(currentUser.getStatus().getUserStatus())
-            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
-            .introduction(profileEntity.getIntroduction())
-            .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .birth(profileEntity.getBirth())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .build();
-
-        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache updated for user ID: {}", currentUser.getId());
 
         // 이벤트 발행
         UserMbtiChangedEvent event = new UserMbtiChangedEvent(currentUser.getId(), mbtiString);

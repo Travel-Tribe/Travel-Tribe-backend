@@ -2,8 +2,7 @@ package com.zerobase.user.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import com.zerobase.user.type.Gender;
-import com.zerobase.user.type.UserStatus;
+import com.zerobase.user.application.UserInfoFacadeDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +21,18 @@ public class OtherUserInfoResponseDTO {
     private Double ratingAvg;
     private String gender;
     private String status;
+
+    public static OtherUserInfoResponseDTO fromDto(UserInfoFacadeDto userInfoFacadeDto) {
+        return OtherUserInfoResponseDTO.builder()
+            .username(userInfoFacadeDto.getUsername())
+            .nickname(userInfoFacadeDto.getNickname())
+            .email(userInfoFacadeDto.getEmail())
+            .count(userInfoFacadeDto.getCount())
+            .ratingAvg(userInfoFacadeDto.getRatingAvg())
+            .gender(userInfoFacadeDto.getGender().getGender())
+            .status(userInfoFacadeDto.getStatus().getUserStatus())
+            .build();
+    }
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class OtherUserInfoResponseDTOBuilder {

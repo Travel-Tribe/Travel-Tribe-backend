@@ -3,11 +3,13 @@ package com.zerobase.user.controller;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.user.dto.request.UserProfileAvgRating;
+import com.zerobase.user.dto.response.InternalUserInfoResponseDTO;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.service.ProfileService;
 import com.zerobase.user.service.UserService;
+import com.zerobase.user.service.dto.UserServiceDto;
 import com.zerobase.user.type.MBTI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +28,15 @@ public class InternalUserController {
     private final UserService userService;
     private final ProfileService profileService;
 
+
     // 프로필 조회
     @GetMapping("/{userEmail}")
-    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserEmail(
+    public ResponseEntity<ResponseMessage<InternalUserInfoResponseDTO>> getUserEmail(
         @PathVariable String userEmail) {
-        UserInfoResponseDTO byUserWithEmail = userService.findByUserWithEmail(userEmail);
-        return ResponseEntity.status(OK).body(ResponseMessage.success(byUserWithEmail));
+        UserServiceDto byUserWithEmail = userService.findByUserWithEmail(userEmail);
+        return ResponseEntity.status(OK).body(ResponseMessage.success(
+            InternalUserInfoResponseDTO.fromDto(byUserWithEmail))
+        );
     }
 
     // 사용자 평균평점을 업데이트 시켜주는 기능

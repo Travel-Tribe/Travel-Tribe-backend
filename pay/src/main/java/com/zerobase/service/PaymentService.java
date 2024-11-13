@@ -1,7 +1,6 @@
 package com.zerobase.service;
 
-import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
-
+import com.zerobase.config.Constants;
 import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.OrderType;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository ;
+    private final Constants constants;
 
 
     public PaymentDto createPaymentAndSave(Long depositId, String userId, String payKey,
@@ -32,7 +32,7 @@ public class PaymentService {
                 .referentialOrderId(depositId)
                 .userId(userId)
                 .paykey(payKey)
-                .amount(DEPOSIT_AMOUNT)
+                .amount(constants.DEPOSIT_AMOUNT)
                 .paymentStatus(PaymentStatus.PAY_IN_PROGRESS)
                 .pgMethod(pgMethod)
                 .build());

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class RequestpayDepositRefund {
 
-    private long participationId;
+    private long depositId;
     private String userId;
 
 }

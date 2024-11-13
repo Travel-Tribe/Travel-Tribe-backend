@@ -44,8 +44,8 @@ public class PaymentService {
 
 
     public PaymentEntity changeStatus(PaymentEntity paymentEntity,
-        PaymentStatus payFailed) {
-        paymentEntity.setPaymentStatus(payFailed);
+        PaymentStatus status) {
+        paymentEntity.setPaymentStatus(status);
         return paymentEntity;
     }
 
@@ -54,11 +54,14 @@ public class PaymentService {
             PaymentDto::fromEntity).toList();
     }
 
-    public PaymentEntity getPaymentsInProgressByOrderId( String userId,long orderId) {
-        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            orderId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException());
+    public PaymentEntity getPaymentsInProgressAndChangeStatusByOrderId(
+        long depositId, PaymentStatus paymentStatus) {
 
-        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException();
+        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
+            depositId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException());
+
+        paymentEntity.setPaymentStatus(paymentStatus);
+
 
         return paymentEntity;
     }
@@ -74,7 +77,7 @@ public class PaymentService {
 
 
 
-    public void savePayments(PaymentEntity paymentEntity) {
+    public void save(PaymentEntity paymentEntity) {
          paymentRepository.save(paymentEntity);
     }
 }

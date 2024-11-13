@@ -28,7 +28,7 @@ public class PayInternalController {
     public ResponseEntity<Object> payDepositRefund(
         RequestpayDepositRefund request) {
         log.info(" pay deposit refund sign from client");
-         payManagementService.refundDepositPay(request.getParticipationId(), request.getUserId());
+         payManagementService.refundDepositPay(request.getDepositId(), request.getUserId());
         return ResponseEntity.ok().build();
     }
 

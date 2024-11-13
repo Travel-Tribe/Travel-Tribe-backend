@@ -65,7 +65,7 @@ public class PayController {
         @RequestHeader("X-User-Id") String userId) {
         log.info(" pay deposit success sign from client");
         payManagmentService.clientSuccessDepositPay(
-            request.getParticipationId(),userId, request.getPg_token());
+            request.getDepositId(),userId, request.getPg_token());
 
         return ResponseEntity.ok().build();
     }
@@ -78,7 +78,7 @@ public class PayController {
         @RequestHeader("X-User-Id") String userId
     ) {
         log.info(" pay deposit fail sign from client");
-        payManagmentService.clientFailedDepositPay(userId,request.getParticipationId());
+        payManagmentService.clientFailedDepositPay(userId,request.getDepositId());
 
         return ResponseEntity.ok().build();
     }

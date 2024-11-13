@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableFeignClients // FeignClient 활성화
-public class Main {
+public class UserApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(UserApplication.class, args);
     }
 }

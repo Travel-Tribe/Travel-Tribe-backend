@@ -15,6 +15,6 @@ public class PostFacade {
 
     public void createPost(PostDTO postDTO, String userEmail) {
         PostEntity post = postService.createPost(postDTO, userEmail);
-        participationManagementService.readyParticipation(post.getPostId(), String.valueOf(post.getUserId()));
+        participationManagementService.readyParticipation(post.getPostId(), String.valueOf(post.getUserId()),userEmail);
     }
 }

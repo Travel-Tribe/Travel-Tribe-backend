@@ -11,6 +11,7 @@ import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
 import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
+import com.zerobase.user.dto.response.InternalUserInfoResponseDTO;
 import com.zerobase.user.dto.response.OtherUserInfoResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.EmailVerificationEntity;
@@ -20,7 +21,11 @@ import com.zerobase.user.exception.BizException;
 import com.zerobase.user.repository.EmailVerificationRepository;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
+import com.zerobase.user.service.dto.UserServiceDto;
+import com.zerobase.user.type.Gender;
+import com.zerobase.user.type.MBTI;
 import com.zerobase.user.type.Role;
+import com.zerobase.user.type.Smoking;
 import com.zerobase.user.type.UserStatus;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -134,75 +139,40 @@ public class UserService {
         };
     }
 
-    public UserInfoResponseDTO getUserInfo(UserEntity currentUser) {
+    public UserServiceDto getUserInfo(long userId) {
 
-        String cacheKey = "userInfo:" + currentUser.getId();
+        String cacheKey = "userInfo:" + userId;
         // Redis에서 캐시된 데이터 조회
         Object cachedData = redisTemplate.opsForValue().get(cacheKey);
         if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", currentUser.getId());
-            return (UserInfoResponseDTO) cachedData;
+            log.info("Cache hit for user ID: {}", userId);
+            return (UserServiceDto) cachedData;
         }
-
-        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
+        UserEntity userEntity = userRepository.findById(userId).get();
+        ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
         // 데이터베이스에서 조회
-        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
-            .id(currentUser.getId())
-            .username(currentUser.getUsername())
-            .nickname(currentUser.getNickname())
-            .phone(currentUser.getPhone())
-            .email(currentUser.getEmail())
-            .status(currentUser.getStatus().getUserStatus())
+        UserServiceDto userInfo = UserServiceDto.builder()
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .phone(userEntity.getPhone())
+            .email(userEntity.getEmail())
+            .status(userEntity.getStatus())
             .introduction(profileEntity.getIntroduction())
             .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
+            .gender(profileEntity.getGender())
+            .smoking(profileEntity.getSmoking())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
 
         // Redis에 캐시 저장 (만료 시간 1시간 설정)
         redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", currentUser.getId());
+        log.info("Cache miss for user ID: {}. Data cached.", userEntity.getId());
 
         return userInfo;
-    }
-
-    public OtherUserInfoResponseDTO getOtherUserInfo(Long userId) {
-        String cacheKey = "otheruserInfo:" + userId;
-        // Redis에서 캐시된 데이터 조회
-        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
-        if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", userId);
-            return (OtherUserInfoResponseDTO) cachedData;
-        }
-
-        UserEntity userEntity = userRepository.findById(userId)
-            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
-
-        Integer completedTripsCount = userParticipationService.getCompletedTripsCount(
-            String.valueOf(userId));
-
-        ProfileEntity profileEntity = profileRepository.findByUserId(
-            userEntity.getId()).orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-
-        OtherUserInfoResponseDTO otherUserInfo = OtherUserInfoResponseDTO.builder()
-            .username(userEntity.getUsername())
-            .nickname(userEntity.getNickname())
-            .count(completedTripsCount)
-            .email(userEntity.getEmail())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .gender(profileEntity.getGender().getGender())
-            .status(userEntity.getStatus().getUserStatus())
-            .build();
-
-        // Redis에 캐시 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, otherUserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", userId);
-
-        return otherUserInfo;
     }
 
     public void deleteProcess(UserEntity currentUser) {
@@ -270,7 +240,7 @@ public class UserService {
         emailService.sendResetPassword(email, generateRandomPassword);
     }
 
-    public UserInfoResponseDTO findByUserWithEmail(String userEmail) {
+    public UserServiceDto findByUserWithEmail(String userEmail) {
         UserEntity userEntity = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
 
@@ -283,19 +253,19 @@ public class UserService {
         Object cachedData = redisTemplate.opsForValue().get(cacheKey);
         if (cachedData != null) {
             log.info("Cache hit for user ID: {}", userId);
-            return (UserInfoResponseDTO) cachedData;
+            return (UserServiceDto) cachedData;
         }
 
-        UserInfoResponseDTO userInfo = UserInfoResponseDTO.builder()
+        UserServiceDto userInfo = UserServiceDto.builder()
             .id(userEntity.getId())
             .username(userEntity.getUsername())
             .nickname(userEntity.getNickname())
             .email(userEntity.getEmail())
-            .status(userEntity.getStatus().getUserStatus())
+            .status(userEntity.getStatus())
             .phone(userEntity.getPhone())
             .introduction(profileEntity.getIntroduction())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .gender(profileEntity.getGender().getGender())
+            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender())
             .mbti(profileEntity.getMbti())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())

@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailVerificationDTO {
 
-    @Email(message = "E01011")
+    @Email(message = "USER-ERROR-VALID-00011")
     private String email;
 
-    @NotBlank(message = "E01035")
+    @NotBlank(message = "USER-ERROR-VALID-00019")
     private String code;
 }

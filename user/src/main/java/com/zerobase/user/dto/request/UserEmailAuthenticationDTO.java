@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserEmailAuthenticationDTO {
 
-    @Email(message = "E01011")
+    @Email(message = "USER-ERROR-VALID-00011")
     private String email;
 
 }

@@ -17,7 +17,7 @@ public enum ValidErrorCode implements ErrorCode {
     public static ErrorCode findErrorCode(FieldError fieldError) {
 
         return Arrays.stream(ValidErrorCode.values())
-            .filter(v -> v.getErrorCode().equals(fieldError.getDefaultMessage())) // E01002
+            .filter(v -> v.getErrorCode().equals(fieldError.getDefaultMessage())) // USER-ERROR-VALID-00002
             .findAny()
             .orElseThrow(() -> new RuntimeException());
     }

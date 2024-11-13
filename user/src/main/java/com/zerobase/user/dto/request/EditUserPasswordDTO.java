@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EditUserPasswordDTO {
 
-    @Size(min = 4, message = "E01009")
+    @Size(min = 4, message = "USER-ERROR-VALID-00009")
     private String password;
 
-    @Size(min = 4, message = "E01010")
+    @Size(min = 4, message = "USER-ERROR-VALID-00010")
     private String newPassword;
 
 }

@@ -14,19 +14,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JoinDTO {
 
-    @NotBlank(message = "E01006")
+    @NotBlank(message = "USER-ERROR-VALID-00006")
     private String username;
 
-    @NotBlank(message = "E01007")
+    @NotBlank(message = "USER-ERROR-VALID-00007")
     private String nickname;
 
-    @NotBlank(message = "E01008")
+    @NotBlank(message = "USER-ERROR-VALID-00008")
     private String phone;
 
-    @Size(min = 4, message = "E01009")
+    @Size(min = 4, message = "USER-ERROR-VALID-00009")
     private String password;
 
-    @Email(message = "E01011")  // 오류 코드 문자열을 직접 사용
+    @Email(message = "USER-ERROR-VALID-00011")  // 오류 코드 문자열을 직접 사용
     private String email;
 
 }

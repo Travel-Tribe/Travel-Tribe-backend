@@ -153,13 +153,13 @@ public class ParticipationService {
 
 
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ParticipationsDto> getParticipationsDtosStatusOfJoin(
+    public List<ParticipationsDto> getParticipationsDtosStatusOfJoinAndJoinReady(
         Long postId) {
         log.info("participation getParticipationsStatusOfJoinAndJoin");
 
         List<ParticipationEntity> participationEntities
-            = participationRepository.findAllByPostEntityPostIdAndParticipationStatus(
-            postId, ParticipationStatus.JOIN);
+            = participationRepository.findAllByPostEntityPostIdAndParticipationStatusIn(
+            postId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
 
         return participationEntities.stream().map(ParticipationsDto::fromEntity)
             .toList();

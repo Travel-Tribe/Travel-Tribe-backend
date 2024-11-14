@@ -49,7 +49,7 @@ public class PayManagementService {
             participationId, userId);
 
         // pg 사와 통신을 통해 tid 추출
-        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApi.sendPayReadySign(
+        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApi.sendPayReadySign(postId,
             depositEntity.getDepositId(), userId);
 
         // tid를 기반으로 결제데이터 생성 & 카카오페이 결제 이력 저장

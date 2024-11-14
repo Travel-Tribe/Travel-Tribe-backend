@@ -104,7 +104,7 @@ public class VoteService {
             List<VotingEntity> allByVotingStartEntity = votingRepository.findAllByVotingStartEntity(votingStartEntity);
 
             allByVotingStartEntity.forEach(
-                votingEntity -> participationManagementService.unjoinParticipationWithiDepositReturned(postId, String.valueOf(votingEntity.getUserId()))
+                votingEntity -> participationManagementService.unjoinParticipationWithDepositReturned(postId, String.valueOf(votingEntity.getUserId()))
             );
 
             //post delete

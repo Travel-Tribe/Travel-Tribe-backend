@@ -163,7 +163,7 @@ public class UserController {
             .body(ResponseMessage.success(OtherUserInfoResponseDTO.fromDto(otherUserInfo)));
     }
 
-    @PostMapping("/duplicate")
+    @GetMapping("/duplicate")
     public ResponseEntity<?> verifyDuplicateUser(
         @RequestParam("type") String type,
         @RequestParam("query") String query) {

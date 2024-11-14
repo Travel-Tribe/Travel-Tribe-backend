@@ -10,8 +10,10 @@ import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.PaymentDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
+import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentStatus;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class PayManagementService {
     4. 결제성공과 실패에 따라서 payment와 deposit의 상태를 변경시키고, travel모듈에 결과를 통보하여 participationId의 상태도 변경시킨다.
     5. 결제실패시에는 첫단계부터 재시도하여 participationId, depositId, paymentId를 새로 만든다.
      */
+
 
 
     public ResponseDepositPayDto createDepositOrderAndInitiatePay(
@@ -147,7 +150,10 @@ public class PayManagementService {
         PaymentEntity paymentEntity = paymentService.getPaymentsInProgressAndChangeStatusByOrderId(
             depositId, PaymentStatus.PAY_REFUNDED);
 
-
+        if(!Objects.equals(depositEntity.getUserId(), userId)
+            || !Objects.equals(paymentEntity.getUserId(), userId)){
+            throw new CustomException();
+        }
 
         kakaopayApi.sendPayRefundSign(
                 paymentEntity.getPaykey(), constants.DEPOSIT_AMOUNT, constants.TAX_FREE_AMOUNT);

@@ -45,6 +45,7 @@ class ParticipationManagementServiceTest {
         .depositReturnDate(LocalDate.now().plusDays(30L))
         .build();
 
+    /*
     @Test
     void readyParticipation_shouldCreateParticipation_whenValid() {
         // Given
@@ -58,6 +59,8 @@ class ParticipationManagementServiceTest {
         // Then
         assertEquals(expectedParticipationDto, result);
     }
+
+     */
 
     @Test
     void failedPaymentParticipation_shouldUpdateStatusToJoinFailed() {

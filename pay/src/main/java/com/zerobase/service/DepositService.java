@@ -40,4 +40,8 @@ public class DepositService {
     public void save(DepositEntity depositEntity) {
         depositRepository.save(depositEntity);
     }
+
+    public void validateDepositCreateRequest(long postId, long participationId, String userId) {
+
+    }
 }

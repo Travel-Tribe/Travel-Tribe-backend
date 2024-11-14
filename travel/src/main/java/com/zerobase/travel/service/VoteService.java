@@ -133,7 +133,13 @@ public class VoteService {
                 .mapToDouble(MinusRatingEntity::getMinusScore)
                 .sum();
 
-            userApi.updateUserRating(postEntity.getUserId(), (sum - minusSum) / size);
+            double ratingScore = 0;
+
+            if (sum - minusSum > 0) {
+                ratingScore = (sum - minusSum) / size;
+            }
+
+            userApi.updateUserRating(postEntity.getUserId(), ratingScore);
 
         } else {
             // post RECRUITMENT_COMPLETED
@@ -172,7 +178,6 @@ public class VoteService {
     }
 
     private void validationCreateVote(long organizerUserId, long postId) {
-
         //organizerUserId가 postId의 주최자 인지
         if (!postRepository.existsByPostIdAndUserId(postId, organizerUserId)) {
             throw new BizException(VoteErrorCode.ONLY_AUTHOR_CAN_START_VOTE);
@@ -181,6 +186,11 @@ public class VoteService {
         //이미 게시된 투표 인지
         if (votingStartRepository.existsByPostId(postId)) {
             throw new BizException(VoteErrorCode.ALREADY_VOTING_START);
+        }
+
+        // 투표 시작시 RECRUITMENT_COMPLETED("모집완료") 일 때만 가능
+        if (postRepository.findById(postId).get().getStatus() != PostStatus.RECRUITMENT_COMPLETED) {
+            throw new BizException(VoteErrorCode.NOT_YET_VOTE_START);
         }
 
     }

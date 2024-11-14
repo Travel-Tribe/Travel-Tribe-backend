@@ -8,6 +8,7 @@ import com.zerobase.travel.exception.errorcode.RatingErrorCode;
 import com.zerobase.travel.exception.errorcode.VoteErrorCode;
 import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.repository.RatingRepository;
+import com.zerobase.travel.type.ParticipationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,11 +46,12 @@ public class RatingService {
     }
 
     private void validationRegisterRating(long postId, long senderUserId, long receiverUserId, double score) {
-        //점수 준 사람, 받은 사람이 해당 여행에 참여 하였는지
+        //받은 사람이 해당 여행에 참여 하였는지
         if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(receiverUserId)).isEmpty()) {
             throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
         }
 
+        //점수 준 사람이 해당 여행에 참여 하였는지
         if (participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(senderUserId)).isEmpty()) {
             throw new BizException(VoteErrorCode.UNJOIN_TRAVEL);
         }
@@ -66,6 +68,20 @@ public class RatingService {
 
         if (score % SCORE_UNIT != 0) {
             throw new BizException(RatingErrorCode.SCORE_OUT_OF_UNIT);
+        }
+
+        //주는 사람 여행 참여상태가 travel_finish 일때 가능
+        if (ParticipationStatus.TRAVEL_FINISHED
+            .equals(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(senderUserId)).get().getParticipationStatus())
+        ) {
+            throw new BizException(RatingErrorCode.NOT_YET_GIVE_RATING);
+        }
+
+        //받는 사람 여행 참여상태가 travel_finish 일때 가능
+        if (ParticipationStatus.TRAVEL_FINISHED
+            .equals(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(receiverUserId)).get().getParticipationStatus())
+        ) {
+            throw new BizException(RatingErrorCode.NOT_YET_GIVE_RATING);
         }
     }
 

@@ -23,7 +23,9 @@ public enum BasicErrorCode implements ErrorCode {
     ILLEGAL_EMAIL_ADDRESS_ERROR("USER-ERROR-BASIC-00015", "잘못된 이메일 주소"),
     EMAIL_SENDING_ERROR("USER-ERROR-BASIC-00016", "이메일 전송 실패"),
     CREATE_TOKEN_ERROR("USER-ERROR-BASIC-00017", "토큰 생성 중 오류가 발생했습니다."),
-    LOCK_ACQUISITION_FAILED_ERROR("USER-ERROR-BASIC-00018", "레디스 락 획득 실패.");
+    LOCK_ACQUISITION_FAILED_ERROR("USER-ERROR-BASIC-00018", "레디스 락 획득 실패."),
+    DEACTIVATED_USER_ERROR("USER-ERROR-BASIC-00019", "탈퇴한 회원 입니다."),
+    SUSPENDED_USER_ERROR("USER-ERROR-BASIC-00020", "정지당한 회원 입니다.");
 
     private final String errorCode;
     private final String errorMessage;

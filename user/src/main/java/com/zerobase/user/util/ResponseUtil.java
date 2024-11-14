@@ -1,6 +1,7 @@
 package com.zerobase.user.util;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.response.ErrorCode;
 import com.zerobase.user.dto.response.LoginSuccessDTO;
@@ -32,15 +33,21 @@ public class ResponseUtil {
     }
 
     public static void setJsonResponse(HttpServletResponse response, int statusCode,
-        ErrorCode errorCode) throws IOException {
+        ErrorCode errorCode) {
         response.setStatus(statusCode);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        String jsonResponse = objectMapper.writeValueAsString(ResponseMessage.fail(errorCode));
-
-        PrintWriter writer = response.getWriter();
-        writer.write(jsonResponse);
-        writer.flush();
+        String jsonResponse = null;
+        try {
+            jsonResponse = objectMapper.writeValueAsString(ResponseMessage.fail(errorCode));
+            PrintWriter writer = response.getWriter();
+            writer.write(jsonResponse);
+            writer.flush();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

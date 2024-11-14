@@ -1,8 +1,8 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.application.RatingFacade;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.request.GiveRatingDto;
-import com.zerobase.travel.service.RatingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class RatingController {
 
-    private final RatingService ratingService;
+    private final RatingFacade ratingFacade;
     
     @PostMapping("/posts/{postId}/rating")
     public ResponseEntity<ResponseMessage<Void>> registerRating(
@@ -26,7 +26,7 @@ public class RatingController {
         @RequestBody GiveRatingDto giveRatingDto
     ) {
 
-        ratingService.giveRating(giveRatingDto, postId, userId);
+        ratingFacade.giveRating(giveRatingDto, postId, userId);
         return ResponseEntity.ok(ResponseMessage.success());
     }
 

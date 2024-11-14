@@ -26,6 +26,7 @@ public class DepositService {
 
         DepositEntity entity = DepositEntity.builder()
             .postId(postId)
+            .paymentStatus(PaymentStatus.PAY_IN_PROGRESS)
             .participationId(participationId)
             .userId(userId)
             .build();

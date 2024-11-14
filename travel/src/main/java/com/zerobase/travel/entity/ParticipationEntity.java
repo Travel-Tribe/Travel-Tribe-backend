@@ -70,11 +70,10 @@ public class ParticipationEntity {
     @Transient
     private List<Enum<?>> statuses;
 
-    // You can initialize this list in the constructor or a method
-    public void initializeStatuses() {
-        this.statuses = List.of(participationStatus, depositStatus, ratingStatus);
+    public List<Enum<?>> getStatuses() {
+        statuses = List.of(participationStatus, depositStatus, ratingStatus);
+        return statuses;
     }
-
 
 
 

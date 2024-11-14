@@ -45,7 +45,7 @@ public class ParticipationController {
     }
 
 
-    // 참여자 조회시에 Status에 Join 상태의 유저 리스트 확인
+    // 참여자 조회시에 Status에 Join/joinready 상태의 유저 리스트 확인
     @GetMapping("{postId}/participations")
     public ResponseEntity<List<ResponseParticipationsDto>> getParticipationsByPost(
         @PathVariable Long postId) {

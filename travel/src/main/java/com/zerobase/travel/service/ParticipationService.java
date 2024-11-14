@@ -236,8 +236,8 @@ public class ParticipationService {
         log.info("participation getParticipationsStatusOfJoinAndJoin");
 
         List<ParticipationEntity> participationEntities
-            = participationRepository.findAllByPostEntityPostIdAndParticipationStatus(
-            postId, ParticipationStatus.JOIN);
+            = participationRepository.findAllByPostEntityPostIdAndParticipationStatusIn(
+            postId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
 
         return participationEntities.stream().map(ResponseParticipationsDto::fromEntity)
             .toList();

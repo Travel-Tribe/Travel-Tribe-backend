@@ -34,7 +34,6 @@ public class RatingService {
             .senderUserId(senderUserId)
             .receiverUserId(giveRatingDto.getReceiverId())
             .score(giveRatingDto.getScore())
-            .comment(giveRatingDto.getComment())
             .build();
 
         ratingRepository.save(rating);

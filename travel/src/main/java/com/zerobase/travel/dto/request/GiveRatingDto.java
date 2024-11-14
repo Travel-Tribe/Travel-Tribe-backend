@@ -13,6 +13,5 @@ public class GiveRatingDto {
 
     private long receiverId;
     private double score;
-    private String comment;
 
 }

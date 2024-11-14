@@ -117,14 +117,6 @@ public class UserService {
     }
 
     public UserServiceDto getUserInfo(long userId) {
-
-        String cacheKey = "userInfo:" + userId;
-        // Redis에서 캐시된 데이터 조회
-        Object cachedData = redisTemplate.opsForValue().get(cacheKey);
-        if (cachedData != null) {
-            log.info("Cache hit for user ID: {}", userId);
-            return (UserServiceDto) cachedData;
-        }
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(()->new BizException(USER_NOT_FOUND_ERROR));
         ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
@@ -144,10 +136,6 @@ public class UserService {
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
-
-        // Redis에 캐시 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, userInfo, 1, TimeUnit.HOURS);
-        log.info("Cache miss for user ID: {}. Data cached.", userEntity.getId());
 
         return userInfo;
     }

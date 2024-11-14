@@ -244,30 +244,14 @@ public class PostService {
     }
 
     @Transactional
-    public ResponsePostDTO findPost(Long postId, String userEmail) {
+    public ResponsePostDTO findPost(Long postId) {
         // 게시글 조회
         PostEntity existingPost = postRepository.findById(postId)
             .orElseThrow(() -> new BizException(POST_NOT_FOUND_ERROR));
 
-        // 사용자 정보 조회
-        UserInfoResponseDTO userInfo;
-        try {
-            userInfo = userClientService.getUserInfo(userEmail);
-            log.info("User Info: {}", userInfo);
-        } catch (FeignException e) {
-            log.error("userClient 호출 실패: {}", e.getMessage());
-            throw new BizException(USER_INFO_CALL_ERROR);
-        }
-
-        if (userInfo == null) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        }
-
-        Long userId = userInfo.getId();
-
         // ResponsePostDTO 빌드
         return ResponsePostDTO.builder()
-            .userId(userId)
+            .userId(existingPost.getUserId())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())

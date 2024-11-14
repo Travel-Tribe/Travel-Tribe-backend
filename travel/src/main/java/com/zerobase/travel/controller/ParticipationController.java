@@ -1,7 +1,7 @@
 package com.zerobase.travel.controller;
 
 import com.zerobase.travel.dto.ParticipationDto;
-import com.zerobase.travel.dto.ParticipationsDto;
+import com.zerobase.travel.dto.ResponseParticipationsDto;
 import com.zerobase.travel.service.ParticipationManagementService;
 import com.zerobase.travel.service.ParticipationService;
 import java.util.List;
@@ -47,7 +47,7 @@ public class ParticipationController {
 
     // 참여자 조회시에 Status에 Join 상태의 유저 리스트 확인
     @GetMapping("{postId}/participations")
-    public ResponseEntity<List<ParticipationsDto>> getParticipationsByPost(
+    public ResponseEntity<List<ResponseParticipationsDto>> getParticipationsByPost(
         @PathVariable Long postId) {
         log.info("getParticipationsByPost controller start");
         return ResponseEntity.ok(

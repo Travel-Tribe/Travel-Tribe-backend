@@ -24,7 +24,14 @@ spring:
             - Path=/api/v1/posts/**, /api/v1/reviews/**, /api/v1/communities/**, /api/v1/file/**
           filters:
             - Jwt
+        - id: pay-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/pay/**, /internal/api/v1/pay/**
+          filters:
+            - Jwt
           # post-service로의 요청에만 JwtFilter 적용
+
 
   jwt:
     secret: dlstoddmsgksqjsQnsdlslchljsdmfekgotkfwkvhrlgkwlakfwk

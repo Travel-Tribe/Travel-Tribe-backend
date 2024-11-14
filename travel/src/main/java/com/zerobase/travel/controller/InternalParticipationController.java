@@ -42,7 +42,7 @@ public class InternalParticipationController {
 
 
     // 유저들의 완료된 여행에 대해서 숫자 반환
-    @GetMapping("/participations/by-userid/{userId}")
+    @GetMapping("/by-userid/{userId}")
     public ResponseEntity<Integer> getParticipationsCompletedByUserId(
         @PathVariable String userId) {
         log.info("getParticipationsCompletedByUserId controller start");

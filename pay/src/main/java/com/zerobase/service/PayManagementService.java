@@ -44,8 +44,8 @@ public class PayManagementService {
 
         depositService.validateDepositCreateRequest(postId,participationId,userId);
 
-        // deposit 생성
-        DepositEntity depositEntity = depositService.createDepositOrder(postId,
+        // deposit 생성과 저장 ; 저장해야 depositId생성가능
+        DepositEntity depositEntity = depositService.createAndSaveDepositOrder(postId,
             participationId, userId);
 
         // pg 사와 통신을 통해 tid 추출
@@ -57,7 +57,6 @@ public class PayManagementService {
             depositEntity.getDepositId(), userId, payReadyApiDto.getTid(),
             pgMethod);
 
-        depositService.save(depositEntity);
 
         return ResponseDepositPayDto.builder()
             .depositId(depositEntity.getDepositId())

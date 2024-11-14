@@ -1,9 +1,11 @@
 package com.zerobase.entity;
 
+import com.zerobase.model.type.PaymentStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,4 +26,5 @@ public class DepositEntity {
     private Long postId;
     private Long participationId;
     private String userId;
+    private PaymentStatus paymentStatus;
 }

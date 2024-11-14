@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class RequestPayDepositFail {
 
-    private long participationId;
+    private long depositId;
 
 }

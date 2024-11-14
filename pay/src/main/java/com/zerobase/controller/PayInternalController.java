@@ -1,10 +1,10 @@
 package com.zerobase.controller;
 
+import com.zerobase.model.RequestpayDepositRefund;
 import com.zerobase.service.PayManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +24,11 @@ public class PayInternalController {
 
 
     // client 결제환불시 url 신호받기
-    @PutMapping(value = "/deposit/byParticipation/{participationId}/refund")
-    public ResponseEntity<Object> payDepositRefund(@PathVariable Long participationId) {
+    @PutMapping(value = "/deposit/refund")
+    public ResponseEntity<Object> payDepositRefund(
+        RequestpayDepositRefund request) {
         log.info(" pay deposit refund sign from client");
-         payManagementService.refundDepositPay(participationId);
+         payManagementService.refundDepositPay(request.getDepositId(), request.getUserId());
         return ResponseEntity.ok().build();
     }
 

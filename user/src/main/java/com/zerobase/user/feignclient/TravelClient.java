@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "post-service", url = "${post-service.url}") // application.yml에 정의된 URL 사용
 public interface TravelClient {
 
-    @GetMapping("/api/v1/posts/participations/by-userid/{userId}")
+    @GetMapping("/internal/api/v1/posts/participations/by-userid/{userId}")
     ResponseEntity<Integer> getParticipationsCompletedByUserId(@PathVariable("userId") String userId);
 
 }

@@ -5,6 +5,7 @@ import com.zerobase.travel.service.ParticipationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,6 +38,16 @@ public class InternalParticipationController {
         log.info("failed participation controller start");
         participationManagementService.failedPaymentParticipation(participationId, userId);
         return ResponseEntity.ok().build();
+    }
+
+
+    // 유저들의 완료된 여행에 대해서 숫자 반환
+    @GetMapping("/participations/by-userid/{userId}")
+    public ResponseEntity<Integer> getParticipationsCompletedByUserId(
+        @PathVariable String userId) {
+        log.info("getParticipationsCompletedByUserId controller start");
+        return ResponseEntity.ok(
+            participationService.countParticipationsCompletedByUserId(userId));
     }
 
 

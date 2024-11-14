@@ -178,11 +178,12 @@ public class ParticipationService {
         List<Enum<?>> statuses = participationEntity.getStatuses();
 
         // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
-        for (Enum<?> status : statuses) {
-            for (Enum<?> enumElement : changEnumFrom) {
-                if (status.getClass() == enumElement.getClass()) {
-                    if (status != enumElement) {
-                        log.error("status is not as expected :" + status);
+        for (Enum<?> enumOfEntity : statuses) {
+            for (Enum<?> checkEnumData : changEnumFrom) {
+                // entity의 enum이 check 하고자하는 enum과 동일한 타입일 경우 검증로직 실행
+                if (enumOfEntity.getClass() == checkEnumData.getClass()) {
+                    if (enumOfEntity != checkEnumData) {
+                        log.error("status is not as expected :" + enumOfEntity);
                         throw new CustomException(
                             ErrorCode.PARTICIPATION_STATUS_ERROR);
                     }
@@ -190,17 +191,18 @@ public class ParticipationService {
             }
         }
 
-        // entity의 enum type을 원하는 값으로 변경
-        for (Enum<?> enumElement : changEnumTo) {
-            if (enumElement instanceof ParticipationStatus) {
+        // entity의 enum data를 changeEnumTo의 값으로 변경
+        for (Enum<?> enumToInput : changEnumTo) {
+            //  enum값의 type을 검증하여 어떤 타입인지 확인한다.
+            if (enumToInput instanceof ParticipationStatus) {
                 participationEntity.setParticipationStatus(
-                    (ParticipationStatus) enumElement);
-            } else if (enumElement instanceof DepositStatus) {
+                    (ParticipationStatus) enumToInput);
+            } else if (enumToInput instanceof DepositStatus) {
                 participationEntity.setDepositStatus(
-                    (DepositStatus) enumElement);
-            } else if (enumElement instanceof RatingStatus) {
+                    (DepositStatus) enumToInput);
+            } else if (enumToInput instanceof RatingStatus) {
                 participationEntity.setRatingStatus(
-                    (RatingStatus) enumElement);
+                    (RatingStatus) enumToInput);
             }
         }
 

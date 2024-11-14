@@ -1,20 +1,13 @@
 package com.zerobase.api;
 
-import static com.zerobase.config.Constants.DEPOSIT_AMOUNT;
-import static com.zerobase.config.Constants.ITEM_NAME;
-import static com.zerobase.config.Constants.KAKAO_APPROVAL_URL;
-import static com.zerobase.config.Constants.KAKAO_CANCEL_URL;
-import static com.zerobase.config.Constants.KAKAO_CID;
-import static com.zerobase.config.Constants.KAKAO_FAIL_URL;
-import static com.zerobase.config.Constants.QUANTITY;
-import static com.zerobase.config.Constants.SECRET_KEY;
-import static com.zerobase.config.Constants.TAX_FREE_AMOUNT;
 
-import com.zerobase.model.ResponseApi;
-import com.zerobase.model.ResponseApi.PayRefundApiDto;
+
+import com.zerobase.config.Constants;
 import com.zerobase.model.RequestApi;
 import com.zerobase.model.RequestApi.ConfirmDto;
 import com.zerobase.model.RequestApi.RefundDto;
+import com.zerobase.model.ResponseApi;
+import com.zerobase.model.ResponseApi.PayRefundApiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +17,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Slf4j
 public class KakaopayApi implements ApiInterface {
+
+    private final Constants constants;
 
 
 
@@ -38,20 +33,20 @@ public class KakaopayApi implements ApiInterface {
         WebClient webclient = WebClient.builder()
             .baseUrl("https://open-api.kakaopay.com")
             .defaultHeader("Content-Type", "application/json")
-            .defaultHeader("Authorization", "SECRET_KEY "+ SECRET_KEY)
+            .defaultHeader("Authorization", "SECRET_KEY "+ constants.SECRET_KEY)
             .build();
 
         RequestApi.ReadyDto readyApiDto = RequestApi.ReadyDto.builder()
-            .cid(KAKAO_CID)
+            .cid(constants.KAKAO_CID)
             .partnerOrderId(String.valueOf(orderId))
             .partnerUserId(userId)
-            .itemName(ITEM_NAME)
-            .quantity(String.valueOf(QUANTITY))
-            .totalAmount(String.valueOf(DEPOSIT_AMOUNT))
-            .taxFreeAmount(String.valueOf(TAX_FREE_AMOUNT))
-            .approvalUrl(KAKAO_APPROVAL_URL+"?orderId="+orderId)
-            .cancelUrl(KAKAO_CANCEL_URL+"?orderId="+orderId)
-            .failUrl(KAKAO_FAIL_URL+"?orderId="+orderId)
+            .itemName(constants.ITEM_NAME)
+            .quantity(String.valueOf(constants.QUANTITY))
+            .totalAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
+            .taxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
+            .approvalUrl(constants.KAKAO_APPROVAL_URL+"?orderId="+orderId)
+            .cancelUrl(constants.KAKAO_CANCEL_URL+"?orderId="+orderId)
+            .failUrl(constants.KAKAO_FAIL_URL+"?orderId="+orderId)
             .build();
         //
         ResponseApi.PayReadyApiDto payReadyApiDto = webclient.post()
@@ -76,11 +71,11 @@ public class KakaopayApi implements ApiInterface {
         WebClient webclient = WebClient.builder()
             .baseUrl("https://open-api.kakaopay.com")
             .defaultHeader("Content-Type", "application/json")
-            .defaultHeader("Authorization", "SECRET_KEY " + SECRET_KEY)
+            .defaultHeader("Authorization", "SECRET_KEY " + constants.SECRET_KEY)
             .build();
 
         ConfirmDto confirmDto = ConfirmDto.builder()
-            .cid(KAKAO_CID)
+            .cid(constants.KAKAO_CID)
             .tid(tid)
             .partnerOrderId(String.valueOf(orderId))
             .partnerUserId(userId)
@@ -107,11 +102,11 @@ public class KakaopayApi implements ApiInterface {
         WebClient webclient = WebClient.builder()
             .baseUrl("https://open-api.kakaopay.com")
             .defaultHeader("Content-Type", "application/json")
-            .defaultHeader("Authorization", "SECRET_KEY " + SECRET_KEY)
+            .defaultHeader("Authorization", "SECRET_KEY " + constants.SECRET_KEY)
             .build();
 
         RequestApi.RefundDto refundDto = RefundDto.builder()
-            .cid(KAKAO_CID)
+            .cid(constants.KAKAO_CID)
             .tid(tid)
             .cancelAmount(String.valueOf(cancelAmount))
             .cancelTaxFreeAmount(String.valueOf(cancel_tax_free_amount))

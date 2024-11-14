@@ -112,7 +112,7 @@ class ParticipationManagementServiceTest {
             participationEntity,
             List.of(ParticipationStatus.JOIN, DepositStatus.PAID),
             List.of(ParticipationStatus.JOIN_CANCEL, DepositStatus.RETURNED));
-        verify(payApi).payDepositRefund(participationEntity.getParticipationId());
+        verify(payApi).payDepositRefund(participationEntity.getParticipationId(),USER_ID);
         verify(participationService).setDateToReturnDeposit(eq(participationEntity), any(LocalDate.class));
         verify(participationService).saveParticipation(participationEntity);
     }
@@ -166,7 +166,7 @@ class ParticipationManagementServiceTest {
             participationEntity,
             List.of(ParticipationStatus.TRAVEL_FINISHED, DepositStatus.PAID),
             List.of(DepositStatus.RETURNED));
-        verify(payApi).payDepositRefund(participationEntity.getParticipationId());
+        verify(payApi).payDepositRefund(participationEntity.getParticipationId(),USER_ID);
         verify(participationService).saveParticipation(participationEntity);
     }
 }

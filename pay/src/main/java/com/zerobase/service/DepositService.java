@@ -3,6 +3,7 @@ package com.zerobase.service;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.exception.CustomException;
+import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.DepositRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +44,25 @@ public class DepositService {
 
     public void validateDepositCreateRequest(long postId, long participationId, String userId) {
 
+    }
+
+    public DepositEntity getPaymentInProgressAndchangeStatusByOrderId(long depositId,
+        PaymentStatus paymentStatus) {
+        DepositEntity depositEntity = depositRepository.findById(depositId)
+            .orElseThrow(() -> new CustomException());
+
+        depositEntity.setPaymentStatus(paymentStatus);
+
+        return depositEntity;
+    }
+
+    public DepositEntity getPaymentCompletedAndChangeStatusByOrderId(long depositId,
+        PaymentStatus paymentStatus) {
+        DepositEntity depositEntity = depositRepository.findById(depositId)
+            .orElseThrow(() -> new CustomException());
+
+        depositEntity.setPaymentStatus(paymentStatus);
+
+        return depositEntity;
     }
 }

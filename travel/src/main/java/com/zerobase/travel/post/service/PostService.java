@@ -249,6 +249,10 @@ public class PostService {
         PostEntity existingPost = postRepository.findById(postId)
             .orElseThrow(() -> new BizException(POST_NOT_FOUND_ERROR));
 
+        if(PostStatus.DELETED.equals(existingPost.getStatus())){
+            throw new BizException(POST_NOT_FOUND_ERROR);
+        }
+
         // ResponsePostDTO 빌드
         return ResponsePostDTO.builder()
             .userId(existingPost.getUserId())

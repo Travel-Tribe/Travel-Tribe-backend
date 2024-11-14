@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "/internal/api/v1/posts/participations")
+@RequestMapping(value = "/internal/api/v1/posts")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -23,7 +23,7 @@ public class InternalParticipationController {
 
 
     // 참여 확정 : 프론트에서 결제가 완료되면 호출하도록 이벤트 설정
-    @PutMapping("/{participationId}/success")
+    @PutMapping("/participations/{participationId}/success")
     public ResponseEntity<Void> confirmParticipation(
         @PathVariable long participationId, @RequestHeader("X-User-Id") String userId) {
         log.info("success participation controller start");
@@ -32,7 +32,7 @@ public class InternalParticipationController {
     }
 
     // 참여 확정 : 프론트에서 결제가 완료되면 호출하도록 이벤트 설정
-    @PutMapping("/{participationId}/fail")
+    @PutMapping("/participations/{participationId}/fail")
     public ResponseEntity<Void> failParticipation(
         @PathVariable long participationId, @RequestHeader("X-User-Id") String userId) {
         log.info("failed participation controller start");
@@ -42,13 +42,26 @@ public class InternalParticipationController {
 
 
     // 유저들의 완료된 여행에 대해서 숫자 반환
-    @GetMapping("/by-userid/{userId}")
+    @GetMapping("/participations/by-userid/{userId}")
     public ResponseEntity<Integer> getParticipationsCompletedByUserId(
         @PathVariable String userId) {
         log.info("getParticipationsCompletedByUserId controller start");
         return ResponseEntity.ok(
             participationService.countParticipationsCompletedByUserId(userId));
     }
+
+
+    // pay 모듈에 전달된 participation 정보 검증
+    @GetMapping("{postId}/participations/{participationId}/validate")
+    public ResponseEntity<Boolean> validateParticipationInfo(
+        @PathVariable long postId, @PathVariable long participationId,
+        @RequestHeader("X-User-Id") String userId ) {
+
+        return ResponseEntity.ok(participationService
+            .validateParticipationUserIdAndPostId(postId, participationId, userId));
+    }
+
+
 
 
 

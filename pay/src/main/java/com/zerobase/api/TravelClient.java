@@ -2,7 +2,9 @@ package com.zerobase.api;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -17,4 +19,8 @@ public interface TravelClient {
     ResponseEntity<Void> failedParticipation(
         @PathVariable long participationId, @RequestHeader("X-User-Id") String userId);
 
+
+    @GetMapping("{postId}/participations/{participationId}/validate")
+    ResponseEntity<Boolean> validateParticipationInfo(
+        long postId, long participationId, @RequestHeader("X-User-Id") String userId);
 }

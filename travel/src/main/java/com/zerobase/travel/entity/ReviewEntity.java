@@ -1,5 +1,6 @@
 package com.zerobase.travel.entity;
 
+import com.zerobase.travel.common.entity.BaseEntity;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.persistence.CascadeType;
@@ -27,7 +28,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewEntity {
+public class ReviewEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -79,10 +79,8 @@ public class PostController {
 
     // 여행참여 게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<?> findPost(@PathVariable Long postId,
-        @RequestHeader("X-User-Email") String userEmail) {
-        log.info("email: " + userEmail);
-        ResponsePostDTO responsePostDTO = postService.findPost(postId, userEmail);
+    public ResponseEntity<?> findPost(@PathVariable Long postId) {
+        ResponsePostDTO responsePostDTO = postService.findPost(postId);
         return ResponseEntity.status(OK).body(ResponseMessage.success(responsePostDTO));
     }
 

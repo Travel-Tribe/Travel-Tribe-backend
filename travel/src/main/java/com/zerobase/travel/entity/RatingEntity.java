@@ -24,7 +24,6 @@ public class RatingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ratingId;
 
-    //TODO 김용민 Long, object 선택하기
     private Long postId;
 
     private Double score;
@@ -32,7 +31,5 @@ public class RatingEntity {
     private Long receiverUserId;
 
     private Long senderUserId;
-
-    private String comment;
 
 }

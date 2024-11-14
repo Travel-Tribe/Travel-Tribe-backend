@@ -13,6 +13,8 @@ public interface ParticipationRepository extends JpaRepository<ParticipationEnti
 
 
     int countByUserIdAndParticipationStatusIn(String userId, List<ParticipationStatus> participationStatuses);
+
+    List<ParticipationEntity> findAllByUserIdAndParticipationStatusIn(String userId, List<ParticipationStatus> participationStatuses);
   
     Optional<ParticipationEntity> findByPostEntityPostIdAndUserId(Long postId, String userId);
 

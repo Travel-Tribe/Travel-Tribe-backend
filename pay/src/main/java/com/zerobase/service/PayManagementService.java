@@ -42,6 +42,8 @@ public class PayManagementService {
         long postId, long participationId, String userId, PGMethod pgMethod) {
         log.info("readyDepositPay");
 
+        depositService.validateDepositCreateRequest(postId,participationId,userId);
+
         // deposit 생성
         DepositEntity depositEntity = depositService.createDepositOrder(postId,
             participationId, userId);

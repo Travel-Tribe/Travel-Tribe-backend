@@ -133,7 +133,13 @@ public class VoteService {
                 .mapToDouble(MinusRatingEntity::getMinusScore)
                 .sum();
 
-            userApi.updateUserRating(postEntity.getUserId(), (sum - minusSum) / size);
+            double ratingScore = 0;
+
+            if (sum - minusSum > 0) {
+                ratingScore = (sum - minusSum) / size;
+            }
+
+            userApi.updateUserRating(postEntity.getUserId(), ratingScore);
 
         } else {
             // post RECRUITMENT_COMPLETED

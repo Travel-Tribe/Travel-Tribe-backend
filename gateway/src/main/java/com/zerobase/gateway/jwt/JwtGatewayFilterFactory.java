@@ -11,7 +11,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 @Component
 public class JwtGatewayFilterFactory extends
@@ -30,7 +29,7 @@ public class JwtGatewayFilterFactory extends
         return (exchange, chain) -> {
             String accessToken = exchange.getRequest().getHeaders().getFirst("access");
 
-            if (accessToken == null) {
+            if (accessToken == null || accessToken.isEmpty()) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }

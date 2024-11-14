@@ -1,9 +1,14 @@
 package com.zerobase.user.jwt;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.CREATE_TOKEN_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.INTERNAL_SERVER_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.SUSPENDED_USER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.type.UserStatus.DEACTIVATED;
+import static com.zerobase.user.type.UserStatus.INACTIVE;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
@@ -71,6 +76,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String password = loginRequest.getPassword();
 
         log.debug("Attempting to authenticate user with email: {}", email);
+
+        // 사용자 정보 조회 및 상태 확인
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        if (DEACTIVATED.equals(userEntity.getStatus())) {
+
+            ResponseUtil.setJsonResponse(response, SC_FORBIDDEN, DEACTIVATED_USER_ERROR);
+            throw new BizException(DEACTIVATED_USER_ERROR); // 여기서 BizException 발생
+        } else if (INACTIVE.equals(userEntity.getStatus())) {
+            ResponseUtil.setJsonResponse(response, SC_FORBIDDEN, SUSPENDED_USER_ERROR);
+            throw new BizException(SUSPENDED_USER_ERROR); // 여기서 BizException 발생
+        }
 
         //스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -153,16 +171,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
         HttpServletResponse response, AuthenticationException failed) {
+
         log.warn("Authentication failed for user: {}", request.getParameter("email"), failed);
 
         // 로그인 실패 시 401 응답 코드 반환
-        try {
-            // JSON 응답 생성
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
-                LOGIN_FAIL_ERROR);
-        } catch (IOException e) {
-            log.error("Failed to write the response", e);
-        }
+
+        // JSON 응답 생성
+        ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+            LOGIN_FAIL_ERROR);
+
     }
 }
 

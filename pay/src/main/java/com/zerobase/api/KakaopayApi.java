@@ -26,7 +26,7 @@ public class KakaopayApi implements ApiInterface {
 
 
     @Override
-    public ResponseApi.PayReadyApiDto sendPayReadySign( Long orderId, String userId) {
+    public ResponseApi.PayReadyApiDto sendPayReadySign( Long depositId, String userId) {
         log.info("KakaopayApiService sendPayReadySign");
         // webclient url, header입력
 
@@ -38,15 +38,15 @@ public class KakaopayApi implements ApiInterface {
 
         RequestApi.ReadyDto readyApiDto = RequestApi.ReadyDto.builder()
             .cid(constants.KAKAO_CID)
-            .partnerOrderId(String.valueOf(orderId))
+            .partnerOrderId(String.valueOf(depositId))
             .partnerUserId(userId)
             .itemName(constants.ITEM_NAME)
             .quantity(String.valueOf(constants.QUANTITY))
             .totalAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
-            .approvalUrl(constants.KAKAO_APPROVAL_URL+"?orderId="+orderId)
-            .cancelUrl(constants.KAKAO_CANCEL_URL+"?orderId="+orderId)
-            .failUrl(constants.KAKAO_FAIL_URL+"?orderId="+orderId)
+            .approvalUrl(constants.KAKAO_APPROVAL_URL+"?depositId="+depositId)
+            .cancelUrl(constants.KAKAO_CANCEL_URL+"?depositId="+depositId)
+            .failUrl(constants.KAKAO_FAIL_URL+"?depositId="+depositId)
             .build();
         //
         ResponseApi.PayReadyApiDto payReadyApiDto = webclient.post()

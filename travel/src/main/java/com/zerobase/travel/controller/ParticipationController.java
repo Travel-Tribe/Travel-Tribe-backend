@@ -39,9 +39,7 @@ public class ParticipationController {
 
     // 개인의 참여취소
     @DeleteMapping("{postId}/participations")
-    public ResponseEntity<ResponseMessage<Object>> deleteParticipations(
-        @PathVariable Long postId,
-        @RequestHeader(value = "userId") String userId) {
+    public ResponseEntity<ResponseMessage<Object>> deleteParticipations( @PathVariable Long postId,  @RequestHeader("X-User-Id") String userId ) {
 
         log.info("deleteParticipations controller start");
         participationManagementService.unjoinParticipationWithDepositForfeited(

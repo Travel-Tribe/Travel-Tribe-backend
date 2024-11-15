@@ -3,6 +3,7 @@ package com.zerobase.service;
 import com.zerobase.config.Constants;
 import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.exception.CustomException;
+import com.zerobase.model.exception.ErrorCode;
 import com.zerobase.model.type.OrderType;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.PaymentDto;
@@ -58,7 +59,8 @@ public class PaymentService {
         long depositId, PaymentStatus paymentStatus) {
 
         PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            depositId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException());
+            depositId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException(
+            ErrorCode.PAYMENT_NOT_EXSITING));
 
         paymentEntity.setPaymentStatus(paymentStatus);
 
@@ -68,9 +70,11 @@ public class PaymentService {
 
     public PaymentEntity getPaymentsInPayCompletedByOrderId( String userId,long orderId) {
         PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new CustomException());
+            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new CustomException(
+            ErrorCode.PAYMENT_NOT_EXSITING));
 
-        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException();
+        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException(
+            ErrorCode.INVALID_CLIENT_REQUEST);
 
         return paymentEntity;
     }

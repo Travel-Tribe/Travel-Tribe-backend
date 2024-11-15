@@ -125,7 +125,7 @@ public class PayManagementService {
 
 
         // travel 모듈쪽에 결제확정 통신
-        participationApi.confirmParticipation(depositEntity.getParticipationId(),userId);
+        participationApi.failedParticipation(depositEntity.getParticipationId(),userId);
 
 
         // 두가지가 성공하고나면 payment, deposit entity저장

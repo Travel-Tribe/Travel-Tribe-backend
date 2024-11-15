@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -286,15 +287,18 @@ public class ParticipationService {
     public Boolean validateParticipationUserIdAndPostId(long postId, long participationId,
         String userId) {
 
-        Boolean isValid = true;
+        Optional<ParticipationEntity> optioinal = participationRepository.findById(
+            participationId);
 
-        ParticipationEntity participationEntity = participationRepository.findById(
-            participationId).orElseThrow(()->new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+        if(optioinal.isEmpty()) return false;
+
+        ParticipationEntity participationEntity = optioinal.get();
 
         if(participationEntity.getPostEntity().getPostId() !=postId
             || !Objects.equals(participationEntity.getUserId(), userId)) {
-            isValid = false;
+            return false;
         }
-        return isValid;
+
+        return true;
     }
 }

@@ -1,6 +1,6 @@
 package com.zerobase.service;
 
-import com.zerobase.api.TravelApi;
+import com.zerobase.api.ParticipationApi;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.exception.CustomException;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class DepositService {
 
     private final DepositRepository depositRepository;
-    private final TravelApi travelAPi;
+    private final ParticipationApi participationAPi;
 
 
     // depositId를 생성하기 위해서
@@ -49,7 +49,7 @@ public class DepositService {
 
     public void validateDepositCreateRequest(long postId, long participationId,
         String userId) {
-        if (Boolean.FALSE.equals(travelAPi.validateParticipationInfo
+        if (Boolean.FALSE.equals(participationAPi.validateParticipationInfo
                 (postId, participationId, userId).getBody())) {
             throw new CustomException();
         }

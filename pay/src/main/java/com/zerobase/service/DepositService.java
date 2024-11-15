@@ -4,6 +4,7 @@ import com.zerobase.api.ParticipationApi;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.exception.CustomException;
+import com.zerobase.model.exception.ErrorCode;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.DepositRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class DepositService {
     public DepositDto findByParticipationId(Long participationId) {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
-                CustomException::new));
+                () -> new CustomException(ErrorCode.DEPOSIT_NOT_EXSITING)));
     }
 
     public void save(DepositEntity depositEntity) {
@@ -51,7 +52,7 @@ public class DepositService {
         String userId) {
         if (Boolean.FALSE.equals(participationAPi.validateParticipationInfo
                 (postId, participationId, userId).getBody())) {
-            throw new CustomException();
+            throw new CustomException(ErrorCode.INVALID_CLIENT_REQUEST);
         }
 
 
@@ -61,7 +62,8 @@ public class DepositService {
         long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
-            .orElseThrow(() -> new CustomException());
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.DEPOSIT_NOT_EXSITING));
 
         depositEntity.setPaymentStatus(paymentStatus);
 
@@ -72,7 +74,8 @@ public class DepositService {
         long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
-            .orElseThrow(() -> new CustomException());
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.DEPOSIT_NOT_EXSITING));
 
         depositEntity.setPaymentStatus(paymentStatus);
 

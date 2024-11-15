@@ -1,6 +1,6 @@
 package com.zerobase.common.response;
 
-import com.zerobase.travel.exception.errorcode.ErrorCode;
+import com.zerobase.common.ErrorCode;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

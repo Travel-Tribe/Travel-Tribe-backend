@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/internal/api/v1/pay")
 @RequiredArgsConstructor
 @Slf4j
-public class PayInternalController {
+public class InternalPayController {
 
     private final PayManagementService payManagementService;
 

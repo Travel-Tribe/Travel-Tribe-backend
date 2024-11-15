@@ -7,6 +7,7 @@ import com.zerobase.model.RequestApi;
 import com.zerobase.model.RequestApi.ConfirmDto;
 import com.zerobase.model.RequestApi.RefundDto;
 import com.zerobase.model.ResponseApi;
+import com.zerobase.model.ResponseApi.PayReadyApiDto;
 import com.zerobase.model.ResponseApi.PayRefundApiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,8 @@ public class KakaopayApi implements ApiInterface {
 
 
     @Override
-    public ResponseApi.PayReadyApiDto sendPayReadySign( Long depositId, String userId) {
+    public ResponseApi.PayReadyApiDto sendPayReadySign(long postId, long depositId,
+        String userId) {
         log.info("KakaopayApiService sendPayReadySign");
         // webclient url, header입력
 
@@ -44,7 +46,7 @@ public class KakaopayApi implements ApiInterface {
             .quantity(String.valueOf(constants.QUANTITY))
             .totalAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
-            .approvalUrl(constants.KAKAO_APPROVAL_URL+"?depositId="+depositId)
+            .approvalUrl(constants.KAKAO_APPROVAL_URL+"/"+postId+"?depositId="+depositId)
             .cancelUrl(constants.KAKAO_CANCEL_URL+"?depositId="+depositId)
             .failUrl(constants.KAKAO_FAIL_URL+"?depositId="+depositId)
             .build();

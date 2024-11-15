@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -280,5 +281,20 @@ public class ParticipationService {
             throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
 
         return participationEntity;
+    }
+
+    public Boolean validateParticipationUserIdAndPostId(long postId, long participationId,
+        String userId) {
+
+        Boolean isValid = true;
+
+        ParticipationEntity participationEntity = participationRepository.findById(
+            participationId).orElseThrow(()->new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+        if(participationEntity.getPostEntity().getPostId() !=postId
+            || !Objects.equals(participationEntity.getUserId(), userId)) {
+            isValid = false;
+        }
+        return isValid;
     }
 }

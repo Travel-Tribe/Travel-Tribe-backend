@@ -37,9 +37,9 @@ travel-service:
 
 kakaopay:
   cid: TC0ONETIME
-  approval-url: http://localhost/api/v1/pay/deposit/success
-  fail-url: http://localhost/api/v1/pay/deposit/fail
-  cancel-url: http://localhost/api/v1/pay/deposit/refund
+  approval-url: http://localhost:3000/recruitment
+  fail-url: http://localhost:3000/recruitment
+  cancel-url: http://localhost:3000/recruitment
   item-name: "여행참여 보증금"
   quantity: 1
   deposit-amount: 100000

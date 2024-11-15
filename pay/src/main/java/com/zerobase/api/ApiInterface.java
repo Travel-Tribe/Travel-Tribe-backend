@@ -4,7 +4,7 @@ import com.zerobase.model.ResponseApi.PayReadyApiDto;
 
 public interface ApiInterface {
 
-    public PayReadyApiDto sendPayReadySign(Long orderId, String userId);
+    public PayReadyApiDto sendPayReadySign(long depositId, long id, String userId);
 
 
 }

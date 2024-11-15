@@ -10,8 +10,10 @@ import com.zerobase.entity.PaymentEntity;
 import com.zerobase.model.PaymentDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
+import com.zerobase.model.exception.CustomException;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentStatus;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class PayManagementService {
      */
 
 
+
     public ResponseDepositPayDto createDepositOrderAndInitiatePay(
         long postId, long participationId, String userId, PGMethod pgMethod) {
         log.info("readyDepositPay");
@@ -49,7 +52,7 @@ public class PayManagementService {
             participationId, userId);
 
         // pg 사와 통신을 통해 tid 추출
-        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApi.sendPayReadySign(
+        ResponseApi.PayReadyApiDto payReadyApiDto = kakaopayApi.sendPayReadySign(postId,
             depositEntity.getDepositId(), userId);
 
         // tid를 기반으로 결제데이터 생성 & 카카오페이 결제 이력 저장
@@ -147,7 +150,10 @@ public class PayManagementService {
         PaymentEntity paymentEntity = paymentService.getPaymentsInProgressAndChangeStatusByOrderId(
             depositId, PaymentStatus.PAY_REFUNDED);
 
-
+        if(!Objects.equals(depositEntity.getUserId(), userId)
+            || !Objects.equals(paymentEntity.getUserId(), userId)){
+            throw new CustomException();
+        }
 
         kakaopayApi.sendPayRefundSign(
                 paymentEntity.getPaykey(), constants.DEPOSIT_AMOUNT, constants.TAX_FREE_AMOUNT);

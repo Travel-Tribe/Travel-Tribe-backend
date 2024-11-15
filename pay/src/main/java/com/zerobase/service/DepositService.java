@@ -1,5 +1,6 @@
 package com.zerobase.service;
 
+import com.zerobase.api.TravelApi;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.exception.CustomException;
@@ -16,21 +17,21 @@ import org.springframework.stereotype.Service;
 public class DepositService {
 
     private final DepositRepository depositRepository;
-
+    private final TravelApi travelAPi;
 
 
     // depositId를 생성하기 위해서
-    public DepositEntity createAndSaveDepositOrder(Long postId, Long participationId,
+    public DepositEntity createAndSaveDepositOrder(Long postId,
+        Long participationId,
         String userId) {
         log.info("DepositRepository initial save start");
 
         DepositEntity entity = DepositEntity.builder()
             .postId(postId)
+            .paymentStatus(PaymentStatus.PAY_IN_PROGRESS)
             .participationId(participationId)
             .userId(userId)
             .build();
-
-
 
         return depositRepository.save(entity);
     }
@@ -39,18 +40,25 @@ public class DepositService {
     public DepositDto findByParticipationId(Long participationId) {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
-            CustomException::new));
+                CustomException::new));
     }
 
     public void save(DepositEntity depositEntity) {
         depositRepository.save(depositEntity);
     }
 
-    public void validateDepositCreateRequest(long postId, long participationId, String userId) {
+    public void validateDepositCreateRequest(long postId, long participationId,
+        String userId) {
+        if (Boolean.FALSE.equals(travelAPi.validateParticipationInfo
+                (postId, participationId, userId).getBody())) {
+            throw new CustomException();
+        }
+
 
     }
 
-    public DepositEntity getPaymentInProgressAndchangeStatusByOrderId(long depositId,
+    public DepositEntity getPaymentInProgressAndchangeStatusByOrderId(
+        long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
             .orElseThrow(() -> new CustomException());
@@ -60,7 +68,8 @@ public class DepositService {
         return depositEntity;
     }
 
-    public DepositEntity getPaymentCompletedAndChangeStatusByOrderId(long depositId,
+    public DepositEntity getPaymentCompletedAndChangeStatusByOrderId(
+        long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
             .orElseThrow(() -> new CustomException());

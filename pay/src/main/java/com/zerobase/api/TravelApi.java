@@ -18,5 +18,9 @@ public class TravelApi {
         return travelClient.failedParticipation(postId, userId);
     }
 
+    public ResponseEntity<Boolean> validateParticipationInfo(long postId,
+        long participationId, String userId) {
+        return travelClient.validateParticipationInfo(postId,participationId,userId);
+    }
 
     }

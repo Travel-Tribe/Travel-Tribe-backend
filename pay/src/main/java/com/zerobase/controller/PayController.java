@@ -1,5 +1,6 @@
 package com.zerobase.controller;
 
+import com.zerobase.common.response.ResponseMessage;
 import com.zerobase.model.RequestPayDepositFail;
 import com.zerobase.model.RequestPayDepositSuccess;
 import com.zerobase.model.RequestReadyPayDeposit;
@@ -36,51 +37,51 @@ public class PayController {
 
 
     @GetMapping(value = "/list")
-    public ResponseEntity<List<ResponsePaymentDto>> getPayHistory(
+    public ResponseEntity<ResponseMessage<List<ResponsePaymentDto>>> getPayHistory(
         @RequestHeader("X-User-Id") String userId) {
 
         List<PaymentDto> paymentDtos = paymentService.getPaymentsByUserId(userId);
-        return ResponseEntity.ok(
-            paymentDtos.stream().map(ResponsePaymentDto::fromDto).toList());
+        return ResponseEntity.ok(ResponseMessage.success(
+            paymentDtos.stream().map(ResponsePaymentDto::fromDto).toList()));
     }
 
     // 결제시도후 payDeposit 생성하기
     @PostMapping(value = "/deposit/ready")
-    public ResponseEntity<ResponseDepositPayDto> readyPayDeposit(
+    public ResponseEntity<ResponseMessage<ResponseDepositPayDto>> readyPayDeposit(
         @RequestBody RequestReadyPayDeposit request,
         @RequestHeader("X-User-Id") String userId) {
         log.info("request ready pay deposit ");
-        return ResponseEntity.ok(
+        return ResponseEntity.ok(ResponseMessage.success(
             payManagmentService.createDepositOrderAndInitiatePay(
                 request.getPostId(),
                 request.getParticipationId(), userId,
-                request.getPgMethod()))
+                request.getPgMethod())))
             ;
     }
 
     // client 결제성공시 확정처리를 위해서 신호받기
     @PutMapping(value = "/deposit/success")
-    public ResponseEntity<Object> PayDepositSuccess(
+    public ResponseEntity<ResponseMessage<Object>> PayDepositSuccess(
         @RequestBody RequestPayDepositSuccess request,
         @RequestHeader("X-User-Id") String userId) {
         log.info(" pay deposit success sign from client");
         payManagmentService.clientSuccessDepositPay(
             request.getDepositId(),userId, request.getPg_token());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ResponseMessage.success());
     }
 
 
     // client 결제실패시 url 신호받기
     @PutMapping(value = "/deposit/fail")
-    public ResponseEntity<Object> PayDepositFail(
+    public ResponseEntity<ResponseMessage<Object>> PayDepositFail(
         @RequestBody RequestPayDepositFail request,
         @RequestHeader("X-User-Id") String userId
     ) {
         log.info(" pay deposit fail sign from client");
         payManagmentService.clientFailedDepositPay(userId,request.getDepositId());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ResponseMessage.success());
     }
 
 

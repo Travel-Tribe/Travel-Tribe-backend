@@ -3,7 +3,7 @@ package com.zerobase.service;
 
 
 import com.zerobase.api.KakaopayApi;
-import com.zerobase.api.TravelApi;
+import com.zerobase.api.ParticipationApi;
 import com.zerobase.config.Constants;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.entity.PaymentEntity;
@@ -27,7 +27,7 @@ public class PayManagementService {
     private final DepositService depositService;
     private final KakaopayApi kakaopayApi;
     private final PaymentService paymentService;
-    private final TravelApi travelApi;
+    private final ParticipationApi participationApi;
     private final Constants constants;
 
     /*
@@ -97,7 +97,7 @@ public class PayManagementService {
             paymentEntity.getReferentialOrderId(), userId, pgToken);
 
         // travel 모듈쪽에 결제확정 통신
-        travelApi.confirmParticipation(depositEntity.getParticipationId(),userId);
+        participationApi.confirmParticipation(depositEntity.getParticipationId(),userId);
 
         // 두가지가 성공하고나면 payment, deposit entity저장
         paymentService.save(paymentEntity);
@@ -125,7 +125,7 @@ public class PayManagementService {
 
 
         // travel 모듈쪽에 결제확정 통신
-        travelApi.confirmParticipation(depositEntity.getParticipationId(),userId);
+        participationApi.failedParticipation(depositEntity.getParticipationId(),userId);
 
 
         // 두가지가 성공하고나면 payment, deposit entity저장

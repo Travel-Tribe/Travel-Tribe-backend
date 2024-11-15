@@ -6,21 +6,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class TravelApi {
+public class ParticipationApi {
 
-    private final TravelClient travelClient;
+    private final ParticipationClient participationClient;
 
     public ResponseEntity<Void> confirmParticipation(long participationId, String userId) {
-       return travelClient.confirmParticipation(participationId, userId);
+       return participationClient.confirmParticipation(participationId, userId);
     }
 
     public ResponseEntity<Void> failedParticipation(long postId, String userId) {
-        return travelClient.failedParticipation(postId, userId);
+        return participationClient.failedParticipation(postId, userId);
     }
 
     public ResponseEntity<Boolean> validateParticipationInfo(long postId,
         long participationId, String userId) {
-        return travelClient.validateParticipationInfo(postId,participationId,userId);
+        return participationClient.validateParticipationInfo(postId,participationId,userId);
     }
 
     }

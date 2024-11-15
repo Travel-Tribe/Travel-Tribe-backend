@@ -59,14 +59,8 @@ public class ParticipationController {
                 participationService.getParticipationsDtosStatusOfJoin(postId)));
     }
 
-    // 유저들의 완료된 여행에 대해서 숫자 반환
-    @GetMapping("/participations/by-userid/{userId}")
-    public ResponseEntity<ResponseMessage<Integer>> getParticipationsCompletedByUserId(
-        @PathVariable String userId) {
-        log.info("getParticipationsCompletedByUserId controller start");
-        return ResponseEntity.ok(ResponseMessage.success(
-            participationService.countParticipationsCompletedByUserId(userId)));
-    }
+
+
 
 
 }

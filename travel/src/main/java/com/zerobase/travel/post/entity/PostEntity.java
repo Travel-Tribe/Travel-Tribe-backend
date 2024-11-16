@@ -114,14 +114,14 @@ public class PostEntity {
     public static boolean validateUserGEnder(PostEntity postEntity, Gender userGender) {
         if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
             if(userGender.equals(Gender.FEMALE)){
-                return true;
+                return false;
             }
         } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {
             if(userGender.equals(Gender.MALE)){
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
 
     }
 
@@ -129,14 +129,14 @@ public class PostEntity {
 
         if (postEntity.getLimitSmoke().equals(LimitSmoke.SMOKER)) {
             if (userSmoking.equals(Smoking.YES)) {
-                    return true;
+                    return false;
             }
         } else if (postEntity.getLimitSmoke().equals(LimitSmoke.NON_SMOKER)) {
             if (userSmoking.equals(Smoking.NO)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     // 연관관계 편의 메서드 for DayEntity

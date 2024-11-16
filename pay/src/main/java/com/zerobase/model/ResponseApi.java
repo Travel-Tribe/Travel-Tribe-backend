@@ -31,7 +31,8 @@ public class ResponseApi {
     @NoArgsConstructor
     public static class PayReadyApiDto {
         private String tid;
-        private String next_redirect_pc_url;
+        @JsonProperty("next_redirect_pc_url")
+        private String nextRedirectPcUrl;
     }
 
     @Getter

@@ -26,4 +26,7 @@ public interface ParticipationRepository extends JpaRepository<ParticipationEnti
 
     List<ParticipationEntity> findAllByPostEntityPostIdAndParticipationStatus(
         Long postId, ParticipationStatus participationStatus);
+
+
+    List<ParticipationEntity> findAllByPostEntityIn(List<PostEntity> postEntities);
 }

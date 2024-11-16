@@ -138,25 +138,28 @@ public class ParticipationManagementService {
 
 
     // 4. 인원이 시간이 지나서 여행을 완료하는 경우;
-    public void travelFinishedParticipation(Long postId, String userId) {
+    public void travelFinishedParticipations() {
 
         // 매일 게시글의 여행완료 시점을 확인 로직 추가
 
-        // 식별한 participation을 호출
-        ParticipationEntity participationEntity = participationService
-            .getParticipationEntityByPostIdAndUserId(postId, userId);
+        List<ParticipationEntity> participationEntities
+            = participationService.findParticipationToCompleteByNow();
 
         // 참여의 상태를 검증하고 변경
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity,
-            List.of(ParticipationStatus.JOIN),
-            List.of(ParticipationStatus.TRAVEL_FINISHED));
+        for (ParticipationEntity participationEntity : participationEntities) {
 
-        // 보증금 반환일자를 확정
-        participationService.setDateToReturnDeposit(participationEntity,
-            LocalDate.now().plusDays(30));
+            participationService.checkAndChangeStatusParticipation(
+                participationEntity,
+                List.of(ParticipationStatus.JOIN),
+                List.of(ParticipationStatus.TRAVEL_FINISHED));
 
-        participationService.saveParticipation(participationEntity);
+            // 보증금 반환일자를 확정
+            participationService.setDateToReturnDeposit(participationEntity,
+                LocalDate.now().plusDays(30));
+        }
+
+        participationService.saveParticipations(participationEntities);
+
     }
 
 

@@ -25,5 +25,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>, JpaSpec
     List<PostEntity> findByDeadlineBeforeAndStatus(LocalDate deadline, PostStatus status);
 
 
-    Optional<PostEntity> findByPostId(long postId);
+    List<PostEntity> findAllPostByDeadlineAndStatus( LocalDate deadline, PostStatus status);
+
+    Optional<PostEntity> findByPostId(Long postId);
 }

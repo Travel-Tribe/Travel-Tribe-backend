@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -224,11 +223,6 @@ public class ParticipationService {
         return participationRepository.findByPostEntityPostIdAndUserId(
             postId, userId).orElseThrow(
             () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
-
-
-
-
-
     }
 
 
@@ -244,6 +238,8 @@ public class ParticipationService {
         return participationEntities.stream().map(ResponseParticipationsDto::fromEntity)
             .toList();
     }
+
+
 
 
     //--------------------------- 데이터 count 메소드 ---------------------------//
@@ -300,5 +296,21 @@ public class ParticipationService {
         }
 
         return true;
+    }
+
+    public List<ParticipationEntity> findParticipationToCompleteByNow(){
+
+        List<PostEntity> postEntities = postRepository.findAllPostByDeadlineAndStatus(
+            LocalDate.now(), PostStatus.RECRUITMENT_COMPLETED);
+
+        List<ParticipationEntity> allByPostEntityIn = participationRepository.findAllByPostEntityIn(
+            postEntities);
+
+        return allByPostEntityIn;
+    }
+
+
+    public void saveParticipations(List<ParticipationEntity> participationEntities) {
+        participationRepository.saveAll(participationEntities);
     }
 }

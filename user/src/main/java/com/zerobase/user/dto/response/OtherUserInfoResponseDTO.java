@@ -19,6 +19,7 @@ public class OtherUserInfoResponseDTO {
     private String email;
     private Integer count; // 여행 횟수
     private Double ratingAvg;
+    private String fileAddress;
     private String gender;
     private String status;
 
@@ -28,6 +29,7 @@ public class OtherUserInfoResponseDTO {
             .nickname(userInfoFacadeDto.getNickname())
             .email(userInfoFacadeDto.getEmail())
             .count(userInfoFacadeDto.getCount())
+            .fileAddress(userInfoFacadeDto.getFileAddress())
             .ratingAvg(userInfoFacadeDto.getRatingAvg())
             .gender(userInfoFacadeDto.getGender().getGender())
             .status(userInfoFacadeDto.getStatus().getUserStatus())

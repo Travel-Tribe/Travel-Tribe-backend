@@ -42,6 +42,7 @@ public class UserInfoFacade {
             .ratingAvg(userInfo.getRatingAvg())
             .birth(userInfo.getBirth())
             .introduction(userInfo.getIntroduction())
+            .fileAddress(userInfo.getFileAddress())
             .nickname(userInfo.getNickname())
             .status(userInfo.getStatus())
             .smoking(userInfo.getSmoking())

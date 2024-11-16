@@ -143,7 +143,7 @@ public class ParticipationManagementService {
         // 매일 게시글의 여행완료 시점을 확인 로직 추가
 
         List<ParticipationEntity> participationEntities
-            = participationService.findParticipationToCompleteByNow();
+            = participationService.getParticipationOfPostIdOnDeadLine();
 
         // 참여의 상태를 검증하고 변경
         for (ParticipationEntity participationEntity : participationEntities) {

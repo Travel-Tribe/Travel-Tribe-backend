@@ -321,4 +321,8 @@ public class ParticipationService {
     public void saveParticipation(ParticipationEntity participationEntity) {
         participationRepository.save(participationEntity);
     }
+
+    public List<ParticipationEntity> getParticipationsByDepositReturnDate() {
+       return participationRepository.findAllByDepositReturnDate(LocalDate.now());
+    }
 }

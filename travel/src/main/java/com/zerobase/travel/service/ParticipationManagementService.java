@@ -13,6 +13,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /*
@@ -213,7 +214,6 @@ public class ParticipationManagementService {
 
         //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경(보증금 지급일을 -23일함)
         if(entity.getDepositReturnDate().isAfter(LocalDate.now())){
-
             participationService.setDateToReturnDeposit(entity,
                 entity.getDepositReturnDate().minusDays(23));
 
@@ -223,24 +223,12 @@ public class ParticipationManagementService {
                     ,DepositStatus.PAID),
                 List.of(RatingStatus.RATED)
             );
-
-
         }
-
-
     }
 
-    // 6. 여행을 왼료한 후에 보증금이 반환됨
-    public void returnDepositAfterTravelFinished(Long postId,
-        String userId) {
-
-        // 매일 보증금 반환시점을 확인하고 보증금 반환을 확인하는 logic 추가
-
-        // 식별된 entity를 호출해옴
-        ParticipationEntity participationEntity = participationService
-            .getParticipationEntityByPostIdAndUserId(postId, userId);
-
-
+    // 6 여행을 왼료한 후에 보증금이 반환됨
+    @Transactional
+    public void returnDepositAfterTravelFinished(ParticipationEntity participationEntity) {
 
         // 보증금 반환 상태를 검증 후 상태 변환
         participationService.checkAndChangeStatusParticipation(

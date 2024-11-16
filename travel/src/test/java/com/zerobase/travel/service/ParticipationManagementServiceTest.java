@@ -60,7 +60,7 @@ class ParticipationManagementServiceTest {
     void failedPaymentParticipation_shouldUpdateStatusToJoinFailed() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.validateParticipationUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByIdAndValidateUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.failedPaymentParticipation(PARTICIPATION_ID, USER_ID);
@@ -77,7 +77,7 @@ class ParticipationManagementServiceTest {
     void successPaymentParticipation_shouldUpdateStatusToJoinAndPaid() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.validateParticipationUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByIdAndValidateUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.successPaymentParticipation(PARTICIPATION_ID, USER_ID);
@@ -95,7 +95,7 @@ class ParticipationManagementServiceTest {
         // Given mock participationservice
 
 
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
 
         // When
@@ -115,7 +115,7 @@ class ParticipationManagementServiceTest {
     void unjoinParticipationWithDepositForfeited_shouldUpdateStatusToJoinCancelAndForfeited() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.unjoinParticipationWithDepositForfeited(POST_ID, USER_ID);
@@ -137,7 +137,7 @@ class ParticipationManagementServiceTest {
     void returnDepositAfterTravelFinished_shouldUpdateStatusToReturnedAndCallPayApi() {
         // Given
 
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
 
         // Then

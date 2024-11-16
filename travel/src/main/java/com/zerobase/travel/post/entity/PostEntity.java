@@ -1,9 +1,13 @@
 package com.zerobase.travel.post.entity;
 
+import com.zerobase.travel.communities.type.CustomException;
+import com.zerobase.travel.communities.type.ErrorCode;
+import com.zerobase.travel.post.type.Gender;
 import com.zerobase.travel.post.type.LimitSex;
 import com.zerobase.travel.post.type.LimitSmoke;
 import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
+import com.zerobase.travel.post.type.Smoking;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.persistence.CascadeType;
@@ -99,6 +103,41 @@ public class PostEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<DayEntity> days = new HashSet<>();
+
+
+
+    public static boolean validateUserAge(PostEntity postEntity, int userAge) {
+        if (postEntity.getLimitMinAge() > userAge || postEntity.getLimitMaxAge() < userAge) return false;
+        return true;
+    }
+
+    public static boolean validateUserGEnder(PostEntity postEntity, Gender userGender) {
+        if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
+            if(userGender.equals(Gender.FEMALE)){
+                return true;
+            }
+        } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {
+            if(userGender.equals(Gender.MALE)){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public static boolean validateSmoking(PostEntity postEntity, Smoking userSmoking) {
+
+        if (postEntity.getLimitSmoke().equals(LimitSmoke.SMOKER)) {
+            if (userSmoking.equals(Smoking.YES)) {
+                    return true;
+            }
+        } else if (postEntity.getLimitSmoke().equals(LimitSmoke.NON_SMOKER)) {
+            if (userSmoking.equals(Smoking.NO)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // 연관관계 편의 메서드 for DayEntity
     public void addDay(DayEntity day) {

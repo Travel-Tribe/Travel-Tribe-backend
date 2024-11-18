@@ -8,7 +8,8 @@ import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.type.UserStatus.DEACTIVATED;
 import static com.zerobase.user.type.UserStatus.INACTIVE;
-import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
@@ -82,13 +83,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
 
         if (DEACTIVATED.equals(userEntity.getStatus())) {
-
-            ResponseUtil.setJsonResponse(response, SC_FORBIDDEN, DEACTIVATED_USER_ERROR);
-            throw new BizException(DEACTIVATED_USER_ERROR); // 여기서 BizException 발생
+            ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), DEACTIVATED_USER_ERROR);
         } else if (INACTIVE.equals(userEntity.getStatus())) {
-            ResponseUtil.setJsonResponse(response, SC_FORBIDDEN, SUSPENDED_USER_ERROR);
-            throw new BizException(SUSPENDED_USER_ERROR); // 여기서 BizException 발생
+            ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), SUSPENDED_USER_ERROR);
         }
+
 
         //스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -177,7 +176,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         // 로그인 실패 시 401 응답 코드 반환
 
         // JSON 응답 생성
-        ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
+        ResponseUtil.setJsonResponse(response, SC_UNAUTHORIZED,
             LOGIN_FAIL_ERROR);
 
     }

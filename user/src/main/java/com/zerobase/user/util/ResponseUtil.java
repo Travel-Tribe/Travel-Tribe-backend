@@ -44,8 +44,6 @@ public class ResponseUtil {
             PrintWriter writer = response.getWriter();
             writer.write(jsonResponse);
             writer.flush();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

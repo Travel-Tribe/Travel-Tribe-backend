@@ -50,7 +50,7 @@ public class PostController {
 
     // 여행참여 게시글 등록
     @PostMapping
-    public ResponseEntity<?> createPost(
+    public ResponseEntity<ResponseMessage<Void>> createPost(
         @Valid @RequestBody PostDTO postDTO,
         @RequestHeader("X-User-Email") String userEmail) { // 이메일 추출
         log.info("email: " + userEmail);
@@ -60,7 +60,7 @@ public class PostController {
 
     // 여행참여 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<?> updatePost(@PathVariable Long postId,
+    public ResponseEntity<ResponseMessage<Void>> updatePost(@PathVariable Long postId,
         @Valid @RequestBody PostDTO postDTO,
         @RequestHeader("X-User-Email") String userEmail) {
         log.info("email: " + userEmail);
@@ -70,7 +70,7 @@ public class PostController {
 
     // 여행참여 게시글 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<?> deletePost(@PathVariable Long postId,
+    public ResponseEntity<ResponseMessage<Void>> deletePost(@PathVariable Long postId,
         @RequestHeader("X-User-Email") String userEmail) {
         log.info("email: " + userEmail);
         postService.deletePost(postId, userEmail);
@@ -79,7 +79,7 @@ public class PostController {
 
     // 여행참여 게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<?> findPost(@PathVariable Long postId) {
+    public ResponseEntity<ResponseMessage<ResponsePostDTO>> findPost(@PathVariable Long postId) {
         ResponsePostDTO responsePostDTO = postService.findPost(postId);
         return ResponseEntity.status(OK).body(ResponseMessage.success(responsePostDTO));
     }
@@ -87,7 +87,7 @@ public class PostController {
     // **게시글 리스트 검색**
     // 게시글 리스트 검색
     @GetMapping
-    public ResponseEntity<?> searchPosts(
+    public ResponseEntity<ResponseMessage<PagedResponseDTO<ResponsePostsDTO>>> searchPosts(
         @RequestParam(required = false) String title,
         @RequestParam(required = false) String content,
         @RequestParam(required = false) String continent,

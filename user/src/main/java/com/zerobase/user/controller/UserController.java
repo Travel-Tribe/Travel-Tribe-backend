@@ -53,19 +53,8 @@ public class UserController {
 
     private final UserService userService;
     private final ProfileService profileService;
-    private final UserRepository userRepository;
     private final ReissueService reissueService;
     private final UserInfoFacade userInfoFacade;
-
-    private UserEntity getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new BizException(UNAUTHORIZED_ERROR);
-        }
-
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userRepository.findByEmail(customUserDetails.getUsername())
-            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
-    }
 
     // 회원가입
     @PostMapping
@@ -86,7 +75,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<Void>> editUserInfo(
         @RequestBody @Valid EditUserInfoDTO editUserInfoDTO,
         Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         userService.editUserInfoProcess(editUserInfoDTO, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -96,7 +85,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<Void>> UserEmailAuthentication(
         @RequestBody @Valid UserEmailAuthenticationDTO userEmailAuthenticationDTO,
         Authentication authentication) {
-        getCurrentUser(authentication);
+        userService.getCurrentUser(authentication);
         userService.userEmailAuthenticationProcess(userEmailAuthenticationDTO);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -107,7 +96,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<Void>> verifyEmailCode(
         @RequestBody @Valid EmailVerificationDTO emailVerificationDTO,
         Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         boolean isVerified = userService.verifyEmailCode(emailVerificationDTO.getEmail(),
             emailVerificationDTO.getCode());
 
@@ -125,7 +114,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<Void>> editUserPassword(
         @RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO,
         Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         userService.editUserPasswordProcess(editUserPasswordDTO, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -141,7 +130,7 @@ public class UserController {
     // 회원 탈퇴
     @DeleteMapping
     public ResponseEntity<ResponseMessage<Void>> deleteProcess(Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         userService.deleteProcess(currentUser);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
@@ -151,7 +140,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo(
         Authentication authentication) {
         UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(
-            getCurrentUser(authentication).getId());
+            userService.getCurrentUser(authentication).getId());
         return ResponseEntity.status(OK)
             .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(otherUserInfo)));
     }
@@ -179,7 +168,7 @@ public class UserController {
     @PostMapping("/profile")
     public ResponseEntity<ResponseMessage<Void>> createProfile(
         @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         profileService.createProfile(profileRequest, currentUser);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
@@ -188,7 +177,7 @@ public class UserController {
     @PatchMapping("/profile")
     public ResponseEntity<ResponseMessage<Void>> editProfile(
         @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
-        UserEntity currentUser = getCurrentUser(authentication);
+        UserEntity currentUser = userService.getCurrentUser(authentication);
         profileService.editProfile(profileRequest, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }

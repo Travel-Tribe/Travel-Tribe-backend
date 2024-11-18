@@ -2,6 +2,7 @@ package com.zerobase.user.service;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.AUTHENTICATION_CODE_EXPIRED_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
@@ -18,6 +19,7 @@ import com.zerobase.user.entity.EmailVerificationEntity;
 import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
+import com.zerobase.user.jwt.CustomUserDetails;
 import com.zerobase.user.repository.EmailVerificationRepository;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +50,16 @@ public class UserService {
     private final ProfileRepository profileRepository;
     private final PasswordResetService passwordResetService;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    public UserEntity getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BizException(UNAUTHORIZED_ERROR);
+        }
+
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userRepository.findByEmail(customUserDetails.getUsername())
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+    }
 
     public void joinProcess(JoinDTO joinDTO) {
         log.info("Processing registration for email: {}", joinDTO.getEmail());

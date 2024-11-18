@@ -55,7 +55,7 @@ public class DepositService {
             throw new CustomException(ErrorCode.INVALID_CLIENT_REQUEST);
         }
 
-        if(depositRepository.existsByParticipationIdAndStatus(participationId,PaymentStatus.PAY_COMPLETED))
+        if(depositRepository.existsByParticipationIdAndPaymentStatus(participationId,PaymentStatus.PAY_COMPLETED))
             throw new CustomException(ErrorCode.DESPOSIT_ALREADY_PAID);
 
 

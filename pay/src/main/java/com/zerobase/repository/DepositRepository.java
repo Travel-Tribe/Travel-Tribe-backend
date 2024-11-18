@@ -11,6 +11,6 @@ public interface DepositRepository extends JpaRepository<DepositEntity,Long> {
 
     Optional<DepositEntity> findByParticipationId(Long participationId);
 
-    boolean existsByParticipationIdAndStatus(long participationId,
+    boolean existsByParticipationIdAndPaymentStatus(long participationId,
         PaymentStatus paymentStatus);
 }

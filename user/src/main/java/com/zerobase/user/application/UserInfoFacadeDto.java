@@ -27,6 +27,7 @@ public class UserInfoFacadeDto {
     private MBTI mbti;
     private Smoking smoking;
     private String introduction;
+    private String fileAddress;
     private Gender gender;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)

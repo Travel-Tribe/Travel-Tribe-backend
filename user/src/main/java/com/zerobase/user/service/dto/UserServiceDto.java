@@ -24,6 +24,7 @@ public class UserServiceDto {
     private String nickname;
     private String phone;
     private String email;
+    private String fileAddress;
     private UserStatus status;
     private MBTI mbti;
     private Smoking smoking;

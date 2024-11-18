@@ -1,8 +1,12 @@
 package com.zerobase.user.service;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.SUSPENDED_USER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.type.UserStatus.DEACTIVATED;
+import static com.zerobase.user.type.UserStatus.INACTIVE;
 
 import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
@@ -160,8 +164,15 @@ public class ProfileService {
 
     public ProfileResponseDTO getProfile(Long userId) {
         // 사용자 및 프로필 조회
-        userRepository.findById(userId)
+        UserEntity userEntity = userRepository.findById(userId)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        if (DEACTIVATED.equals(userEntity.getStatus())) {
+            throw new BizException(DEACTIVATED_USER_ERROR);
+        } else if (INACTIVE.equals(userEntity.getStatus())) {
+            throw new BizException(SUSPENDED_USER_ERROR);
+        }
+
         ProfileEntity profile = profileRepository.findByUserId(userId)
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 

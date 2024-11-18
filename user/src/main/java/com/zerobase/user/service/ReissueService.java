@@ -1,15 +1,18 @@
 package com.zerobase.user.service;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.EXPIRED_TOKEN_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_REFRESH_TOKEN_CATEGORY_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_FOUND_IN_COOKIE_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_IN_DATABASE;
 import static com.zerobase.user.dto.response.BasicErrorCode.TOKEN_VALIDATION_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.zerobase.user.entity.RefreshEntity;
 import com.zerobase.user.entity.UserEntity;
+import com.zerobase.user.exception.BizException;
 import com.zerobase.user.exception.TokenException;
 import com.zerobase.user.repository.RefreshRepository;
 import com.zerobase.user.repository.UserRepository;
@@ -50,8 +53,9 @@ public class ReissueService {
         String email = jwtUtil.getEmail(refreshToken);
         String role = jwtUtil.getRole(refreshToken);
 
-        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
-        UserEntity userEntity = optionalUserEntity.get();
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
         Long userEntityId = userEntity.getId();
 
         // 새로운 Access, Refresh 토큰 생성

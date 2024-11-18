@@ -52,7 +52,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBizException(BizException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseMessage.fail(ex.getErrorCode()));
-
     }
 
     // 토큰 예외 처리

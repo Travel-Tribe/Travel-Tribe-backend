@@ -1,9 +1,5 @@
 package com.zerobase.user.controller;
 
-import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_AUTHENTICATION_CODE_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
-import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -21,19 +17,16 @@ import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.UserEntity;
-import com.zerobase.user.exception.BizException;
-import com.zerobase.user.jwt.CustomUserDetails;
-import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.service.ProfileService;
 import com.zerobase.user.service.ReissueService;
 import com.zerobase.user.service.UserService;
+import com.zerobase.user.util.AuthenticationUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,6 +48,7 @@ public class UserController {
     private final ProfileService profileService;
     private final ReissueService reissueService;
     private final UserInfoFacade userInfoFacade;
+    private final AuthenticationUtil authenticationUtil;
 
     // 회원가입
     @PostMapping
@@ -73,9 +67,9 @@ public class UserController {
     // 회원 정보 변경
     @PatchMapping("/info")
     public ResponseEntity<ResponseMessage<Void>> editUserInfo(
-        @RequestBody @Valid EditUserInfoDTO editUserInfoDTO,
-        Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
+        @RequestBody @Valid EditUserInfoDTO editUserInfoDTO) {
+        String email = authenticationUtil.getLoginedUserEmail();
+        UserEntity currentUser = userService.getCurrentUser(email);
         userService.editUserInfoProcess(editUserInfoDTO, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -83,9 +77,9 @@ public class UserController {
     // 회원 이메일 인증 요청
     @PostMapping("/change-email/request")
     public ResponseEntity<ResponseMessage<Void>> UserEmailAuthentication(
-        @RequestBody @Valid UserEmailAuthenticationDTO userEmailAuthenticationDTO,
-        Authentication authentication) {
-        userService.getCurrentUser(authentication);
+        @RequestBody @Valid UserEmailAuthenticationDTO userEmailAuthenticationDTO) {
+        String email = authenticationUtil.getLoginedUserEmail();
+        userService.getCurrentUser(email);
         userService.userEmailAuthenticationProcess(userEmailAuthenticationDTO);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -94,27 +88,22 @@ public class UserController {
     @PostMapping("/change-email/verify")
     @Transactional
     public ResponseEntity<ResponseMessage<Void>> verifyEmailCode(
-        @RequestBody @Valid EmailVerificationDTO emailVerificationDTO,
-        Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
-        boolean isVerified = userService.verifyEmailCode(emailVerificationDTO.getEmail(),
-            emailVerificationDTO.getCode());
+        @RequestBody @Valid EmailVerificationDTO emailVerificationDTO) {
+        String currentUserEmail = authenticationUtil.getLoginedUserEmail();
+        userService.verifyEmailCode(
+            emailVerificationDTO.getEmail(),
+            emailVerificationDTO.getCode(),
+            currentUserEmail);
 
-        if (isVerified) {
-            currentUser.setEmail(emailVerificationDTO.getEmail());
-            return ResponseEntity.ok(ResponseMessage.success());
-        } else {
-            return ResponseEntity.status(BAD_REQUEST)
-                .body(ResponseMessage.fail(INVALID_AUTHENTICATION_CODE_ERROR));
-        }
+        return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
 
     // 회원 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity<ResponseMessage<Void>> editUserPassword(
-        @RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO,
-        Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
+        @RequestBody @Valid EditUserPasswordDTO editUserPasswordDTO) {
+        String email = authenticationUtil.getLoginedUserEmail();
+        UserEntity currentUser = userService.getCurrentUser(email);
         userService.editUserPasswordProcess(editUserPasswordDTO, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -129,18 +118,19 @@ public class UserController {
 
     // 회원 탈퇴
     @DeleteMapping
-    public ResponseEntity<ResponseMessage<Void>> deleteProcess(Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
+    public ResponseEntity<ResponseMessage<Void>> deleteProcess() {
+        String email = authenticationUtil.getLoginedUserEmail();
+        UserEntity currentUser = userService.getCurrentUser(email);
         userService.deleteProcess(currentUser);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
 
     // 나의 회원정보 조회
     @GetMapping
-    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo(
-        Authentication authentication) {
+    public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo() {
+        String email = authenticationUtil.getLoginedUserEmail();
         UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(
-            userService.getCurrentUser(authentication).getId());
+            userService.getCurrentUser(email).getId());
         return ResponseEntity.status(OK)
             .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(otherUserInfo)));
     }
@@ -167,8 +157,9 @@ public class UserController {
     // 프로필 생성
     @PostMapping("/profile")
     public ResponseEntity<ResponseMessage<Void>> createProfile(
-        @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
+        @RequestBody @Valid ProfileRequestDTO profileRequest) {
+        String email = authenticationUtil.getLoginedUserEmail();
+        UserEntity currentUser = userService.getCurrentUser(email);
         profileService.createProfile(profileRequest, currentUser);
         return ResponseEntity.status(CREATED).body(ResponseMessage.success());
     }
@@ -176,8 +167,9 @@ public class UserController {
     // 프로필 수정
     @PatchMapping("/profile")
     public ResponseEntity<ResponseMessage<Void>> editProfile(
-        @RequestBody @Valid ProfileRequestDTO profileRequest, Authentication authentication) {
-        UserEntity currentUser = userService.getCurrentUser(authentication);
+        @RequestBody @Valid ProfileRequestDTO profileRequest) {
+        String email = authenticationUtil.getLoginedUserEmail();
+        UserEntity currentUser = userService.getCurrentUser(email);
         profileService.editProfile(profileRequest, currentUser);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
@@ -190,6 +182,5 @@ public class UserController {
         return ResponseEntity.status(OK)
             .body(ResponseMessage.success(profileResponseDTO));
     }
-
 }
 

@@ -25,7 +25,9 @@ public enum BasicErrorCode implements ErrorCode {
     CREATE_TOKEN_ERROR("USER-ERROR-BASIC-00017", "토큰 생성 중 오류가 발생했습니다."),
     LOCK_ACQUISITION_FAILED_ERROR("USER-ERROR-BASIC-00018", "레디스 락 획득 실패."),
     DEACTIVATED_USER_ERROR("USER-ERROR-BASIC-00019", "탈퇴한 회원 입니다."),
-    SUSPENDED_USER_ERROR("USER-ERROR-BASIC-00020", "정지당한 회원 입니다.");
+    SUSPENDED_USER_ERROR("USER-ERROR-BASIC-00020", "정지당한 회원 입니다."),
+    UNAUTHORIZED_ROLE_ERROR("USER-ERROR-BASIC-00021", "역할 접근 권한이 없습니다.");
+
 
     private final String errorCode;
     private final String errorMessage;

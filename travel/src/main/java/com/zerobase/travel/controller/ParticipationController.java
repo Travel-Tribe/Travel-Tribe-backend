@@ -56,7 +56,7 @@ public class ParticipationController {
         log.info("getParticipationsByPost controller start");
         return ResponseEntity.ok(
             ResponseMessage.success(
-                participationService.getParticipationsDtosStatusOfJoin(postId)));
+                participationService.getParticipationsDtosByPostIdAndStatusOfJoin(postId)));
     }
 
     // 참여자 조회시에Join/joinready 상태의 자신의 참여 게시글 리스트 확인

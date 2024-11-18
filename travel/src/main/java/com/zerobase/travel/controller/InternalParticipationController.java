@@ -58,7 +58,7 @@ public class InternalParticipationController {
         @RequestHeader("X-User-Id") String userId ) {
 
         return ResponseEntity.ok(participationService
-            .validateParticipationUserIdAndPostId(postId, participationId, userId));
+            .validateParticipationInfoUserIdAndPostId(postId, participationId, userId));
     }
 
 

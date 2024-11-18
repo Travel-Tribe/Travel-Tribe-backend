@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 
 
 @Entity
@@ -66,13 +66,53 @@ public class ParticipationEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    // A list to hold each status without persisting it to the database
+    // participation 의 상황에 따른 status 모음
     @Transient
-    private List<Enum<?>> statuses;
+    public static List<Enum<?>> beforePayStatuses = List.of(ParticipationStatus.JOIN_READY,DepositStatus.UNPAID,RatingStatus.NOT_RATED);
+    @Transient
+    public static List<Enum<?>> afterPaySuccessStatuses = List.of(ParticipationStatus.JOIN,DepositStatus.PAID,RatingStatus.NOT_RATED);
+    @Transient
+    public static List<Enum<?>> afterPayFailStatuses = List.of(ParticipationStatus.JOIN_FAILED,DepositStatus.UNPAID,RatingStatus.NOT_RATED);
+    @Transient
+    public static List<Enum<?>> afterVotingStatuses = List.of(ParticipationStatus.JOIN_CANCEL,DepositStatus.RETURNED,RatingStatus.NOT_RATED);
+    @Transient
+    public static List<Enum<?>> afterCancelStatuses = List.of(ParticipationStatus.JOIN_CANCEL,DepositStatus.FORFEITED,RatingStatus.NOT_RATED);
+    @Transient
+    public static List<Enum<?>> afterTravelFinishStatusesUnRated = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID,RatingStatus.NOT_RATED);
 
-    public List<Enum<?>> getStatuses() {
-        statuses = List.of(participationStatus, depositStatus, ratingStatus);
-        return statuses;
+    @Transient
+    public static List<Enum<?>> afterTravelFinishStatusesRated = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID,RatingStatus.RATED);
+
+
+    @Transient
+    public static List<Enum<?>> afterRatingStatuses = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID,RatingStatus.RATED);
+    @Transient
+    public static List<Enum<?>> afterTravelFinishStatusesExcludeRating = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID);
+    @Transient
+    public static List<Enum<?>> afterDepositReturnedExcludeRating = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID);
+
+
+
+
+    public boolean hasStatus(Enum<?> status) {
+        if (status instanceof ParticipationStatus) {
+            return this.participationStatus == status;
+        } else if (status instanceof DepositStatus) {
+            return this.depositStatus == status;
+        } else if (status instanceof RatingStatus) {
+            return this.ratingStatus == status;
+        }
+        return false;
+    }
+
+    public void updateStatus(Enum<?> status) {
+        if (status instanceof ParticipationStatus) {
+            this.participationStatus = (ParticipationStatus) status;
+        } else if (status instanceof DepositStatus) {
+            this.depositStatus = (DepositStatus) status;
+        } else if (status instanceof RatingStatus) {
+            this.ratingStatus = (RatingStatus) status;
+        }
     }
 
 

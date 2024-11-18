@@ -74,7 +74,7 @@ public class ParticipationService {
 
         //  유저의 참여중인 정보를 호출
         List<ParticipationDto> participations =
-            this.findParticipationsJoinAndJoinReadyByUserId(userId);
+            this.getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(userId);
 
 
         // 1.1 유저는 최대 두개까지만 참여가능
@@ -124,8 +124,7 @@ public class ParticipationService {
         int userAge = Period.between(userInfo.getBirth(), LocalDate.now()).getYears();
 
 
-        if (postEntity.getLimitMinAge() > userAge
-            || postEntity.getLimitMaxAge() < userAge)
+        if (postEntity.getLimitMinAge() > userAge || postEntity.getLimitMaxAge() < userAge)
             throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
 
         // 성별검증
@@ -153,6 +152,25 @@ public class ParticipationService {
 
     }
 
+
+    public Boolean validateParticipationInfoUserIdAndPostId(long postId, long participationId,
+        String userId) {
+
+        Optional<ParticipationEntity> optioinal = participationRepository.findById(
+            participationId);
+
+        if(optioinal.isEmpty()) return false;
+
+        ParticipationEntity participationEntity = optioinal.get();
+
+        if(participationEntity.getPostEntity().getPostId() !=postId
+            || !Objects.equals(participationEntity.getUserId(), userId)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public ParticipationDto createParticipationReady(Long postId,
         String userId) {
         log.info("participation creation service start ");
@@ -171,66 +189,78 @@ public class ParticipationService {
         return ParticipationDto.fromEntity(entity);
     }
 
+
+    public void setDateToReturnDeposit(ParticipationEntity entity,
+        LocalDate time) {
+        entity.setDepositReturnDate(time);
+
+    }
+
     // participation 의 상태를 검증하고 상태를 변화시켜서 그대로 저장함
     public void checkAndChangeStatusParticipation(
         ParticipationEntity participationEntity
-        , List<Enum<?>> changEnumFrom, List<Enum<?>> changEnumTo) {
-
-        // entity의 status들을 list에 담음
-        List<Enum<?>> statuses = participationEntity.getStatuses();
+        , List<Enum<?>> expectedEnums, List<Enum<?>> updateEnums) {
 
         // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
-        for (Enum<?> enumOfEntity : statuses) {
-            for (Enum<?> checkEnumData : changEnumFrom) {
-                // entity의 enum이 check 하고자하는 enum과 동일한 타입일 경우 검증로직 실행
-                if (enumOfEntity.getClass() == checkEnumData.getClass()) {
-                    if (enumOfEntity != checkEnumData) {
-                        log.error("status is not as expected :" + enumOfEntity);
-                        throw new CustomException(
-                            ErrorCode.PARTICIPATION_STATUS_ERROR);
-                    }
-                }
-            }
+        for (Enum<?> expectedEnum : expectedEnums) {
+            if(!participationEntity.hasStatus(expectedEnum))
+                throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
         }
 
-        // entity의 enum data를 changeEnumTo의 값으로 변경
-        for (Enum<?> enumToInput : changEnumTo) {
-            //  enum값의 type을 검증하여 어떤 타입인지 확인한다.
-            if (enumToInput instanceof ParticipationStatus) {
-                participationEntity.setParticipationStatus(
-                    (ParticipationStatus) enumToInput);
-            } else if (enumToInput instanceof DepositStatus) {
-                participationEntity.setDepositStatus(
-                    (DepositStatus) enumToInput);
-            } else if (enumToInput instanceof RatingStatus) {
-                participationEntity.setRatingStatus(
-                    (RatingStatus) enumToInput);
-            }
+        for (Enum<?> updateEnum : updateEnums) {
+            participationEntity.updateStatus(updateEnum);
         }
 
     }
 
-    public void saveParticipation(ParticipationEntity participationEntity) {
-        participationRepository.save(participationEntity);
+
+
+
+    //--------------------------- 데이터 count 메소드 ---------------------------//
+
+    public int countParticipationsCompletedByUserId(String userId) {
+
+        return participationRepository.countByUserIdAndParticipationStatusIn(
+            userId, List.of(ParticipationStatus.TRAVEL_FINISHED));
     }
+
+    private int countParticipationsJoinAndJoinReadyByPostId(long postId) {
+        return participationRepository.countByPostEntityPostIdAndParticipationStatusIn(
+            postId,
+            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
+    }
+
+
+
 
     //--------------------------- 데이터 load 메소드 ---------------------------//
 
+
+
+    public ParticipationEntity getParticipationByIdAndValidateUserId(long participationId, String userId) {
+        ParticipationEntity participationEntity = participationRepository.findById(
+            participationId).orElseThrow(()->new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+
+        if(!Objects.equals(participationEntity.getUserId(), userId))
+            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
+
+        return participationEntity;
+    }
+
+
     // 현재 개별인원 엔티티 반환
-    public ParticipationEntity getParticipationEntityByPostIdAndUserId(
+    public ParticipationEntity getParticipationByPostIdAndUserId(
         Long postId, String userId) {
         log.info("participation getParticipationEntityByPostIdAndUserId");
 
         return participationRepository.findByPostEntityPostIdAndUserId(
             postId, userId).orElseThrow(
             () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
-
-
     }
 
 
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ResponseParticipationsByPostDto> getParticipationsDtosStatusOfJoin(
+    public List<ResponseParticipationsDto> getParticipationsDtosByPostIdAndStatusOfJoin(
         Long postId) {
         log.info("service getParticipationsStatusOfJoinAndJoin");
 
@@ -260,14 +290,8 @@ public class ParticipationService {
     }
 
 
-    //--------------------------- 데이터 count 메소드 ---------------------------//
 
-    public int countParticipationsCompletedByUserId(String userId) {
-
-        return participationRepository.countByUserIdAndParticipationStatusIn(
-            userId, List.of(ParticipationStatus.TRAVEL_FINISHED));
-    }
-    public List<ParticipationDto> findParticipationsJoinAndJoinReadyByUserId(String userId) {
+    public List<ParticipationDto> getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(String userId) {
         List<ParticipationEntity> participationEntities = participationRepository.findAllByUserIdAndParticipationStatusIn(
             userId,
             List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
@@ -275,44 +299,34 @@ public class ParticipationService {
         return participationEntities.stream().map(ParticipationDto::fromEntity).toList();
 
     }
-    private int countParticipationsJoinAndJoinReadyByPostId(long postId) {
-        return participationRepository.countByPostEntityPostIdAndParticipationStatusIn(
-            postId,
-            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
+
+    public List<ParticipationEntity> getParticipationOfPostIdOnDeadLine(){
+
+        List<PostEntity> postEntities = postRepository.findAllPostByDeadlineAndStatus(
+            LocalDate.now(), PostStatus.RECRUITMENT_COMPLETED);
+
+        List<ParticipationEntity> allByPostEntityIn = participationRepository.findAllByPostEntityIn(
+            postEntities);
+
+        return allByPostEntityIn;
     }
 
-    public void setDateToReturnDeposit(ParticipationEntity entity,
-        LocalDate time) {
-        entity.setDepositReturnDate(time);
 
+    public List<ParticipationEntity> getParticipationsByDepositReturnDate() {
+        return participationRepository.findAllByDepositReturnDate(LocalDate.now());
     }
 
 
-    public ParticipationEntity validateParticipationUserId(long participationId, String userId) {
-        ParticipationEntity participationEntity = participationRepository.findById(
-            participationId).orElseThrow(()->new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
 
-        if(!Objects.equals(participationEntity.getUserId(), userId))
-            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
 
-        return participationEntity;
+    public void saveParticipations(List<ParticipationEntity> participationEntities) {
+        participationRepository.saveAll(participationEntities);
     }
 
-    public Boolean validateParticipationUserIdAndPostId(long postId, long participationId,
-        String userId) {
 
-        Optional<ParticipationEntity> optioinal = participationRepository.findById(
-            participationId);
 
-        if(optioinal.isEmpty()) return false;
-
-        ParticipationEntity participationEntity = optioinal.get();
-
-        if(participationEntity.getPostEntity().getPostId() !=postId
-            || !Objects.equals(participationEntity.getUserId(), userId)) {
-            return false;
-        }
-
-        return true;
+    public void saveParticipation(ParticipationEntity participationEntity) {
+        participationRepository.save(participationEntity);
     }
+
 }

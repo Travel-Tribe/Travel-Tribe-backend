@@ -3,6 +3,7 @@ package com.zerobase.travel.repository;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.type.ParticipationStatus;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,9 @@ public interface ParticipationRepository extends JpaRepository<ParticipationEnti
 
     List<ParticipationEntity> findAllByPostEntityPostIdAndParticipationStatus(
         Long postId, ParticipationStatus participationStatus);
+
+
+    List<ParticipationEntity> findAllByPostEntityIn(List<PostEntity> postEntities);
+
+    List<ParticipationEntity> findAllByDepositReturnDate(LocalDate now);
 }

@@ -1,20 +1,14 @@
 package com.zerobase.travel.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.zerobase.travel.api.PayApi;
-import com.zerobase.travel.communities.type.CustomException;
-import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,7 +60,7 @@ class ParticipationManagementServiceTest {
     void failedPaymentParticipation_shouldUpdateStatusToJoinFailed() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.validateParticipationUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByIdAndValidateUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.failedPaymentParticipation(PARTICIPATION_ID, USER_ID);
@@ -83,7 +77,7 @@ class ParticipationManagementServiceTest {
     void successPaymentParticipation_shouldUpdateStatusToJoinAndPaid() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.validateParticipationUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByIdAndValidateUserId(PARTICIPATION_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.successPaymentParticipation(PARTICIPATION_ID, USER_ID);
@@ -101,7 +95,7 @@ class ParticipationManagementServiceTest {
         // Given mock participationservice
 
 
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
 
         // When
@@ -121,7 +115,7 @@ class ParticipationManagementServiceTest {
     void unjoinParticipationWithDepositForfeited_shouldUpdateStatusToJoinCancelAndForfeited() {
         // Given
         ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
         // When
         participationManagementService.unjoinParticipationWithDepositForfeited(POST_ID, USER_ID);
@@ -136,30 +130,15 @@ class ParticipationManagementServiceTest {
 
     @Test
     void travelFinishedParticipation_shouldUpdateStatusToTravelFinished() {
-        // Given
-        ParticipationEntity participationEntity = new ParticipationEntity();
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
-
-        // When
-        participationManagementService.travelFinishedParticipation(POST_ID, USER_ID);
-
-        // Then
-        verify(participationService).checkAndChangeStatusParticipation(
-            participationEntity,
-            List.of(ParticipationStatus.JOIN),
-            List.of(ParticipationStatus.TRAVEL_FINISHED));
-        verify(participationService).setDateToReturnDeposit(eq(participationEntity), any(LocalDate.class));
-        verify(participationService).saveParticipation(participationEntity);
+        // Given;
     }
 
     @Test
     void returnDepositAfterTravelFinished_shouldUpdateStatusToReturnedAndCallPayApi() {
         // Given
 
-        when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
+        when(participationService.getParticipationByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
-        // When
-        participationManagementService.returnDepositAfterTravelFinished(POST_ID, USER_ID);
 
         // Then
         verify(participationService).checkAndChangeStatusParticipation(

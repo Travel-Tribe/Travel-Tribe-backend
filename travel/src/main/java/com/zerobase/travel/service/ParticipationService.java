@@ -10,11 +10,7 @@ import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.repository.PostRepository;
-import com.zerobase.travel.post.type.Gender;
-import com.zerobase.travel.post.type.LimitSex;
-import com.zerobase.travel.post.type.LimitSmoke;
 import com.zerobase.travel.post.type.PostStatus;
-import com.zerobase.travel.post.type.Smoking;
 import com.zerobase.travel.repository.ParticipationRepository;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
@@ -243,7 +239,7 @@ public class ParticipationService {
 
 
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ResponseParticipationsDto> getParticipationsDtosByPostIdAndStatusOfJoin(
+    public List<ResponseParticipationsByPostDto> getParticipationsDtosByPostIdAndStatusOfJoin(
         Long postId) {
         log.info("service getParticipationsStatusOfJoinAndJoin");
 
@@ -253,7 +249,22 @@ public class ParticipationService {
             List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
 
         return participationEntities.stream()
-            .map(ResponseParticipationsDto::fromEntity).toList();
+            .map(ResponseParticipationsByPostDto::fromEntity).toList();
+    }
+
+
+    // 현재 자신이  참여하고 있는 게시글의 리스트 반환
+    public List<ResponseParticipationsByUserDto> getParticipationsByUserStatusOfJoinAndJoinReady(
+        String userId) {
+        log.info("service getParticipationsByUserStatusOfJoinAndJoinReady");
+
+        List<ParticipationEntity> participationEntities
+            = participationRepository.findAllByUserIdAndParticipationStatusIn(
+            userId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
+
+        return participationEntities.stream().map(
+                ResponseParticipationsByUserDto::fromEntity)
+            .toList();
     }
 
 
@@ -267,6 +278,7 @@ public class ParticipationService {
             .toList();
 
     }
+
 
     public List<ParticipationEntity> getParticipationOfPostIdOnDeadLine() {
 
@@ -295,5 +307,6 @@ public class ParticipationService {
     public void saveParticipation(ParticipationEntity participationEntity) {
         participationRepository.save(participationEntity);
     }
+
 
 }

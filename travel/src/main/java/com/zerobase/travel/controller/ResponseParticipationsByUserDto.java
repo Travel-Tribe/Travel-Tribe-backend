@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
+@Getter
 public class ResponseParticipationsByUserDto {
 
     private Long participationId;

@@ -8,7 +8,6 @@ import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
 import static com.zerobase.user.type.UserStatus.DEACTIVATED;
 
-import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
@@ -95,9 +94,13 @@ public class UserService {
         String userKey = "userInfo:" + currentUser.getId();
         String profileKey = "userProfile:" + currentUser.getId();
 
-        currentUser.setNickname(editUserInfoDTO.getNickname());
-        currentUser.setPhone(editUserInfoDTO.getPhone());
+        if (editUserInfoDTO.getNickname() != null) {
+            currentUser.setNickname(editUserInfoDTO.getNickname());
+        }
 
+        if (editUserInfoDTO.getPhone() != null) {
+            currentUser.setPhone(editUserInfoDTO.getPhone());
+        }
         // 기존 캐시 삭제
         redisTemplate.delete(userKey);
         redisTemplate.delete(profileKey);
@@ -130,7 +133,8 @@ public class UserService {
     }
 
     public UserServiceDto getUserInfo(long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(()->new BizException(USER_NOT_FOUND_ERROR));
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
         ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 

@@ -84,8 +84,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         if (DEACTIVATED.equals(userEntity.getStatus())) {
             ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), DEACTIVATED_USER_ERROR);
+            return null;
         } else if (INACTIVE.equals(userEntity.getStatus())) {
             ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), SUSPENDED_USER_ERROR);
+            return null;
         }
 
 

@@ -71,7 +71,7 @@ public class UserController {
     }
 
     // 회원 정보 변경
-    @PatchMapping("/Info")
+    @PatchMapping("/info")
     public ResponseEntity<ResponseMessage<Void>> editUserInfo(
         @RequestBody @Valid EditUserInfoDTO editUserInfoDTO,
         Authentication authentication) {

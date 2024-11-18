@@ -3,8 +3,9 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
+import com.zerobase.travel.controller.ResponseParticipationsByUserDto;
 import com.zerobase.travel.dto.ParticipationDto;
-import com.zerobase.travel.dto.ResponseParticipationsDto;
+import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.PostEntity;
@@ -261,13 +262,30 @@ public class ParticipationService {
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
     public List<ResponseParticipationsDto> getParticipationsDtosByPostIdAndStatusOfJoin(
         Long postId) {
-        log.info("participation getParticipationsStatusOfJoinAndJoin");
+        log.info("service getParticipationsStatusOfJoinAndJoin");
 
         List<ParticipationEntity> participationEntities
             = participationRepository.findAllByPostEntityPostIdAndParticipationStatusIn(
             postId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
 
-        return participationEntities.stream().map(ResponseParticipationsDto::fromEntity)
+        return participationEntities.stream().map(
+                ResponseParticipationsByPostDto::fromEntity)
+            .toList();
+    }
+
+
+
+    // 현재 자신이  참여하고 있는 게시글의 리스트 반환
+    public List<ResponseParticipationsByUserDto> getParticipationsByUserStatusOfJoinAndJoinReady(
+        String userId) {
+        log.info("service getParticipationsByUserStatusOfJoinAndJoinReady");
+
+        List<ParticipationEntity> participationEntities
+            = participationRepository.findAllByUserIdAndParticipationStatusIn(
+            userId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
+
+        return participationEntities.stream().map(
+            ResponseParticipationsByUserDto::fromEntity)
             .toList();
     }
 

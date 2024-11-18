@@ -27,6 +27,7 @@ public class UserInfoResponseDTO {
     private String email;
     private String status;
     private MBTI mbti;
+    private String fileAddress;
     private String smoking;
     private String introduction;
     private String gender;
@@ -45,6 +46,7 @@ public class UserInfoResponseDTO {
             .email(userInfoFacadeDto.getEmail())
             .mbti(userInfoFacadeDto.getMbti())
             .introduction(userInfoFacadeDto.getIntroduction())
+            .fileAddress(userInfoFacadeDto.getFileAddress())
             .birth(userInfoFacadeDto.getBirth())
             .ratingAvg(userInfoFacadeDto.getRatingAvg())
             .smoking(userInfoFacadeDto.getSmoking().getSmoke())

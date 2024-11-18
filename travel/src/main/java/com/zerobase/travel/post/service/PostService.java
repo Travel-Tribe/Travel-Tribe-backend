@@ -52,7 +52,6 @@ public class PostService {
     private final UserClientService userClientService;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
-    @Transactional
     public PostEntity createPost(PostDTO postDTO, String userEmail) {
 
         // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
@@ -291,22 +290,7 @@ public class PostService {
 
 
     @Transactional(readOnly = true)
-    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, String userEmail,
-        Pageable pageable) {
-        // 사용자 정보 조회
-        UserInfoResponseDTO userInfo;
-        try {
-            userInfo = userClientService.getUserInfo(userEmail);
-            log.info("User Info: {}", userInfo);
-        } catch (FeignException e) {
-            log.error("userClient 호출 실패: {}", e.getMessage());
-            throw new BizException(USER_INFO_CALL_ERROR);
-        }
-
-        if (userInfo == null) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        }
-
+    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, Pageable pageable) {
         // 'others=true'인 경우, country는 이미 criteria에 반영됨
         return postRepository.findAll(PostSpecification.getPosts(criteria), pageable)
             .map(this::mapToDTO);

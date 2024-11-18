@@ -134,6 +134,7 @@ public class UserService {
             .gender(profileEntity.getGender())
             .smoking(profileEntity.getSmoking())
             .birth(profileEntity.getBirth())
+            .fileAddress(profileEntity.getFileAddress())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
 

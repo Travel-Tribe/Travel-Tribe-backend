@@ -97,6 +97,7 @@ public class PostEntity {
     private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private PostStatus status;
 
     // Post와 Day 간의 연관관계 설정

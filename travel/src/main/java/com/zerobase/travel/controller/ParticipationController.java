@@ -2,7 +2,7 @@ package com.zerobase.travel.controller;
 
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.ParticipationDto;
-import com.zerobase.travel.dto.ResponseParticipationsDto;
+import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.service.ParticipationManagementService;
 import com.zerobase.travel.service.ParticipationService;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ParticipationController {
 
     // 참여자 조회시에 Status에 Join/joinready 상태의 유저 리스트 확인
     @GetMapping("{postId}/participations")
-    public ResponseEntity<ResponseMessage<List<ResponseParticipationsDto>>> getParticipationsByPost(
+    public ResponseEntity<ResponseMessage<List<ResponseParticipationsByPostDto>>> getParticipationsByPost(
         @PathVariable Long postId) {
         log.info("getParticipationsByPost controller start");
         return ResponseEntity.ok(
@@ -59,14 +59,18 @@ public class ParticipationController {
                 participationService.getParticipationsDtosByPostIdAndStatusOfJoin(postId)));
     }
 
-    // 유저들의 완료된 여행에 대해서 숫자 반환
-    @GetMapping("/participations/by-userid/{userId}")
-    public ResponseEntity<ResponseMessage<Integer>> getParticipationsCompletedByUserId(
-        @PathVariable String userId) {
-        log.info("getParticipationsCompletedByUserId controller start");
-        return ResponseEntity.ok(ResponseMessage.success(
-            participationService.countParticipationsCompletedByUserId(userId)));
+    // 참여자 조회시에Join/joinready 상태의 자신의 참여 게시글 리스트 확인
+    @GetMapping("/participations")
+    public ResponseEntity<ResponseMessage<List<ResponseParticipationsByUserDto>>> getActiveParticipationsByUser(
+        @RequestHeader("X-User-Id") String userId) {
+        log.info("getParticipationsByPost controller start");
+        return ResponseEntity.ok(
+            ResponseMessage.success(
+                participationService.getParticipationsByUserStatusOfJoinAndJoinReady(userId)));
     }
+
+
+
 
 
 }

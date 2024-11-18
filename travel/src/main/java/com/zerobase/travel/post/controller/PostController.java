@@ -93,11 +93,8 @@ public class PostController {
         @RequestParam(required = false) String continent,
         @RequestParam(required = false) String country,
         @RequestParam(required = false) String mbti,
-        @RequestHeader("X-User-Email") String userEmail,
         @PageableDefault(size = 8, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        log.info("searchPosts - email: " + userEmail);
-
         // 검색 기준 설정
         PostSearchCriteria criteria = new PostSearchCriteria();
         criteria.setTitle(title);
@@ -138,7 +135,7 @@ public class PostController {
         }
 
         // 검색 수행
-        Page<ResponsePostsDTO> postPage = postService.searchPosts(criteria, userEmail, pageable);
+        Page<ResponsePostsDTO> postPage = postService.searchPosts(criteria, pageable);
 
         // PagedResponseDTO로 변환
         PagedResponseDTO<ResponsePostsDTO> pagedResponse = PagedResponseDTO.<ResponsePostsDTO>builder()
@@ -152,7 +149,5 @@ public class PostController {
 
         return ResponseEntity.status(OK).body(ResponseMessage.success(pagedResponse));
     }
-
-
 }
 

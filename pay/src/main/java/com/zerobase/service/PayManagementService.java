@@ -68,7 +68,7 @@ public class PayManagementService {
             .participationId(depositEntity.getParticipationId())
             .userId(depositEntity.getUserId())
             .amount(payment.getAmount())
-            .next_redirect_pc_url(payReadyApiDto.getNext_redirect_pc_url())
+            .nextRedirectPcUrl(payReadyApiDto.getNextRedirectPcUrl())
             .build();
     }
 

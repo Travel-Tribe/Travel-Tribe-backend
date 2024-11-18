@@ -20,7 +20,7 @@ public class ResponseDepositPayDto {
     private Long depositId;
     private Long amount;
     private String userId;
-    private String next_redirect_pc_url;
+    private String nextRedirectPcUrl;
 
 
 

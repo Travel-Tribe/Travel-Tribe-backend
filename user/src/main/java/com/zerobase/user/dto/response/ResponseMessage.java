@@ -34,16 +34,16 @@ public class ResponseMessage<T> {
             .build();
     }
 
-    public static ResponseMessage<Object> fail(ErrorCode errorCode, Object data) {
-        return ResponseMessage.builder()
-            .result(FAIL.toString())
-            .data(data)
-            .errors(List.of(new Errors(errorCode)))
-            .build();
-    }
+//    public static ResponseMessage<Object> fail(ErrorCode errorCode, Object data) {
+//        return ResponseMessage.builder()
+//            .result(FAIL.toString())
+//            .data(data)
+//            .errors(List.of(new Errors(errorCode)))
+//            .build();
+//    }
 
-    public static <T> ResponseMessage<T> fail(List<Errors> errors) {
-        return ResponseMessage.<T>builder()
+    public static ResponseMessage<Void> fail(List<Errors> errors) {
+        return ResponseMessage.<Void>builder()
             .result(FAIL.toString())
             .errors(errors)
             .build();

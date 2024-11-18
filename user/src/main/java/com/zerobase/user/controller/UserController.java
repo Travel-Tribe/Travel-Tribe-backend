@@ -169,8 +169,7 @@ public class UserController {
     public ResponseEntity<ResponseMessage<Void>> editProfile(
         @RequestBody @Valid ProfileRequestDTO profileRequest) {
         String email = authenticationUtil.getLoginedUserEmail();
-        UserEntity currentUser = userService.getCurrentUser(email);
-        profileService.editProfile(profileRequest, currentUser);
+        profileService.editProfile(profileRequest, email);
         return ResponseEntity.status(OK).body(ResponseMessage.success());
     }
 

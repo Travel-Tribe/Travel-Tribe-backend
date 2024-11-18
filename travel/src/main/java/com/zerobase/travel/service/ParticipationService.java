@@ -73,7 +73,7 @@ public class ParticipationService {
 
         //  유저의 참여중인 정보를 호출
         List<ParticipationDto> participations =
-            this.findParticipationsJoinAndJoinReadyByUserId(userId);
+            this.getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(userId);
 
 
         // 1.1 유저는 최대 두개까지만 참여가능
@@ -209,36 +209,6 @@ public class ParticipationService {
 
     }
 
-    public void saveParticipation(ParticipationEntity participationEntity) {
-        participationRepository.save(participationEntity);
-    }
-
-    //--------------------------- 데이터 load 메소드 ---------------------------//
-
-    // 현재 개별인원 엔티티 반환
-    public ParticipationEntity getParticipationEntityByPostIdAndUserId(
-        Long postId, String userId) {
-        log.info("participation getParticipationEntityByPostIdAndUserId");
-
-        return participationRepository.findByPostEntityPostIdAndUserId(
-            postId, userId).orElseThrow(
-            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
-    }
-
-
-    // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ResponseParticipationsDto> getParticipationsDtosStatusOfJoin(
-        Long postId) {
-        log.info("participation getParticipationsStatusOfJoinAndJoin");
-
-        List<ParticipationEntity> participationEntities
-            = participationRepository.findAllByPostEntityPostIdAndParticipationStatusIn(
-            postId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
-
-        return participationEntities.stream().map(ResponseParticipationsDto::fromEntity)
-            .toList();
-    }
-
 
 
 
@@ -249,14 +219,7 @@ public class ParticipationService {
         return participationRepository.countByUserIdAndParticipationStatusIn(
             userId, List.of(ParticipationStatus.TRAVEL_FINISHED));
     }
-    public List<ParticipationDto> findParticipationsJoinAndJoinReadyByUserId(String userId) {
-        List<ParticipationEntity> participationEntities = participationRepository.findAllByUserIdAndParticipationStatusIn(
-            userId,
-            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
 
-        return participationEntities.stream().map(ParticipationDto::fromEntity).toList();
-
-    }
     private int countParticipationsJoinAndJoinReadyByPostId(long postId) {
         return participationRepository.countByPostEntityPostIdAndParticipationStatusIn(
             postId,
@@ -298,7 +261,44 @@ public class ParticipationService {
         return true;
     }
 
-    public List<ParticipationEntity> findParticipationToCompleteByNow(){
+    //--------------------------- 데이터 load 메소드 ---------------------------//
+
+    // 현재 개별인원 엔티티 반환
+    public ParticipationEntity getParticipationEntityByPostIdAndUserId(
+        Long postId, String userId) {
+        log.info("participation getParticipationEntityByPostIdAndUserId");
+
+        return participationRepository.findByPostEntityPostIdAndUserId(
+            postId, userId).orElseThrow(
+            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+    }
+
+
+    // 현재 여행을 참여하고 있는 복수 인원리스트 반환
+    public List<ResponseParticipationsDto> getParticipationsDtosByPostIdAndStatusOfJoin(
+        Long postId) {
+        log.info("participation getParticipationsStatusOfJoinAndJoin");
+
+        List<ParticipationEntity> participationEntities
+            = participationRepository.findAllByPostEntityPostIdAndParticipationStatusIn(
+            postId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
+
+        return participationEntities.stream().map(ResponseParticipationsDto::fromEntity)
+            .toList();
+    }
+
+
+
+    public List<ParticipationDto> getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(String userId) {
+        List<ParticipationEntity> participationEntities = participationRepository.findAllByUserIdAndParticipationStatusIn(
+            userId,
+            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
+
+        return participationEntities.stream().map(ParticipationDto::fromEntity).toList();
+
+    }
+
+    public List<ParticipationEntity> getParticipationOfPostIdOnDeadLine(){
 
         List<PostEntity> postEntities = postRepository.findAllPostByDeadlineAndStatus(
             LocalDate.now(), PostStatus.RECRUITMENT_COMPLETED);
@@ -310,7 +310,19 @@ public class ParticipationService {
     }
 
 
+
+
     public void saveParticipations(List<ParticipationEntity> participationEntities) {
         participationRepository.saveAll(participationEntities);
+    }
+
+
+
+    public void saveParticipation(ParticipationEntity participationEntity) {
+        participationRepository.save(participationEntity);
+    }
+
+    public List<ParticipationEntity> getParticipationsByDepositReturnDate() {
+       return participationRepository.findAllByDepositReturnDate(LocalDate.now());
     }
 }

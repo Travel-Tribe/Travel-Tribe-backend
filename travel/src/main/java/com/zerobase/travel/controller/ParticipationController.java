@@ -56,7 +56,7 @@ public class ParticipationController {
         log.info("getParticipationsByPost controller start");
         return ResponseEntity.ok(
             ResponseMessage.success(
-                participationService.getParticipationsDtosStatusOfJoin(postId)));
+                participationService.getParticipationsDtosByPostIdAndStatusOfJoin(postId)));
     }
 
     // 유저들의 완료된 여행에 대해서 숫자 반환

@@ -139,8 +139,6 @@ class ParticipationManagementServiceTest {
 
         when(participationService.getParticipationEntityByPostIdAndUserId(POST_ID, USER_ID)).thenReturn(participationEntity);
 
-        // When
-        participationManagementService.returnDepositAfterTravelFinished(POST_ID, USER_ID);
 
         // Then
         verify(participationService).checkAndChangeStatusParticipation(

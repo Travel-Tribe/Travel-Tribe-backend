@@ -98,7 +98,7 @@ public class ReissueService {
     private void setTokensInResponse(HttpServletResponse response, String newAccessToken,
         String newRefreshToken) {
         response.setHeader("access", newAccessToken);
-        response.addCookie(cookieUtil.createCookie("refresh", newRefreshToken));
+        response.setHeader("Set-Cookie", cookieUtil.createCookie("refresh", newRefreshToken).toString());
     }
 
     /**

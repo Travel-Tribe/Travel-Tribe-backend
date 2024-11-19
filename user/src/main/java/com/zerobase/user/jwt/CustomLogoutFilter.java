@@ -9,6 +9,7 @@ import static com.zerobase.user.dto.response.BasicErrorCode.REFRESH_TOKEN_NOT_IN
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.response.ResponseMessage;
 import com.zerobase.user.repository.RefreshRepository;
+import com.zerobase.user.util.CookieUtil;
 import com.zerobase.user.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -128,7 +129,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setMaxAge(0);
         cookie.setPath("/");
 
-        response.addCookie(cookie);
+        response.setHeader("Set-Cookie", CookieUtil.createCookie1("refresh", "").toString());
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(ResponseMessage.success()));

@@ -129,10 +129,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
             //응답 설정
             response.setHeader("access", access);
-            response.addCookie(cookieUtil.createCookie("refresh", refresh));
+            response.setHeader("Set-Cookie", cookieUtil.createCookie("refresh", refresh).toString());
 
             // JSON 응답 생성
-
             Optional<ProfileEntity> OptionalProfileEntity = profileRepository.findByUserId(
                 userEntityId);
 

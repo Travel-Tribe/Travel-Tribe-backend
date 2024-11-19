@@ -1,5 +1,7 @@
 package com.zerobase.travel.config;
 
+import org.springframework.http.HttpMethod;
+import com.zerobase.travel.filter.AuthenticFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -14,9 +17,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//            .csrf(AbstractHttpConfigurer::disable)
-//            .authorizeHttpRequests(auth-> auth.anyRequest().permitAll());
+
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/communities/**").permitAll()
+            .anyRequest().authenticated()
+        );
+
+        http
+            .addFilterBefore(new AuthenticFilter(), UsernamePasswordAuthenticationFilter.class);
+
         //csrf disable
         http
             .csrf((auth) -> auth.disable());
@@ -28,6 +39,8 @@ public class SecurityConfig {
         //http basic 인증 방식 disable
         http
             .httpBasic((auth) -> auth.disable());
+
+
 
         //세션 설정
         http

@@ -31,20 +31,10 @@ public class JwtGatewayFilterFactory extends
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             // 요청 경로 및 HTTP 메서드 가져오기
-            String requestPath = exchange.getRequest().getPath().toString();
-            HttpMethod method = exchange.getRequest().getMethod();
-
-            // GET 방식 + 특정 경로 제외 (searchPosts 및 findPost)
-            if (GET.equals(method) &&
-                ("/api/v1/posts".equals(requestPath) || requestPath.matches("/api/v1/posts/\\d+"))) {
-                return chain.filter(exchange); // 필터를 거치지 않고 다음으로 전달
-            }
-
             String accessToken = exchange.getRequest().getHeaders().getFirst("access");
 
             if (accessToken == null || accessToken.isEmpty()) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
+                return chain.filter(exchange);
             }
 
             try {

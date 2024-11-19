@@ -1,9 +1,9 @@
 package com.zerobase.travel.config;
 
-import org.springframework.http.HttpMethod;
 import com.zerobase.travel.filter.AuthenticFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,32 +19,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/api/v1/file/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/communities/**").permitAll()
             .anyRequest().authenticated()
         );
 
-        http
-            .addFilterBefore(new AuthenticFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new AuthenticFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        //csrf disable
-        http
-            .csrf((auth) -> auth.disable());
-
-        //From 로그인 방식 disable
-        http
-            .formLogin((auth) -> auth.disable());
-
-        //http basic 인증 방식 disable
-        http
-            .httpBasic((auth) -> auth.disable());
-
-
+        http.csrf(AbstractHttpConfigurer::disable)          //csrf disable
+            .formLogin(AbstractHttpConfigurer::disable)     //From 로그인 방식 disable
+            .httpBasic(AbstractHttpConfigurer::disable);    //http basic 인증 방식 disable
 
         //세션 설정
-        http
-            .sessionManagement((session) -> session
+        http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }

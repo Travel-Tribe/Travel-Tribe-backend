@@ -8,6 +8,7 @@ import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.type.UserStatus.DEACTIVATED;
 import static com.zerobase.user.type.UserStatus.INACTIVE;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -84,8 +85,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         if (DEACTIVATED.equals(userEntity.getStatus())) {
             ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), DEACTIVATED_USER_ERROR);
+            return null;
         } else if (INACTIVE.equals(userEntity.getStatus())) {
             ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), SUSPENDED_USER_ERROR);
+            return null;
         }
 
 
@@ -140,13 +143,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .profileCheck(OptionalProfileEntity.isPresent())
                 .build();
 
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_OK, loginSuccessDTO);
+            ResponseUtil.setJsonResponse(response, SC_OK, loginSuccessDTO);
         } catch (JwtException e) { // jwtUtil.createJwt(...) 에서 발생할 수 있는 예외
             log.error("Failed to create JWT token", e);
-            throw new BizException(CREATE_TOKEN_ERROR);
+            //throw new BizException(CREATE_TOKEN_ERROR);
+            ResponseUtil.setJsonResponse(response, SC_OK, CREATE_TOKEN_ERROR);
         } catch (Exception e) { // 기타 모든 예외
             log.error("Unexpected error during authentication", e);
-            throw new BizException(INTERNAL_SERVER_ERROR);
+            //throw new BizException(INTERNAL_SERVER_ERROR);
+            ResponseUtil.setJsonResponse(response, SC_OK, INTERNAL_SERVER_ERROR);
         }
 
         log.debug("Access and refresh tokens sent in response for user: {}", email);

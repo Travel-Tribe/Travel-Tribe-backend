@@ -1,8 +1,12 @@
 package com.zerobase.user.service;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.ILLEGAL_ARGUMENT__ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.SUSPENDED_USER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.type.UserStatus.DEACTIVATED;
+import static com.zerobase.user.type.UserStatus.INACTIVE;
 
 import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.ProfileRequestDTO;
@@ -92,76 +96,79 @@ public class ProfileService {
     }
 
     @Transactional
-    public void editProfile(ProfileRequestDTO profileRequest, UserEntity currentUser) {
+    public void editProfile(ProfileRequestDTO profileRequest, String email) {
         // 사용자 및 프로필 조회
-        userRepository.findById(currentUser.getId())
+        UserEntity userEntity = userRepository.findByEmail(email)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
-        ProfileEntity profile = profileRepository.findByUserId(currentUser.getId())
+        ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
-        String userKey = "userInfo:" + currentUser.getId();
-        String profileKey = "userProfile:" + currentUser.getId();
+        String userKey = "userInfo:" + userEntity.getId();
+        String profileKey = "userProfile:" + userEntity.getId();
 
         // 기존 캐시 삭제
         redisTemplate.delete(userKey);
         redisTemplate.delete(profileKey);
-        log.info("Cache deleted for user ID: {}", currentUser.getId());
+        log.info("Cache deleted for user ID: {}", userEntity.getId());
 
         String mbtiString = profileRequest.getMbti().toUpperCase();
 
         // 프로필 정보 업데이트
         if (profileRequest.getIntroduction() != null) {
-            profile.setIntroduction(profileRequest.getIntroduction());
+            profileEntity.setIntroduction(profileRequest.getIntroduction());
         }
         if (profileRequest.getMbti() != null) {
-            profile.setMbti(MBTI.valueOf(mbtiString));
+            profileEntity.setMbti(MBTI.valueOf(mbtiString));
         }
         if (profileRequest.getSmoking() != null) {
-            profile.setSmoking(Smoking.valueOf(profileRequest.getSmoking().toUpperCase()));
+            profileEntity.setSmoking(Smoking.valueOf(profileRequest.getSmoking().toUpperCase()));
         }
         if (profileRequest.getGender() != null) {
-            profile.setGender(Gender.valueOf(profileRequest.getGender().toUpperCase()));
+            profileEntity.setGender(Gender.valueOf(profileRequest.getGender().toUpperCase()));
         }
         if (profileRequest.getBirth() != null) {
-            profile.setBirth(profileRequest.getBirth());
+            profileEntity.setBirth(profileRequest.getBirth());
         }
         if (profileRequest.getFileAddress() != null) {
-            profile.setFileAddress(profileRequest.getFileAddress());
+            profileEntity.setFileAddress(profileRequest.getFileAddress());
         }
 
         // 기존 방문 국가와 언어 삭제 및 업데이트
         if (profileRequest.getVisitedCountries() != null) {
-            visitedCountryRepository.deleteAllByProfileEntity(profile);
+            visitedCountryRepository.deleteAllByProfileEntity(profileEntity);
             List<VisitedCountryEntity> newCountries = profileRequest.getVisitedCountries().stream()
-                .map(country -> new VisitedCountryEntity(profile, country))
+                .map(country -> new VisitedCountryEntity(profileEntity, country))
                 .collect(Collectors.toList());
             visitedCountryRepository.saveAll(newCountries);
         }
 
         if (profileRequest.getLangAbilities() != null) {
-            langAbilityRepository.deleteAllByProfileEntity(profile);
+            langAbilityRepository.deleteAllByProfileEntity(profileEntity);
             List<LangAbilityEntity> newLanguages = profileRequest.getLangAbilities().stream()
-                .map(lang -> new LangAbilityEntity(profile, lang))
+                .map(lang -> new LangAbilityEntity(profileEntity, lang))
                 .collect(Collectors.toList());
             langAbilityRepository.saveAll(newLanguages);
         }
 
         // 변경된 프로필 정보를 DB에 반영 (더티 체킹에 의해 자동 반영)
 
-        // 변경된 UserInfoResponseDTO 생성
-        ProfileEntity profileEntity = profileRepository.findByUserId(currentUser.getId())
-            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
-
         // 이벤트 발행
-        UserMbtiChangedEvent event = new UserMbtiChangedEvent(currentUser.getId(), mbtiString);
+        UserMbtiChangedEvent event = new UserMbtiChangedEvent(userEntity.getId(), mbtiString);
         kafkaTemplate.send(userMbtiChangedTopic, event);
     }
 
 
     public ProfileResponseDTO getProfile(Long userId) {
         // 사용자 및 프로필 조회
-        userRepository.findById(userId)
+        UserEntity userEntity = userRepository.findById(userId)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        if (DEACTIVATED.equals(userEntity.getStatus())) {
+            throw new BizException(DEACTIVATED_USER_ERROR);
+        } else if (INACTIVE.equals(userEntity.getStatus())) {
+            throw new BizException(SUSPENDED_USER_ERROR);
+        }
+
         ProfileEntity profile = profileRepository.findByUserId(userId)
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 

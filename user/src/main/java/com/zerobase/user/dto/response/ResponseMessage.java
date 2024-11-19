@@ -2,12 +2,14 @@ package com.zerobase.user.dto.response;
 
 import static com.zerobase.user.dto.response.ResponseMessage.Result.FAIL;
 import static com.zerobase.user.dto.response.ResponseMessage.Result.SUCCESS;
+import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
@@ -27,8 +29,8 @@ public class ResponseMessage<T> {
         return new ResponseMessage<T>(SUCCESS.toString(), null, data);
     }
 
-    public static ResponseMessage<Void> fail(ErrorCode errorCode) {
-        return ResponseMessage.<Void>builder()
+    public static <T> ResponseMessage<T> fail(ErrorCode errorCode) {
+        return ResponseMessage.<T>builder()
             .result(FAIL.toString())
             .errors(List.of(new Errors(errorCode)))
             .build();
@@ -42,8 +44,8 @@ public class ResponseMessage<T> {
 //            .build();
 //    }
 
-    public static ResponseMessage<Void> fail(List<Errors> errors) {
-        return ResponseMessage.<Void>builder()
+    public static <T> ResponseMessage<T> fail(List<Errors> errors) {
+        return ResponseMessage.<T>builder()
             .result(FAIL.toString())
             .errors(errors)
             .build();

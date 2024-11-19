@@ -1,14 +1,17 @@
 package com.zerobase.user.service;
 
 import static com.zerobase.user.dto.response.BasicErrorCode.AUTHENTICATION_CODE_EXPIRED_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INVALID_AUTHENTICATION_CODE_ERROR;
 import static com.zerobase.user.dto.response.BasicErrorCode.NOT_FOUND_EMAIL_AUTHENTICATION_ERROR;
-import static com.zerobase.user.dto.response.BasicErrorCode.UNAUTHORIZED_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.SUSPENDED_USER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.PROFILE_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.USER_PW_MISMATCH_ERROR;
+import static com.zerobase.user.type.UserStatus.ACTIVE;
 import static com.zerobase.user.type.UserStatus.DEACTIVATED;
+import static com.zerobase.user.type.UserStatus.INACTIVE;
 
-import com.zerobase.user.application.UserInfoFacade;
 import com.zerobase.user.dto.request.EditUserInfoDTO;
 import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
@@ -19,21 +22,17 @@ import com.zerobase.user.entity.EmailVerificationEntity;
 import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.UserEntity;
 import com.zerobase.user.exception.BizException;
-import com.zerobase.user.jwt.CustomUserDetails;
 import com.zerobase.user.repository.EmailVerificationRepository;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.service.dto.UserServiceDto;
 import com.zerobase.user.type.Role;
-import com.zerobase.user.type.UserStatus;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,13 +50,8 @@ public class UserService {
     private final PasswordResetService passwordResetService;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public UserEntity getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new BizException(UNAUTHORIZED_ERROR);
-        }
-
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userRepository.findByEmail(customUserDetails.getUsername())
+    public UserEntity getCurrentUser(String email) {
+        return userRepository.findByEmail(email)
             .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
     }
 
@@ -95,9 +89,13 @@ public class UserService {
         String userKey = "userInfo:" + currentUser.getId();
         String profileKey = "userProfile:" + currentUser.getId();
 
-        currentUser.setNickname(editUserInfoDTO.getNickname());
-        currentUser.setPhone(editUserInfoDTO.getPhone());
+        if (editUserInfoDTO.getNickname() != null) {
+            currentUser.setNickname(editUserInfoDTO.getNickname());
+        }
 
+        if (editUserInfoDTO.getPhone() != null) {
+            currentUser.setPhone(editUserInfoDTO.getPhone());
+        }
         // 기존 캐시 삭제
         redisTemplate.delete(userKey);
         redisTemplate.delete(profileKey);
@@ -116,7 +114,7 @@ public class UserService {
             .role(Role.ROLE_USER)
             .phone(joinDTO.getPhone())
             .nickname(joinDTO.getNickname())
-            .status(UserStatus.ACTIVE)
+            .status(ACTIVE)
             .build();
     }
 
@@ -130,7 +128,16 @@ public class UserService {
     }
 
     public UserServiceDto getUserInfo(long userId) {
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(()->new BizException(USER_NOT_FOUND_ERROR));
+
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        if (DEACTIVATED.equals(userEntity.getStatus())) {
+            throw new BizException(DEACTIVATED_USER_ERROR);
+        } else if (INACTIVE.equals(userEntity.getStatus())) {
+            throw new BizException(SUSPENDED_USER_ERROR);
+        }
+
         ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
             .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
 
@@ -162,13 +169,16 @@ public class UserService {
         userEntity.setStatus(DEACTIVATED);
 
         String cacheKey = "userInfo:" + currentUser.getId();
+        String profileKey = "userProfile:" + currentUser.getId();
+
         // 기존 캐시 삭제
         redisTemplate.delete(cacheKey);
+        redisTemplate.delete(profileKey);
         log.info("Cache deleted for user ID: {}", currentUser.getId());
     }
 
     @Transactional
-    public boolean verifyEmailCode(String email, String code) {
+    public void verifyEmailCode(String email, String code, String currentUserEmail) {
         EmailVerificationEntity verification = verificationRepository.findByEmail(email)
             .orElseThrow(() -> new BizException(NOT_FOUND_EMAIL_AUTHENTICATION_ERROR));
 
@@ -176,7 +186,15 @@ public class UserService {
             throw new BizException(AUTHENTICATION_CODE_EXPIRED_ERROR);
         }
 
-        return verification.getVerificationCode().equals(code);
+        boolean isVerified = verification.getVerificationCode().equals(code);
+
+        if (!isVerified) {
+            throw new BizException(INVALID_AUTHENTICATION_CODE_ERROR);
+        }
+
+        UserEntity currentUser = userRepository.findByEmail(currentUserEmail)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+        currentUser.setEmail(email);
     }
 
 
@@ -206,15 +224,14 @@ public class UserService {
         String email = resetPasswordDTO.getEmail();
         String generateRandomPassword;
         String encryptedPassword;
-        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
-        if (optionalUserEntity.isEmpty()) {
-            throw new BizException(USER_NOT_FOUND_ERROR);
-        } else {
-            UserEntity userEntity = optionalUserEntity.get();
-            generateRandomPassword = passwordResetService.generateRandomPassword();
-            encryptedPassword = passwordResetService.encryptPassword(generateRandomPassword);
-            userEntity.setPassword(encryptedPassword);
-        }
+
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        generateRandomPassword = passwordResetService.generateRandomPassword();
+        encryptedPassword = passwordResetService.encryptPassword(generateRandomPassword);
+        userEntity.setPassword(encryptedPassword);
+
         emailService.sendResetPassword(email, generateRandomPassword);
     }
 

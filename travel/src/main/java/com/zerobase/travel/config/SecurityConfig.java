@@ -19,6 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.GET, "/internal/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/file/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/posts/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()

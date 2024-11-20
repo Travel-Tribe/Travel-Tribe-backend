@@ -9,9 +9,9 @@ public class CookieUtil {
     public ResponseCookie createCookie(String key, String value) {
 
         return ResponseCookie.from(key, value)
-            //.sameSite("None")
+            .sameSite("None")
             .httpOnly(false)
-            .secure(false)
+            .secure(true)
             .maxAge(24 * 60 * 60)
             .build();
     }
@@ -19,9 +19,9 @@ public class CookieUtil {
     public static ResponseCookie createCookie1(String key, String value) {
 
         return ResponseCookie.from(key, value)
-            //.sameSite("None")
+            .sameSite("None")
             .httpOnly(false)
-            .secure(false)
+            .secure(true)
             .maxAge(24 * 60 * 60)
             .build();
     }

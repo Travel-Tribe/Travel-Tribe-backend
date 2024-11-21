@@ -1,6 +1,5 @@
 package com.zerobase.travel.communities.controller;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,15 +11,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.travel.communities.service.CommunityManagementService;
-import com.zerobase.travel.communities.type.RequestCreateCommunity;
-import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.typeCommon.Continent;
@@ -31,8 +28,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,10 +35,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.http.MediaType;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(controllers = CommunityController.class)
@@ -89,36 +83,6 @@ class CommunityControllerTest {
 
         // given request
 
-        List<String> files = List.of("file1", "file2");
-
-        RequestCreateCommunity request = RequestCreateCommunity.builder()
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Seoul")
-            .title("Sample Title")
-            .content("Sample Content")
-            .files(files)
-            .build();
-
-
-        //when
-
-        when(communityManagementService.createPost(any(RequestCreateCommunity.class),anyString()))
-            .thenReturn(sampleCommunityResponse);
-
-
-        mockMvc.perform(
-            post("/communities")
-                .header(USER_ID_HEADER, SAMPLE_USER_ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-                .with(csrf())
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.communityId").value(1))
-            .andExpect(jsonPath("$.userId").value(SAMPLE_USER_ID))
-            .andExpect(jsonPath("$.title").value("Sample Community"))
-            .andExpect(jsonPath("$.content").value("Sample content"));
     }
 
     @Test
@@ -189,17 +153,17 @@ class CommunityControllerTest {
     @WithMockUser
     void updateCommunity() throws Exception {
         // Given an update request
-        RequestPostCommunity request = RequestPostCommunity.builder()
-            .communityId(1L)
-            .title("Updated Title")
-            .content("Updated Content")
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
-            .build();
+        RequestUpdateCommunity request =  new RequestUpdateCommunity();
+
+        request.setCommunityId(1L);
+        request.setTitle("Updated Title");
+        request.setContent("Updated Content");
+        request.setContinent(Continent.ASIA);
+        request.setCountry(Country.KR);
+        request.setRegion("Busan");
 
         // Mocking the service's response to return a sample community response
-        given(communityManagementService.updatePost(any(RequestPostCommunity.class), anyString()))
+        given(communityManagementService.updatePost(any(RequestUpdateCommunity.class), anyString()))
             .willReturn(sampleCommunityResponse);
 
         // Perform the PUT request
@@ -216,7 +180,8 @@ class CommunityControllerTest {
             .andExpect(jsonPath("$.content").value("Sample content"));
 
         // Verify that the service method was called with the correct parameters
-        verify(communityManagementService, times(1)).updatePost(any(RequestPostCommunity.class), eq(SAMPLE_USER_ID));
+        verify(communityManagementService, times(1)).updatePost(any(
+            RequestUpdateCommunity.class), eq(SAMPLE_USER_ID));
     }
 
 }

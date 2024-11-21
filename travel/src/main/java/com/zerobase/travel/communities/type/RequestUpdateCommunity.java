@@ -5,6 +5,7 @@ import com.zerobase.travel.typeCommon.Country;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,22 +16,20 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class RequestPostCommunity {
+public class RequestUpdateCommunity {
 
 
     @Min(1)
-    long communityId;
+    private long communityId;
     @NotNull
-    Continent continent;
+    private Continent continent;
     @NotNull
-    Country country;
+    private Country country;
     @NotBlank
-    String region;
+    private String region;
     @NotBlank
-    String title;
+    private String title;
     @NotBlank
-    String content;
-    List<String> files;
+    private String content;
+    private List<String> files=new ArrayList<>();
 }

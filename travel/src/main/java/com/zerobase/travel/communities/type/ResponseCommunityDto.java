@@ -16,14 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResponseCommunityDto {
 
-    long communityId;
-    String userId;
-    Continent continent;
-    Country country;
-    String region;
-    String title;
-    String content;
-    List<CommunityFileDto> files;
+    private long communityId;
+    private String userId;
+    private Continent continent;
+    private Country country;
+    private String region;
+    private String title;
+    private String content;
+    private List<CommunityFileDto> files;
 
     public static ResponseCommunityDto fromEntity(
         CommunityDto communityDto,List<CommunityFileDto> communityFileDtos){

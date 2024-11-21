@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verify;
 import com.zerobase.travel.communities.type.CommunityDto;
 import com.zerobase.travel.communities.type.CommunityFileDto;
 import com.zerobase.travel.communities.type.RequestCreateCommunity;
-import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.typeCommon.Continent;
@@ -59,14 +59,6 @@ class CommunityManagementServiceTest {
         sampleFiles = List.of(new CommunityFileDto(1L, "file1.jpg"),
             new CommunityFileDto(2L, "file2.jpg"));
 
-        createRequest = RequestCreateCommunity.builder()
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
-            .title("Sample Title")
-            .content("Sample Content")
-            .files(List.of("file1.jpg", "file2.jpg"))
-            .build();
     }
 
     @Test
@@ -143,15 +135,16 @@ class CommunityManagementServiceTest {
     @Test
     void updatePost() {
         // Given
-        RequestPostCommunity request = RequestPostCommunity.builder()
-            .communityId(1L)
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
-            .title("Updated Title")
-            .content("Updated Content")
-            .files(List.of("updated_file1.jpg", "updated_file2.jpg"))
-            .build();
+        RequestUpdateCommunity request = new RequestUpdateCommunity();
+
+        request.setCommunityId(1L);
+        request.setTitle("Updated Title");
+        request.setContent("Updated Content");
+        request.setContinent(Continent.ASIA);
+        request.setCountry(Country.KR);
+        request.setRegion("Busan");
+        request.setFiles(List.of("updated_file1.jpg", "updated_file2.jpg"));
+
 
         CommunityDto updatedCommunityDto = CommunityDto.builder()
             .communityId(1L)

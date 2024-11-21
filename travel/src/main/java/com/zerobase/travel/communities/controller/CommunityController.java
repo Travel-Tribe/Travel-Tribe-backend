@@ -3,7 +3,7 @@ package com.zerobase.travel.communities.controller;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.communities.service.CommunityManagementService;
 import com.zerobase.travel.communities.type.RequestCreateCommunity;
-import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import jakarta.validation.Valid;
@@ -75,7 +75,7 @@ public class CommunityController {
     // 커뮤니티 수정
     @PutMapping(value = "/{communityId}")
     public ResponseEntity<ResponseMessage<ResponseCommunityDto>> updateCommunity(
-        @Valid @RequestBody RequestPostCommunity request,
+        @Valid @RequestBody RequestUpdateCommunity request,
         @RequestHeader("X-User-Id") String userId) {
         return ResponseEntity.ok(ResponseMessage.success(
             communityManagementService.updatePost(request, userId)));

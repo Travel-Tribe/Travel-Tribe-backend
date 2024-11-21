@@ -103,11 +103,13 @@ public class ParticipationService {
 
         validatePostLimitAndUserProfile(userInfo, postEntity);
 
-        // 4. 게시글의 상태가 현재 모집중인지 확인
-
-//        if (postEntity.getStatus() != PostStatus.RECRUITING) {
-//            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
-//        }
+        // 4. 게시글의 상태가 현재 모집중인지 확인, 단 참여신청자가 user인 경우 post의 상태와 관련없이 참여함
+        if(Objects.equals(String.valueOf(postEntity.getUserId()), userId)){
+            return;
+        }
+        else if (postEntity.getStatus() != PostStatus.RECRUITING) {
+            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
+       }
 
     }
 

@@ -5,10 +5,7 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.service.PostService;
-import com.zerobase.travel.type.DepositStatus;
-import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -51,7 +48,7 @@ public class ParticipationManagementService {
     private final ParticipationService participationService;
     private final PayApi payApi;
     private final PostService postService;
-    private final PostRepository postRepository;
+
 
 
     private final int DEPOSIT_RETURN_DATE_DEFAULT = 30;
@@ -86,6 +83,7 @@ public class ParticipationManagementService {
     }
 
     // 1.2 여행 참가를 눌러서 결재 완료 혹은 결제실패 처리가 정상처리가 된 경우
+    @Transactional
     public void successPaymentParticipation(long participationId, String userId) {
 
         // participation, userId를 통해서 participationEntity호출
@@ -98,6 +96,7 @@ public class ParticipationManagementService {
 
         participationService.saveParticipation(participationEntity);
 
+        postService.changeStatusToRecruiting(participationEntity.getPostEntity().getPostId());
     }
 
     //2. 여행을 투표를 통해서 취소, 투표완료시 해당 메소드 호출

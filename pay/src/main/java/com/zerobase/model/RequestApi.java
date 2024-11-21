@@ -11,8 +11,6 @@ public class RequestApi {
 
     @Getter
     @Setter
-    @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class ConfirmDto {
 
@@ -35,9 +33,6 @@ public class RequestApi {
     }
 
     @Getter
-    @Setter
-    @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadyDto {
         private String cid;
@@ -71,9 +66,7 @@ public class RequestApi {
     }
 
     @Getter
-    @Setter
-    @Builder
-    @AllArgsConstructor
+
     @NoArgsConstructor
     public static class RefundDto {
 

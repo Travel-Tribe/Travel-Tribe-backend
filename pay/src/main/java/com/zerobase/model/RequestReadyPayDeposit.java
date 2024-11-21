@@ -9,8 +9,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class RequestReadyPayDeposit {
     Long postId;

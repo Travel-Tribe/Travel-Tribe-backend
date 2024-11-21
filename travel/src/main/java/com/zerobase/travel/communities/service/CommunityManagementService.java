@@ -3,7 +3,7 @@ package com.zerobase.travel.communities.service;
 import com.zerobase.travel.communities.type.CommunityDto;
 import com.zerobase.travel.communities.type.CommunityFileDto;
 import com.zerobase.travel.communities.type.RequestCreateCommunity;
-import com.zerobase.travel.communities.type.RequestPostCommunity;
+import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import java.util.List;
@@ -88,7 +88,7 @@ public class CommunityManagementService {
     }
 
     @Transactional
-    public ResponseCommunityDto updatePost( RequestPostCommunity request,
+    public ResponseCommunityDto updatePost( RequestUpdateCommunity request,
         String userId) {
 
 

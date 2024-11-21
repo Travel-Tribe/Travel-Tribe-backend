@@ -15,9 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class RequestPostCommunity {
+public class RequestUpdateCommunity {
 
 
     @Min(1)

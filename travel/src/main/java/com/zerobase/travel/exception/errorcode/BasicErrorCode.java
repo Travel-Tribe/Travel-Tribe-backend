@@ -19,7 +19,8 @@ public enum BasicErrorCode implements ErrorCode {
     INVALID_CONTINENT_VALUE("TRAVEL-ERROR-BASIC-00011", "대륙명이 부적절합니다."),
     INVALID_MBTI_VALUE("TRAVEL-ERROR-BASIC-00012", "MBTI가 부적절합니다."),
     REFRESH_TOKEN_ERROR("TRAVEL-ERROR-BASIC-00013", "Refresh 토큰이 없습니다."),
-    EXPIRED_TOKEN_ERROR("TRAVEL-ERROR-BASIC-00014", "만료된 토큰입니다.");
+    EXPIRED_TOKEN_ERROR("TRAVEL-ERROR-BASIC-00014", "만료된 토큰입니다."),
+    CREATE_POST_ERROR("TRAVEL-ERROR-BASIC-00015", "모집 게시글 등록중 오류발생.");
 
     private final String errorCode;
     private final String errorMessage;

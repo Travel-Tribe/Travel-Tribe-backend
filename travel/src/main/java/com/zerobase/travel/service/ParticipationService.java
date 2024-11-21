@@ -105,9 +105,9 @@ public class ParticipationService {
 
         // 4. 게시글의 상태가 현재 모집중인지 확인
 
-        if (postEntity.getStatus() != PostStatus.RECRUITING) {
-            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
-        }
+//        if (postEntity.getStatus() != PostStatus.RECRUITING) {
+//            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
+//        }
 
 
     }

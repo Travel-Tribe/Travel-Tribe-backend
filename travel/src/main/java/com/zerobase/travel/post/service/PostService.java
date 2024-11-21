@@ -1,5 +1,6 @@
 package com.zerobase.travel.post.service;
 
+import static com.zerobase.travel.exception.errorcode.BasicErrorCode.CREATE_POST_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.PERMISSION_DENIED_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.POST_NOT_FOUND_ERROR;
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_CALL_ERROR;
@@ -18,19 +19,13 @@ import com.zerobase.travel.post.entity.DayDetailEntity;
 import com.zerobase.travel.post.entity.DayEntity;
 import com.zerobase.travel.post.entity.ItineraryVisitEntity;
 import com.zerobase.travel.post.entity.PostEntity;
-import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
-import com.zerobase.travel.post.type.LimitSex;
-import com.zerobase.travel.post.type.LimitSmoke;
 import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
-import com.zerobase.travel.post.constants.RepresentativeCountries;
-import com.zerobase.travel.typeCommon.Country;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,77 +49,81 @@ public class PostService {
 
     public PostEntity createPost(PostDTO postDTO, String userEmail) {
 
-        // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
-        // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
-        UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
-        MBTI userMbti = userClientService.getUserMbti(userInfo.getId());
-        log.info(userInfo.toString());
-        Long userId = userInfo.getId();
+        try {
+            // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
+            // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
+            UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
+            MBTI userMbti = userClientService.getUserMbti(userInfo.getId());
+            log.info(userInfo.toString());
+            Long userId = userInfo.getId();
 
-        PostEntity postEntity = PostEntity.builder()
-            .title(postDTO.getTitle())
-            .mbti(userMbti)
-            .userId(userId)
-            .travelStartDate(postDTO.getTravelStartDate())
-            .travelEndDate(postDTO.getTravelEndDate())
-            .maxParticipants(postDTO.getMaxParticipants())
-            .travelCountry(postDTO.getTravelCountry())
-            .continent(postDTO.getContinent())
-            .region(postDTO.getRegion())
-            .accommodationFee(postDTO.getAccommodationFee())
-            .otherExpenses(postDTO.getOtherExpenses())
-            .airplaneFee(postDTO.getAirplaneFee())
-            .limitMinAge(postDTO.getLimitMinAge())
-            .limitMaxAge(postDTO.getLimitMaxAge())
-            .limitSex(postDTO.getLimitSex())
-            .limitSmoke(postDTO.getLimitSmoke())
-            .deadline(postDTO.getDeadline())
-            .status(PostStatus.RECRUITING)
-            .build();
+            PostEntity postEntity = PostEntity.builder()
+                .title(postDTO.getTitle())
+                .mbti(userMbti)
+                .userId(userId)
+                .travelStartDate(postDTO.getTravelStartDate())
+                .travelEndDate(postDTO.getTravelEndDate())
+                .maxParticipants(postDTO.getMaxParticipants())
+                .travelCountry(postDTO.getTravelCountry())
+                .continent(postDTO.getContinent())
+                .region(postDTO.getRegion())
+                .accommodationFee(postDTO.getAccommodationFee())
+                .otherExpenses(postDTO.getOtherExpenses())
+                .airplaneFee(postDTO.getAirplaneFee())
+                .limitMinAge(postDTO.getLimitMinAge())
+                .limitMaxAge(postDTO.getLimitMaxAge())
+                .limitSex(postDTO.getLimitSex())
+                .limitSmoke(postDTO.getLimitSmoke())
+                .deadline(postDTO.getDeadline())
+                .status(PostStatus.PAYMENT_PENDING)
+                .build();
 
-        // Days 처리
-        if (postDTO.getDays() != null) {
-            for (DayDTO dayDTO : postDTO.getDays()) {
-                DayEntity dayEntity = DayEntity.builder().build();
-                postEntity.addDay(dayEntity);
+            // Days 처리
+            if (postDTO.getDays() != null) {
+                for (DayDTO dayDTO : postDTO.getDays()) {
+                    DayEntity dayEntity = DayEntity.builder().build();
+                    postEntity.addDay(dayEntity);
 
-                // DayDetails 처리
-                if (dayDTO.getDayDetails() != null) {
-                    for (DayDetailDTO dayDetailDTO : dayDTO.getDayDetails()) {
-                        DayDetailEntity dayDetailEntity = DayDetailEntity.builder()
-                            .title(dayDetailDTO.getTitle())
-                            .description(dayDetailDTO.getDescription())
-                            .fileAddress(dayDetailDTO.getFileAddress())
-                            .day(dayEntity)
-                            .build();
-                        dayEntity.addDayDetail(dayDetailEntity);
-                    }
-                }
-
-                // ItineraryVisits 처리
-                if (dayDTO.getItineraryVisits() != null) {
-                    for (ItineraryVisitDTO visitDTO : dayDTO.getItineraryVisits()) {
-                        ItineraryVisitEntity visitEntity = ItineraryVisitEntity.builder()
-                            .orderNumber(visitDTO.getOrderNumber())
-                            .day(dayEntity)
-                            .build();
-
-                        // POINT 타입 설정
-                        if (visitDTO.getLatitude() != null && visitDTO.getLongitude() != null) {
-                            Coordinate coordinate = new Coordinate(visitDTO.getLongitude(),
-                                visitDTO.getLatitude());
-                            Point point = geometryFactory.createPoint(coordinate);
-                            visitEntity.setPoint(point);
+                    // DayDetails 처리
+                    if (dayDTO.getDayDetails() != null) {
+                        for (DayDetailDTO dayDetailDTO : dayDTO.getDayDetails()) {
+                            DayDetailEntity dayDetailEntity = DayDetailEntity.builder()
+                                .title(dayDetailDTO.getTitle())
+                                .description(dayDetailDTO.getDescription())
+                                .fileAddress(dayDetailDTO.getFileAddress())
+                                .day(dayEntity)
+                                .build();
+                            dayEntity.addDayDetail(dayDetailEntity);
                         }
+                    }
 
-                        dayEntity.addItineraryVisit(visitEntity);
+                    // ItineraryVisits 처리
+                    if (dayDTO.getItineraryVisits() != null) {
+                        for (ItineraryVisitDTO visitDTO : dayDTO.getItineraryVisits()) {
+                            ItineraryVisitEntity visitEntity = ItineraryVisitEntity.builder()
+                                .orderNumber(visitDTO.getOrderNumber())
+                                .day(dayEntity)
+                                .build();
+
+                            // POINT 타입 설정
+                            if (visitDTO.getLatitude() != null && visitDTO.getLongitude() != null) {
+                                Coordinate coordinate = new Coordinate(visitDTO.getLongitude(),
+                                    visitDTO.getLatitude());
+                                Point point = geometryFactory.createPoint(coordinate);
+                                visitEntity.setPoint(point);
+                            }
+
+                            dayEntity.addItineraryVisit(visitEntity);
+                        }
                     }
                 }
             }
+            // Post 저장
+            return postRepository.save(postEntity);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new BizException(CREATE_POST_ERROR);
         }
-
-        // Post 저장
-        return postRepository.save(postEntity);
     }
 
     @Transactional
@@ -248,7 +247,8 @@ public class PostService {
         PostEntity existingPost = postRepository.findById(postId)
             .orElseThrow(() -> new BizException(POST_NOT_FOUND_ERROR));
 
-        if(PostStatus.DELETED.equals(existingPost.getStatus())){
+        if (PostStatus.DELETED.equals(existingPost.getStatus())
+            || PostStatus.PAYMENT_PENDING.equals(existingPost.getStatus())) {
             throw new BizException(POST_NOT_FOUND_ERROR);
         }
 
@@ -352,13 +352,15 @@ public class PostService {
         LocalDate now = LocalDate.now();
 
         // 마감일이 지났고, 상태가 RECRUITING인 게시물 조회
-        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(now, PostStatus.RECRUITING);
+        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(now,
+            PostStatus.RECRUITING);
 
         for (PostEntity post : postsToUpdate) {
             post.setStatus(PostStatus.RECRUITMENT_COMPLETED);
             // 필요한 경우 추가 로직 수행( 더티 체킹으로 변경내영 저장)
         }
 
-        log.info("마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}", postsToUpdate.size());
+        log.info("마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}",
+            postsToUpdate.size());
     }
 }

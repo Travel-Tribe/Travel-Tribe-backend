@@ -15,6 +15,7 @@ import com.zerobase.travel.post.dto.request.PostSearchCriteria;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostsDTO;
+import com.zerobase.travel.post.dto.response.createdPostResponseDTO;
 import com.zerobase.travel.post.service.PostService;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
@@ -50,12 +51,12 @@ public class PostController {
 
     // 여행참여 게시글 등록
     @PostMapping
-    public ResponseEntity<ResponseMessage<Void>> createPost(
+    public ResponseEntity<ResponseMessage<createdPostResponseDTO>> createPost(
         @Valid @RequestBody PostDTO postDTO,
         @RequestHeader("X-User-Email") String userEmail) { // 이메일 추출
         log.info("email: " + userEmail);
-        postFacade.createPost(postDTO, userEmail);
-        return ResponseEntity.status(CREATED).body(ResponseMessage.success());
+        createdPostResponseDTO post = postFacade.createPost(postDTO, userEmail);
+        return ResponseEntity.status(CREATED).body(ResponseMessage.success(post));
     }
 
     // 여행참여 게시글 수정

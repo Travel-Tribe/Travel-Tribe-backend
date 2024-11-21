@@ -7,6 +7,7 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_INFO_C
 import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FOUND_ERROR;
 
 import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.BasicErrorCode;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
 import com.zerobase.travel.post.dto.request.ItineraryVisitDTO;
@@ -52,7 +53,8 @@ public class PostService {
         try {
             // 이메일을 기반으로 userId 조회 -> 이쪽에서 이제 feignClient나 restTemplate쓰자!
             // FeignClient를 사용하여 User 서비스에서 사용자 정보 조회
-            UserInfoResponseDTO userInfo = userClientService.getUserInfo(userEmail);
+            UserInfoResponseDTO userInfo = userClientService.getUserInfo(
+                userEmail);
             MBTI userMbti = userClientService.getUserMbti(userInfo.getId());
             log.info(userInfo.toString());
             Long userId = userInfo.getId();
@@ -106,10 +108,13 @@ public class PostService {
                                 .build();
 
                             // POINT 타입 설정
-                            if (visitDTO.getLatitude() != null && visitDTO.getLongitude() != null) {
-                                Coordinate coordinate = new Coordinate(visitDTO.getLongitude(),
+                            if (visitDTO.getLatitude() != null
+                                && visitDTO.getLongitude() != null) {
+                                Coordinate coordinate = new Coordinate(
+                                    visitDTO.getLongitude(),
                                     visitDTO.getLatitude());
-                                Point point = geometryFactory.createPoint(coordinate);
+                                Point point = geometryFactory.createPoint(
+                                    coordinate);
                                 visitEntity.setPoint(point);
                             }
 
@@ -196,8 +201,10 @@ public class PostService {
                         .day(dayEntity)
                         .build();
 
-                    if (visitDTO.getLatitude() != null && visitDTO.getLongitude() != null) {
-                        Coordinate coordinate = new Coordinate(visitDTO.getLongitude(),
+                    if (visitDTO.getLatitude() != null
+                        && visitDTO.getLongitude() != null) {
+                        Coordinate coordinate = new Coordinate(
+                            visitDTO.getLongitude(),
                             visitDTO.getLatitude());
                         Point point = geometryFactory.createPoint(coordinate);
                         visitEntity.setPoint(point);
@@ -271,28 +278,34 @@ public class PostService {
             .limitSex(existingPost.getLimitSex().getSex())
             .limitSmoke(existingPost.getLimitSmoke().getSmoke())
             .deadline(existingPost.getDeadline())
-            .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
-                .dayDetails(
-                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
-                        .title(dayDetailEntity.getTitle())
-                        .description(dayDetailEntity.getDescription())
-                        .fileAddress(dayDetailEntity.getFileAddress())
-                        .build()).collect(Collectors.toList()))
-                .itineraryVisits(dayEntity.getItineraryVisits().stream()
-                    .map(visitEntity -> ItineraryVisitDTO.builder()
-                        .latitude(visitEntity.getPoint().getY()) // Latitude는 Y 좌표
-                        .longitude(visitEntity.getPoint().getX()) // Longitude는 X 좌표
-                        .orderNumber(visitEntity.getOrderNumber())
-                        .build()).collect(Collectors.toList()))
-                .build()).collect(Collectors.toList()))
+            .days(existingPost.getDays().stream()
+                .map(dayEntity -> DayDTO.builder()
+                    .dayDetails(
+                        dayEntity.getDayDetails().stream()
+                            .map(dayDetailEntity -> DayDetailDTO.builder()
+                                .title(dayDetailEntity.getTitle())
+                                .description(dayDetailEntity.getDescription())
+                                .fileAddress(dayDetailEntity.getFileAddress())
+                                .build()).collect(Collectors.toList()))
+                    .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                        .map(visitEntity -> ItineraryVisitDTO.builder()
+                            .latitude(
+                                visitEntity.getPoint().getY()) // Latitude는 Y 좌표
+                            .longitude(visitEntity.getPoint()
+                                .getX()) // Longitude는 X 좌표
+                            .orderNumber(visitEntity.getOrderNumber())
+                            .build()).collect(Collectors.toList()))
+                    .build()).collect(Collectors.toList()))
             .build();
     }
 
 
     @Transactional(readOnly = true)
-    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria, Pageable pageable) {
+    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria,
+        Pageable pageable) {
         // 'others=true'인 경우, country는 이미 criteria에 반영됨
-        return postRepository.findAll(PostSpecification.getPosts(criteria), pageable)
+        return postRepository.findAll(PostSpecification.getPosts(criteria),
+                pageable)
             .map(this::mapToDTO);
     }
 
@@ -316,20 +329,22 @@ public class PostService {
             .limitSmoke(existingPost.getLimitSmoke().getSmoke())
             .status(existingPost.getStatus().getPostStatus())
             .deadline(existingPost.getDeadline())
-            .days(existingPost.getDays().stream().map(dayEntity -> DayDTO.builder()
-                .dayDetails(
-                    dayEntity.getDayDetails().stream().map(dayDetailEntity -> DayDetailDTO.builder()
-                        .title(dayDetailEntity.getTitle())
-                        .description(dayDetailEntity.getDescription())
-                        .fileAddress(dayDetailEntity.getFileAddress())
-                        .build()).collect(Collectors.toList()))
-                .itineraryVisits(dayEntity.getItineraryVisits().stream()
-                    .map(visitEntity -> ItineraryVisitDTO.builder()
-                        .latitude(visitEntity.getPoint().getY())
-                        .longitude(visitEntity.getPoint().getX())
-                        .orderNumber(visitEntity.getOrderNumber())
-                        .build()).collect(Collectors.toList()))
-                .build()).collect(Collectors.toList()))
+            .days(existingPost.getDays().stream()
+                .map(dayEntity -> DayDTO.builder()
+                    .dayDetails(
+                        dayEntity.getDayDetails().stream()
+                            .map(dayDetailEntity -> DayDetailDTO.builder()
+                                .title(dayDetailEntity.getTitle())
+                                .description(dayDetailEntity.getDescription())
+                                .fileAddress(dayDetailEntity.getFileAddress())
+                                .build()).collect(Collectors.toList()))
+                    .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                        .map(visitEntity -> ItineraryVisitDTO.builder()
+                            .latitude(visitEntity.getPoint().getY())
+                            .longitude(visitEntity.getPoint().getX())
+                            .orderNumber(visitEntity.getOrderNumber())
+                            .build()).collect(Collectors.toList()))
+                    .build()).collect(Collectors.toList()))
             .build();
     }
 
@@ -352,15 +367,26 @@ public class PostService {
         LocalDate now = LocalDate.now();
 
         // 마감일이 지났고, 상태가 RECRUITING인 게시물 조회
-        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(now,
-            PostStatus.RECRUITING);
+        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(
+            now, PostStatus.RECRUITING);
+
 
         for (PostEntity post : postsToUpdate) {
             post.setStatus(PostStatus.RECRUITMENT_COMPLETED);
             // 필요한 경우 추가 로직 수행( 더티 체킹으로 변경내영 저장)
         }
 
-        log.info("마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}",
+        log.info(
+            "마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}",
             postsToUpdate.size());
+    }
+
+    public void changeStatusToRecruiting(Long postId) {
+        PostEntity postEntity = postRepository.findById(postId)
+            .orElseThrow(() -> new BizException(BasicErrorCode.POST_NOT_FOUND_ERROR));
+
+        postEntity.setStatus(PostStatus.RECRUITING);
+
+        postRepository.save(postEntity);
     }
 }

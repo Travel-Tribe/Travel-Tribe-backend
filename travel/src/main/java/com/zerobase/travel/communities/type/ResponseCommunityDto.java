@@ -2,6 +2,7 @@ package com.zerobase.travel.communities.type;
 
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class ResponseCommunityDto {
     private String title;
     private String content;
     private List<CommunityFileDto> files;
+    private LocalDate createdAt;
 
     public static ResponseCommunityDto fromEntity(
         CommunityDto communityDto,List<CommunityFileDto> communityFileDtos){
@@ -30,6 +32,7 @@ public class ResponseCommunityDto {
             .title(communityDto.getTitle())
             .content(communityDto.getContent())
             .files(communityFileDtos)
+            .createdAt(communityDto.getCreatedAt())
             .build();
     }
 

@@ -1,6 +1,7 @@
 package com.zerobase.travel.communities.type;
 
 import com.zerobase.travel.communities.entity.CommunityEntity;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +11,12 @@ import lombok.Setter;
 @Builder
 public class CommunityDto {
 
-    Long communityId;
-    String userId;
-    String title;
-    String content;
+    private Long communityId;
+    private String userId;
+    private String title;
+    private String content;
+    private LocalDate createdAt;
+
 
     public static CommunityDto fromEntity(CommunityEntity entity) {
         return CommunityDto.builder().
@@ -21,6 +24,7 @@ public class CommunityDto {
             .userId(entity.getUserId())
             .title(entity.getTitle())
             .content(entity.getContent())
+            .createdAt(entity.getCreatedAt().toLocalDate())
             .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.zerobase.controller;
 
-import com.zerobase.common.response.ResponseMessage;
+import com.zerobase.model.ResponseMessage;
 import com.zerobase.model.RequestPayDepositFail;
 import com.zerobase.model.RequestPayDepositSuccess;
 import com.zerobase.model.RequestReadyPayDeposit;

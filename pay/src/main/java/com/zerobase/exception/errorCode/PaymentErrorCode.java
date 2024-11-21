@@ -1,8 +1,10 @@
 package com.zerobase.exception.errorCode;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 public enum PaymentErrorCode {
     DEPOSIT_NOT_EXSITING("ERROR-PAYMENT-00001", "존재하지 않는 DEPOSIT ID입니다."),
     PAYMENT_NOT_EXSITING("ERROR-PAYMENT-00002", "존재하지 않는 PAYMENT ID입니다."),

@@ -49,9 +49,6 @@ class CommunityManagementServiceTest {
         sampleCommunityDto = CommunityDto.builder()
             .communityId(1L)
             .userId("user1")
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
             .title("Sample Title")
             .content("Sample Content")
             .build();
@@ -64,7 +61,7 @@ class CommunityManagementServiceTest {
     @Test
     void createPost() {
         // Given
-        given(communityService.createPost(any(), any(), any(), any(), any(), any())).willReturn(sampleCommunityDto);
+        given(communityService.createPost(any(), any(), any())).willReturn(sampleCommunityDto);
         given(communityFileService.saveFiles(anyLong(), any())).willReturn(sampleFiles);
 
         // When
@@ -75,7 +72,7 @@ class CommunityManagementServiceTest {
         assertThat(response.getTitle()).isEqualTo("Sample Title");
         assertThat(response.getFiles()).hasSize(2);
 
-        verify(communityService, times(1)).createPost(any(), any(), any(), any(), any(), eq("user1"));
+        verify(communityService, times(1)).createPost(any(), any(),  eq("user1"));
         verify(communityFileService, times(1)).saveFiles(anyLong(), any());
     }
 
@@ -149,9 +146,6 @@ class CommunityManagementServiceTest {
         CommunityDto updatedCommunityDto = CommunityDto.builder()
             .communityId(1L)
             .userId("user1")
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
             .title("Updated Title")
             .content("Updated Content")
             .build();
@@ -161,7 +155,7 @@ class CommunityManagementServiceTest {
             new CommunityFileDto(2L, "updated_file2.jpg")
         );
 
-        given(communityService.updatePost(anyLong(), any(), any(), any(), any(), any(), any()))
+        given(communityService.updatePost(anyLong(), any(), any(), any()))
             .willReturn(updatedCommunityDto);
         given(communityFileService.saveFiles(anyLong(), any())).willReturn(updatedFiles);
 
@@ -173,7 +167,7 @@ class CommunityManagementServiceTest {
         assertThat(response.getContent()).isEqualTo("Updated Content");
         assertThat(response.getFiles()).hasSize(2);
 
-        verify(communityService, times(1)).updatePost(anyLong(), any(), any(), any(), any(), any(), eq("user1"));
+        verify(communityService, times(1)).updatePost(anyLong(), any(), any(), eq("user1"));
         verify(communityFileService, times(1)).deleteAllByCommunityId(anyLong());
         verify(communityFileService, times(1)).saveFiles(anyLong(), any());
     }

@@ -64,8 +64,13 @@ public class CommunityService {
 
     public void deletePost(long communityId, String userId) {
 
-        communityRepository.findByUserId(userId).orElseThrow(()
-            -> new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST));
+        CommunityEntity communityEntity = communityRepository.findById(
+            communityId).orElseThrow(()
+            -> new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT));
+
+        if(!communityEntity.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
+        }
 
         communityRepository.deleteByCommunityId(communityId);
     }

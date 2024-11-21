@@ -7,7 +7,6 @@ import com.zerobase.travel.controller.ResponseParticipationsByUserDto;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.exception.BaseException;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ParticipationErrorCode;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
@@ -25,7 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.ApiException;
 import org.springframework.stereotype.Service;
 
 
@@ -190,7 +188,7 @@ public class ParticipationService {
         // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
         for (Enum<?> expectedEnum : expectedEnums) {
             if (!participationEntity.hasStatus(expectedEnum)) {
-                throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
+                throw new BizException(ParticipationErrorCode.PARTICIPATION_STATUS_ERROR);
             }
         }
 
@@ -238,7 +236,7 @@ public class ParticipationService {
 
         return participationRepository.findByPostEntityPostIdAndUserId(
             postId, userId).orElseThrow(
-            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+            () -> new BizException(ParticipationErrorCode.PARTICIPATION_NOT_EXIST));
     }
 
 

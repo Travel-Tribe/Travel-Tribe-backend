@@ -9,9 +9,11 @@ import lombok.Setter;
 
 public class RequestApi {
 
-    @Getter
+
     @Setter
     @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
     public static class ConfirmDto {
 
         private String cid;
@@ -32,8 +34,10 @@ public class RequestApi {
 
     }
 
-    @Getter
+    @Setter
     @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
     public static class ReadyDto {
         private String cid;
 
@@ -64,10 +68,10 @@ public class RequestApi {
         @JsonProperty("fail_url")
         private  String failUrl;
     }
-
-    @Getter
-
+    @Setter
     @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
     public static class RefundDto {
 
         private String cid;

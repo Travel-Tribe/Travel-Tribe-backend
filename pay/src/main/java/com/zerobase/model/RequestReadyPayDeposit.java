@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RequestReadyPayDeposit {
-    Long postId;
-    Long participationId;
-    PGMethod pgMethod;
+    private long postId;
+    private long participationId;
+    private PGMethod pgMethod;
 }

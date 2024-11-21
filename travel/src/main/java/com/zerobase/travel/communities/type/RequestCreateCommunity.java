@@ -16,16 +16,16 @@ import lombok.Setter;
 public class RequestCreateCommunity {
 
     @NotNull
-    Continent continent;
+    private Continent continent;
     @NotNull
-    Country country;
+    private Country country;
     @NotBlank
-    String region;
+    private String region;
     @NotBlank
-    String title;
+    private String title;
     @NotBlank
-    String content;
-    List<String> files = new ArrayList<>();
+    private String content;
+    private List<String> files = new ArrayList<>();
 
 
 

@@ -15,12 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestCreateCommunity {
 
-    @NotNull
-    private Continent continent;
-    @NotNull
-    private Country country;
-    @NotBlank
-    private String region;
+
     @NotBlank
     private String title;
     @NotBlank

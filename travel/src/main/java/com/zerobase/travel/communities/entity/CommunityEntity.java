@@ -1,5 +1,6 @@
 package com.zerobase.travel.communities.entity;
 
+import com.zerobase.travel.communities.type.CommunityStatus;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.persistence.Column;
@@ -36,6 +37,8 @@ public class CommunityEntity {
     private String userId;
     private String title;
     private String content;
+    @Enumerated(EnumType.STRING)
+    private CommunityStatus status;
 
     @CreatedDate
     private LocalDateTime createdAt;

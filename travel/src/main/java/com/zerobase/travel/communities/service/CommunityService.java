@@ -3,17 +3,15 @@ package com.zerobase.travel.communities.service;
 import com.zerobase.travel.communities.entity.CommunityEntity;
 import com.zerobase.travel.communities.repository.CommunityRepository;
 import com.zerobase.travel.communities.type.CommunityDto;
+import com.zerobase.travel.communities.type.CommunityStatus;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-// todo : spring security ID 정보 추가할것
 @Service
 @RequiredArgsConstructor
 public class CommunityService {
@@ -30,6 +28,7 @@ public class CommunityService {
                     .userId(userId)
                     .title(title)
                     .content(content)
+                    .status(CommunityStatus.POSTED)
                     .build()
             );
 
@@ -68,7 +67,9 @@ public class CommunityService {
             throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
         }
 
-        communityRepository.deleteByCommunityId(communityId);
+        communityEntity.setStatus(CommunityStatus.DELETED);
+
+        communityRepository.save(communityEntity);
     }
 
     public CommunityDto updatePost(long communityId, String title, String content, String userId) {

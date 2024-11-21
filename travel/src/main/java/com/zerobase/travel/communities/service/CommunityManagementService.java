@@ -27,7 +27,6 @@ public class CommunityManagementService {
         String userId) {
 
         CommunityDto communityDto = communityService.createPost(
-            request.getContinent(),request.getCountry(),request.getRegion(),
             request.getTitle(),request.getContent(),userId);
 
         List<CommunityFileDto> communityFileDtos
@@ -93,7 +92,6 @@ public class CommunityManagementService {
 
 
         CommunityDto communityDto = communityService.updatePost(request.getCommunityId(),
-            request.getContinent(),request.getCountry(),request.getRegion(),
             request.getTitle(),request.getContent(),userId);
 
         communityFileService.deleteAllByCommunityId(request.getCommunityId());

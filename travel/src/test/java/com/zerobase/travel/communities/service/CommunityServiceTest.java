@@ -9,12 +9,11 @@ import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.communities.entity.CommunityEntity;
 import com.zerobase.travel.communities.repository.CommunityRepository;
-import com.zerobase.travel.communities.service.CommunityService;
 import com.zerobase.travel.communities.type.CommunityDto;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,9 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityServiceTest {
@@ -43,9 +39,6 @@ class CommunityServiceTest {
         String userId = "user1";
         CommunityEntity entity = CommunityEntity.builder()
             .userId(userId)
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Busan")
             .title("Sample Title")
             .content("Sample Content")
             .build();
@@ -54,14 +47,10 @@ class CommunityServiceTest {
         given(communityRepository.save(any(CommunityEntity.class))).willReturn(entity);
 
         // When
-        CommunityDto result = communityService.createPost(
-            Continent.ASIA, Country.KR, "Busan", "Sample Title", "Sample Content", userId);
+        CommunityDto result = communityService.createPost( "Sample Title", "Sample Content", userId);
 
         // Then
         assertThat(result.getUserId()).isEqualTo(userId);
-        assertThat(result.getContinent()).isEqualTo(Continent.ASIA);
-        assertThat(result.getCountry()).isEqualTo(Country.KR);
-        assertThat(result.getRegion()).isEqualTo("Busan");
         assertThat(result.getTitle()).isEqualTo("Sample Title");
         assertThat(result.getContent()).isEqualTo("Sample Content");
 
@@ -165,9 +154,6 @@ class CommunityServiceTest {
         CommunityEntity entity = CommunityEntity.builder()
             .communityId(communityId)
             .userId(userId)
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Seoul")
             .title("Old Title")
             .content("Old Content")
             .build();
@@ -178,14 +164,11 @@ class CommunityServiceTest {
 
         // When
         CommunityDto updatedDto = communityService.updatePost(
-            communityId, Continent.ASIA, Country.KR, "Busan", "Updated Title", "Updated Content", userId);
+            communityId, "Updated Title", "Updated Content", userId);
 
         // Then
         assertThat(updatedDto.getTitle()).isEqualTo("Updated Title");
         assertThat(updatedDto.getContent()).isEqualTo("Updated Content");
-        assertThat(updatedDto.getRegion()).isEqualTo("Busan");
-        assertThat(updatedDto.getContinent()).isEqualTo(Continent.ASIA);
-        assertThat(updatedDto.getCountry()).isEqualTo(Country.KR);
 
         // Verify that find and save were called exactly once
         verify(communityRepository, times(1)).findByCommunityId(communityId);
@@ -203,7 +186,7 @@ class CommunityServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> communityService.updatePost(
-            communityId, Continent.ASIA, Country.KR, "Busan", "Updated Title", "Updated Content", userId))
+            communityId, "Updated Title", "Updated Content", userId))
             .isInstanceOf(CustomException.class)
             .extracting("errorCode")
             .isEqualTo(ErrorCode.USER_UNAUTHORIZED_REQUEST);

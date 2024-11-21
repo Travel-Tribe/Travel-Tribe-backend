@@ -18,9 +18,6 @@ public class ResponseCommunityDto {
 
     private long communityId;
     private String userId;
-    private Continent continent;
-    private Country country;
-    private String region;
     private String title;
     private String content;
     private List<CommunityFileDto> files;
@@ -30,9 +27,6 @@ public class ResponseCommunityDto {
         return ResponseCommunityDto.builder()
             .communityId(communityDto.getCommunityId())
             .userId(communityDto.getUserId())
-            .continent(communityDto.getContinent())
-            .country(communityDto.getCountry())
-            .region(communityDto.getRegion())
             .title(communityDto.getTitle())
             .content(communityDto.getContent())
             .files(communityFileDtos)

@@ -1,8 +1,6 @@
 package com.zerobase.travel.communities.type;
 
 import com.zerobase.travel.communities.entity.CommunityEntity;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +12,6 @@ public class CommunityDto {
 
     Long communityId;
     String userId;
-    Continent continent;
-    Country country;
-    String region;
     String title;
     String content;
 
@@ -24,9 +19,6 @@ public class CommunityDto {
         return CommunityDto.builder().
             communityId(entity.getCommunityId())
             .userId(entity.getUserId())
-            .continent(entity.getContinent())
-            .country(entity.getCountry())
-            .region(entity.getRegion())
             .title(entity.getTitle())
             .content(entity.getContent())
             .build();

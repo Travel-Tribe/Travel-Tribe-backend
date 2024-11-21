@@ -20,8 +20,7 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
 
-    public CommunityDto createPost(Continent continent,
-        Country country, String region,
+    public CommunityDto createPost(
         String title, String content, String userId) {
 
         CommunityEntity entity = communityRepository.
@@ -29,9 +28,6 @@ public class CommunityService {
                 CommunityEntity
                     .builder()
                     .userId(userId)
-                    .continent(continent)
-                    .country(country)
-                    .region(region)
                     .title(title)
                     .content(content)
                     .build()
@@ -75,9 +71,7 @@ public class CommunityService {
         communityRepository.deleteByCommunityId(communityId);
     }
 
-    public CommunityDto updatePost(long communityId, Continent continent,
-        Country country,
-        String region, String title, String content, String userId) {
+    public CommunityDto updatePost(long communityId, String title, String content, String userId) {
 
         CommunityEntity communityEntity = communityRepository.findByCommunityId(
             communityId).orElseThrow(()
@@ -86,9 +80,7 @@ public class CommunityService {
         if(!Objects.equals(communityEntity.getUserId(), userId))
             throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
 
-        communityEntity.setContinent(continent);
-        communityEntity.setCountry(country);
-        communityEntity.setRegion(region);
+
         communityEntity.setTitle(title);
         communityEntity.setContent(content);
 

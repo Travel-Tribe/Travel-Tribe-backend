@@ -34,11 +34,6 @@ public class CommunityEntity {
     private Long communityId;
     @Column(nullable = false)
     private String userId;
-    @Enumerated(EnumType.STRING)
-    private Continent continent;
-    @Enumerated(EnumType.STRING)
-    private Country country;
-    private String region;
     private String title;
     private String content;
 

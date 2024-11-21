@@ -2,11 +2,11 @@ package com.zerobase.service;
 
 import com.zerobase.config.Constants;
 import com.zerobase.entity.PaymentEntity;
-import com.zerobase.model.exception.CustomException;
-import com.zerobase.model.exception.ErrorCode;
+import com.zerobase.exception.BizException;
+import com.zerobase.exception.errorCode.PaymentErrorCode;
+import com.zerobase.model.PaymentDto;
 import com.zerobase.model.type.OrderType;
 import com.zerobase.model.type.PGMethod;
-import com.zerobase.model.PaymentDto;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.PaymentRepository;
 import java.util.List;
@@ -59,8 +59,8 @@ public class PaymentService {
         long depositId, PaymentStatus paymentStatus) {
 
         PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            depositId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new CustomException(
-            ErrorCode.PAYMENT_NOT_EXSITING));
+            depositId, PaymentStatus.PAY_IN_PROGRESS).orElseThrow(() -> new BizException(
+            PaymentErrorCode.PAYMENT_NOT_EXSITING));
 
         paymentEntity.setPaymentStatus(paymentStatus);
 
@@ -70,11 +70,11 @@ public class PaymentService {
 
     public PaymentEntity getPaymentsInPayCompletedByOrderId( String userId,long orderId) {
         PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new CustomException(
-            ErrorCode.PAYMENT_NOT_EXSITING));
+            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new BizException(
+            PaymentErrorCode.PAYMENT_NOT_EXSITING));
 
-        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new CustomException(
-            ErrorCode.INVALID_CLIENT_REQUEST);
+        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new BizException(
+            PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
 
         return paymentEntity;
     }

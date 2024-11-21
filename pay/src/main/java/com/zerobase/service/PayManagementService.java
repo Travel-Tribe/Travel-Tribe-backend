@@ -1,17 +1,16 @@
 package com.zerobase.service;
 
 
-
 import com.zerobase.api.KakaopayApi;
 import com.zerobase.api.ParticipationApi;
 import com.zerobase.config.Constants;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.entity.PaymentEntity;
+import com.zerobase.exception.BizException;
+import com.zerobase.exception.errorCode.PaymentErrorCode;
 import com.zerobase.model.PaymentDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
-import com.zerobase.model.exception.CustomException;
-import com.zerobase.model.exception.ErrorCode;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentStatus;
 import java.util.Objects;
@@ -153,7 +152,7 @@ public class PayManagementService {
 
         if(!Objects.equals(depositEntity.getUserId(), userId)
             || !Objects.equals(paymentEntity.getUserId(), userId)){
-            throw new CustomException(ErrorCode.INVALID_CLIENT_REQUEST);
+            throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
         }
 
         kakaopayApi.sendPayRefundSign(

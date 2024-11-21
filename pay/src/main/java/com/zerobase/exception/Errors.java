@@ -1,6 +1,6 @@
-package com.zerobase.common.response;
+package com.zerobase.exception;
 
-import com.zerobase.common.ErrorCode;
+import com.zerobase.exception.errorCode.PaymentErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class Errors {
     private String errorCode;
     private String errorMessage;
 
-    public Errors(ErrorCode errorCode) {
+    public Errors(PaymentErrorCode errorCode) {
         this.errorCode = errorCode.getErrorCode();
         this.errorMessage = errorCode.getErrorMessage();
     }

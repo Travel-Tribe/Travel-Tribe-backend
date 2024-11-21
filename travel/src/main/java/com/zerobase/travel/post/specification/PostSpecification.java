@@ -66,7 +66,6 @@ public class PostSpecification {
             // 상태가 RECRUITMENT_COMPLETED 또는 DELETED가 아닌 게시글만 조회
             predicate = cb.and(predicate,
                 cb.not(root.get("status").in(
-                    RECRUITMENT_COMPLETED,
                     PAYMENT_PENDING,
                     DELETED
                 ))

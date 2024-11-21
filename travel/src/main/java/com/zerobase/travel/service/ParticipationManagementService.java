@@ -5,6 +5,8 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.post.repository.PostRepository;
+import com.zerobase.travel.post.service.PostService;
 import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
@@ -48,6 +50,8 @@ public class ParticipationManagementService {
 
     private final ParticipationService participationService;
     private final PayApi payApi;
+    private final PostService postService;
+    private final PostRepository postRepository;
 
 
     private final int DEPOSIT_RETURN_DATE_DEFAULT = 30;

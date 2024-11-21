@@ -48,6 +48,8 @@ public class GlobalExceptionHandler {
 
     }
 
+
+
     // 토큰 예외 처리
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<?> handleBizException(TokenException ex) {

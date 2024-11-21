@@ -67,6 +67,7 @@ public class PostSpecification {
             predicate = cb.and(predicate,
                 cb.not(root.get("status").in(
                     RECRUITMENT_COMPLETED,
+                    PAYMENT_PENDING,
                     DELETED
                 ))
             );

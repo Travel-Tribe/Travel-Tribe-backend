@@ -4,9 +4,8 @@ import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +13,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class RequestCreateCommunity {
 
     @NotNull
@@ -28,5 +25,12 @@ public class RequestCreateCommunity {
     String title;
     @NotBlank
     String content;
-    List<String> files;
+    List<String> files = new ArrayList<>();
+
+
+
 }
+
+
+
+

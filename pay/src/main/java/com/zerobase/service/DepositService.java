@@ -38,7 +38,7 @@ public class DepositService {
     }
 
 
-    public DepositDto findByParticipationId(Long participationId) {
+    public DepositDto findByParticipationIdAndChangStatus(Long participationId) {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
                 () -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING)));
@@ -68,6 +68,8 @@ public class DepositService {
             .orElseThrow(() -> new BizException(
                 PaymentErrorCode.DEPOSIT_NOT_EXSITING));
 
+
+
         depositEntity.setPaymentStatus(paymentStatus);
 
         return depositEntity;
@@ -83,5 +85,26 @@ public class DepositService {
         depositEntity.setPaymentStatus(paymentStatus);
 
         return depositEntity;
+    }
+
+    public void refundDepositPay(long participationId, String userId) {
+        DepositEntity depositEntity = depositRepository.findByParticipationId(
+            participationId).orElseThrow(() -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING));
+
+        this.validateDepositInfo(depositEntity,participationId,userId,PaymentStatus.PAY_COMPLETED);
+
+        depositEntity.setPaymentStatus(PaymentStatus.PAY_REFUNDED);
+
+        depositRepository.save(depositEntity);
+    }
+
+    private void validateDepositInfo(DepositEntity depositEntity, long participationId, String userId, PaymentStatus paymentStatus) {
+
+        if(depositEntity.getParticipationId()!=participationId) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
+
+        if(depositEntity.getUserId()!=userId) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
+
+        if(depositEntity.getPaymentStatus()!=paymentStatus) throw new BizException(PaymentErrorCode.INVALID_DEPOSIT_INFORMATION);
+
     }
 }

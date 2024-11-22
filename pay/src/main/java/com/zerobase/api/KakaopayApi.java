@@ -7,7 +7,6 @@ import com.zerobase.model.RequestApi;
 import com.zerobase.model.RequestApi.ConfirmDto;
 import com.zerobase.model.RequestApi.RefundDto;
 import com.zerobase.model.ResponseApi;
-import com.zerobase.model.ResponseApi.PayReadyApiDto;
 import com.zerobase.model.ResponseApi.PayRefundApiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +45,7 @@ public class KakaopayApi implements ApiInterface {
             .quantity(String.valueOf(constants.QUANTITY))
             .totalAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
+            .vatAmount(String.valueOf(constants.VAT_AMOUNT))
             .approvalUrl(constants.KAKAO_APPROVAL_URL+"/"+postId+"?depositId="+depositId)
             .cancelUrl(constants.KAKAO_CANCEL_URL+"?depositId="+depositId)
             .failUrl(constants.KAKAO_FAIL_URL+"?depositId="+depositId)
@@ -97,7 +97,7 @@ public class KakaopayApi implements ApiInterface {
     }
 
     public PayRefundApiDto sendPayRefundSign(
-         String tid, Long cancelAmount, Long cancel_tax_free_amount ) {
+         String tid ) {
         log.info("KakaopayApiService payRefundSign");
         // webclient url, header입력
 
@@ -110,8 +110,9 @@ public class KakaopayApi implements ApiInterface {
         RequestApi.RefundDto refundDto = RefundDto.builder()
             .cid(constants.KAKAO_CID)
             .tid(tid)
-            .cancelAmount(String.valueOf(cancelAmount))
-            .cancelTaxFreeAmount(String.valueOf(cancel_tax_free_amount))
+            .cancelAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
+            .cancelTaxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
+            .cancelVatAmount(String.valueOf(constants.VAT_AMOUNT))
             .build();
         //
         PayRefundApiDto payRefundApiDto = webclient.post()

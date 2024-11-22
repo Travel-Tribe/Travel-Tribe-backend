@@ -45,6 +45,16 @@ public class ResponseApi {
         private String tid;
         private String status;
         @JsonProperty("approved_cancel_amount")
-        private String approvedCancelAmount;
+        private CancelAmountDto approvedCancelAmount;
+
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        public class CancelAmountDto {
+
+            int total;
+
+        }
     }
 }

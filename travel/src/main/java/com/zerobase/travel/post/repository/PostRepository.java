@@ -33,9 +33,9 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>,
     @Modifying
     @Transactional
     @Query(value = """
-            UPDATE post p
-            SET p.status = :newStatus
-            WHERE p.deadline < :now AND p.status = :currentStatus
+            UPDATE /*+ INDEX(post idx_deadline_status) */ post
+            SET status = :newStatus
+            WHERE deadline < :now AND status = :currentStatus
             LIMIT :batchSize
         """, nativeQuery = true)
     int updateStatusForExpiredPosts(@Param("now") LocalDate now,

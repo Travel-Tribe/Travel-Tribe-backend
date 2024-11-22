@@ -10,6 +10,7 @@ import lombok.Setter;
 public class RequestApi {
 
 
+    @Getter
     @Setter
     @NoArgsConstructor
     @Builder
@@ -34,6 +35,7 @@ public class RequestApi {
 
     }
 
+    @Getter
     @Setter
     @NoArgsConstructor
     @Builder
@@ -68,6 +70,8 @@ public class RequestApi {
         @JsonProperty("fail_url")
         private  String failUrl;
     }
+
+    @Getter
     @Setter
     @NoArgsConstructor
     @Builder

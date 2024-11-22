@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.zerobase.travel.communities.entity.CommunityEntity;
 import com.zerobase.travel.communities.repository.CommunityRepository;
 import com.zerobase.travel.communities.type.CommunityDto;
+import com.zerobase.travel.communities.type.CommunityStatus;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import java.util.List;
@@ -102,7 +103,8 @@ class CommunityServiceTest {
             CommunityEntity.builder().communityId(2L).title("Sample 2").build()
         );
         Page<CommunityEntity> page = new PageImpl<>(entities, pageable, entities.size());
-        given(communityRepository.findAll(pageable)).willReturn(page);
+        given(communityRepository.findAllByStatus(pageable,
+            CommunityStatus.POSTED)).willReturn(page);
 
         // When
         Page<CommunityDto> result = communityService.getPosts(pageable);
@@ -111,7 +113,8 @@ class CommunityServiceTest {
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("Sample 1");
         assertThat(result.getContent().get(1).getTitle()).isEqualTo("Sample 2");
-        verify(communityRepository, times(1)).findAll(pageable);
+        verify(communityRepository, times(1)).findAllByStatus(pageable,
+            CommunityStatus.POSTED);
     }
 
     @Test

@@ -1,6 +1,7 @@
-package com.zerobase.common.response;
+package com.zerobase.model;
 
-import com.zerobase.common.ErrorCode;
+import com.zerobase.exception.Errors;
+import com.zerobase.exception.errorCode.PaymentErrorCode;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,14 +26,14 @@ public class ResponseMessage<T> {
         return new ResponseMessage<T>(Result.SUCCESS.toString(), null, data);
     }
 
-    public static ResponseMessage fail(ErrorCode errorCode) {
+    public static ResponseMessage fail(PaymentErrorCode errorCode) {
         return ResponseMessage.builder()
             .result(Result.FAIL.toString())
             .errors(List.of(new Errors(errorCode)))
             .build();
     }
 
-    public static ResponseMessage fail(ErrorCode errorCode, Object data) {
+    public static ResponseMessage fail(PaymentErrorCode errorCode, Object data) {
         return ResponseMessage.builder()
             .result(Result.FAIL.toString())
             .data(data)

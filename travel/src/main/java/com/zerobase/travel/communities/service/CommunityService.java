@@ -6,6 +6,8 @@ import com.zerobase.travel.communities.type.CommunityDto;
 import com.zerobase.travel.communities.type.CommunityStatus;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.CommunityErrorCode;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,15 +41,19 @@ public class CommunityService {
     public CommunityDto getPost(Long communityId) {
         CommunityEntity communityEntity = communityRepository
             .findByCommunityId(communityId).orElseThrow(
-                () -> new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT));
+                () -> new BizException(CommunityErrorCode.COMMUNITY_NOT_EXIST));
+
+        if (communityEntity.getStatus() == CommunityStatus.DELETED) {
+            throw new BizException(CommunityErrorCode.COMMUNITY_DELETED);
+        }
 
         return CommunityDto.fromEntity(communityEntity);
     }
 
     // 포스트 8건 조회
     public Page<CommunityDto> getPosts(Pageable pageable) {
-        Page<CommunityEntity> communityEntities = communityRepository.findAll(
-            pageable);
+        Page<CommunityEntity> communityEntities = communityRepository.findAllByStatus(
+            pageable,CommunityStatus.POSTED);
 
         return communityEntities.map(CommunityDto::fromEntity);
 
@@ -76,10 +82,10 @@ public class CommunityService {
 
         CommunityEntity communityEntity = communityRepository.findByCommunityId(
             communityId).orElseThrow(()
-            -> new CustomException(ErrorCode.COMMUNITY_NON_EXISTENT));
+            -> new BizException(CommunityErrorCode.COMMUNITY_NOT_EXIST));
 
         if(!Objects.equals(communityEntity.getUserId(), userId))
-            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
+            throw new BizException(CommunityErrorCode.USER_UNAUTHORIZED_REQUEST);
 
 
         communityEntity.setTitle(title);

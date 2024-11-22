@@ -5,8 +5,7 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.type.DepositStatus;
-import com.zerobase.travel.type.ParticipationStatus;
+import com.zerobase.travel.post.service.PostService;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -48,11 +47,14 @@ public class ParticipationManagementService {
 
     private final ParticipationService participationService;
     private final PayApi payApi;
+    private final PostService postService;
 
 
     private final int DEPOSIT_RETURN_DATE_DEFAULT = 30;
     private final int DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED = 23;
     private final int NEXT_DAY = 1;
+    private final int DEPOSIT_RETURN_IF_RATED = 1;
+
 
 
 
@@ -61,39 +63,44 @@ public class ParticipationManagementService {
     public ParticipationDto readyParticipation(Long postId, String userId,
         String userEmail) {
 
-        participationService.validateParticipationApplicant(postId,userId,userEmail);
+        participationService.validateParticipationApplicant(postId, userId,
+            userEmail);
 
         return participationService.createParticipationReady(
             postId, userId);
     }
 
     //1.1 여행을 참가를 눌렀지만 결제처리에서 에러가 난경우
-    public void failedPaymentParticipation(long participationId, String userId) {
+    public void failedPaymentParticipation(long participationId,
+        String userId) {
 
         // participation, userId를 통해서 participationEntity호출
         ParticipationEntity participationEntity = participationService
             .getParticipationByIdAndValidateUserId(participationId, userId);
 
-        // fail에 따른 상태검증 및 상태변경
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity, ParticipationEntity.beforePayStatuses,ParticipationEntity.afterPayFailStatuses);
-
+        // fail에 따른 상태검증과 상태변경
+        participationService.checkStatusParticipation(participationEntity, ParticipationEntity.beforePayStatuses);
+        participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterPayFailStatuses);
         participationService.saveParticipation(participationEntity);
     }
 
     // 1.2 여행 참가를 눌러서 결재 완료 혹은 결제실패 처리가 정상처리가 된 경우
-    public void successPaymentParticipation(long participationId, String userId) {
+    @Transactional
+    public void successPaymentParticipation(long participationId,
+        String userId) {
 
         // participation, userId를 통해서 participationEntity호출
-        ParticipationEntity participationEntity = participationService
+        ParticipationEntity entity = participationService
             .getParticipationByIdAndValidateUserId(participationId, userId);
 
         // confirm에 따른 상태 검증 및 변경
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity, ParticipationEntity.beforePayStatuses, ParticipationEntity.afterPaySuccessStatuses);
+        participationService.checkStatusParticipation(entity, ParticipationEntity.beforePayStatuses);
+        participationService.changeStatusParticipation(entity, ParticipationEntity.afterPaySuccessStatuses);
 
-        participationService.saveParticipation(participationEntity);
+        participationService.saveParticipation(entity);
 
+        postService.changeStatusToRecruiting(
+            entity.getPostEntity().getPostId());
     }
 
     //2. 여행을 투표를 통해서 취소, 투표완료시 해당 메소드 호출
@@ -102,22 +109,25 @@ public class ParticipationManagementService {
         String userId) {
 
         // postId, userId를 통해서 participationEntity호출
-        ParticipationEntity participationEntity = participationService
+        ParticipationEntity entity = participationService
             .getParticipationByPostIdAndUserId(postId, userId);
 
         // 상태를 검증하고 변환
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity,ParticipationEntity.afterPaySuccessStatuses,ParticipationEntity.afterVotingStatuses);
+
+        participationService.checkStatusParticipation(entity, ParticipationEntity.afterPaySuccessStatuses);
+        participationService.changeStatusParticipation(entity, ParticipationEntity.afterVotingStatuses);
+
 
         // pay모듈에 취소요청
-        payApi.payDepositRefund(participationEntity.getParticipationId(),participationEntity.getUserId());
+        payApi.payDepositRefund(entity.getParticipationId(),
+            entity.getUserId());
 
         // deposit 반환시점 기록
-        participationService.setDateToReturnDeposit(participationEntity,
+        participationService.setDateToReturnDeposit(entity,
             LocalDate.now());
 
         // 검증 - 보증금반환까지 fail 이 안나면 저장
-        participationService.saveParticipation(participationEntity);
+        participationService.saveParticipation(entity);
     }
 
     // 3. 여행을 자진, 신고를 통해서 개인 취소하여 배당금 몰수
@@ -129,14 +139,11 @@ public class ParticipationManagementService {
             .getParticipationByPostIdAndUserId(postId, userId);
 
         // 상태를 검증하고 변환
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity,ParticipationEntity.afterPaySuccessStatuses,ParticipationEntity.afterCancelStatuses);
-
+        participationService.checkStatusParticipation(participationEntity, ParticipationEntity.afterPaySuccessStatuses);
+        participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterCancelStatuses);
         participationService.saveParticipation(participationEntity);
 
     }
-
-
 
 
     // 4. 인원이 시간이 지나서 여행을 완료하는 경우;
@@ -150,99 +157,78 @@ public class ParticipationManagementService {
         // 참여의 상태를 검증하고 변경
         for (ParticipationEntity participationEntity : participationEntities) {
 
-            participationService.checkAndChangeStatusParticipation(
-                participationEntity,
-                ParticipationEntity.afterPaySuccessStatuses,
-                ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterPaySuccessStatuses);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
 
             // 보증금 반환일자를 확정
-            participationService.setDateToReturnDeposit(participationEntity,
-                LocalDate.now().plusDays(DEPOSIT_RETURN_DATE_DEFAULT));
+            participationService.setDateToReturnDeposit(participationEntity, LocalDate.now().plusDays(DEPOSIT_RETURN_DATE_DEFAULT));
         }
 
         participationService.saveParticipations(participationEntities);
 
     }
 
-
-
     // 5. 여행을 왼료한 후에 평점을 매김
-    //5.1 평점을 보증금 기본반환일(여행완료 후 30일 이후)에 매긴 경우, 평점상태만 변경
-    //5.2 평점을 여행완료 후 7일이거나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경 ? 확인필요
+    //5.1 평점을 보증금 기본반환일이나 그 이후(여행완료 후 30일 이후)에 매긴 경우, 평점상태만 변경
+    //5.2 평점을 여행완료 후 7일이나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경 ? 확인필요
     //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경(보증금 지급일을 -23일함)
-
-    // todo : 아래의 의문사항이 있지만 일단 단순한 상황을 가정해서 코딩후 리팩토링필요
-    // what if1. 여행보증금 지급일로 보증금지급시점을 관리하는데, 보증금 지급일 변경과 지급이 동시에
-    // 이루어지는 경쟁상황은 어떻게 처리할 것인지? 정책적 해결, 기술적 해결.
-    // what if2. 평점을 매긴 날짜가 여행완료후 7일이후일경우에 바로 보증금 반환 혹은 다음날 반환?
 
 
     public void giveRatingParticipation(Long postId, String userId) {
 
-        ParticipationEntity entity = participationService
+        ParticipationEntity participationEntity = participationService
             .getParticipationByPostIdAndUserId(postId, userId);
 
+        LocalDate travelEndDate = participationEntity.getPostEntity().getTravelEndDate();
+        LocalDate returnDateDefault = travelEndDate.plusDays(DEPOSIT_RETURN_DATE_DEFAULT);
+        LocalDate returnDateIfRated = travelEndDate.plusDays(DEPOSIT_RETURN_IF_RATED);
+
+
+
         // 보증금 일자가 정해지지 않았다면 여행이 미완료된 것으로 간주하여 fail
-        if(entity.getDepositReturnDate()==null){
+        if (participationEntity.getDepositReturnDate() == null) {
             throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
         }
+
+        if(participationEntity.getRatingStatus()==RatingStatus.RATED) return;
+
+
         //5.1 보증금 기본 반환일이나 그 이후에 평가한 경우, 평점상태만 변경
-
-        if(LocalDate.now().isAfter(entity.getDepositReturnDate().minusDays(
-            NEXT_DAY))){
-            participationService.checkAndChangeStatusParticipation(
-                entity,
-                // 자정에 평가하는 문제때문에 우선 deposit 상태는 우선 검증 x
-                ParticipationEntity.afterTravelFinishStatusesUnRated,
-                List.of(RatingStatus.RATED)
-            );
+        if (LocalDate.now().isAfter(returnDateDefault)|| LocalDate.now().isEqual(returnDateDefault)) {
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
 
-        //5.2 평점을 여행완료 후 7일이거나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경 ? 확인필요
-
-        if(LocalDate.now().isBefore(entity.getDepositReturnDate())
-        &&LocalDate.now().isAfter(entity.getDepositReturnDate().minusDays(DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED))){
-
-            // 보증금 반환일자를 다음날로 설정
-            participationService.setDateToReturnDeposit(entity,
-                LocalDate.now().plusDays(NEXT_DAY));
-
-            participationService.checkAndChangeStatusParticipation(
-                entity,
-                ParticipationEntity.afterTravelFinishStatusesUnRated,
-                ParticipationEntity.afterTravelFinishStatusesRated
-            );
+        //5.2 평점을 여행완료 후 7일이거나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경
+        if (LocalDate.now().isBefore(returnDateDefault) && LocalDate.now().isAfter(returnDateIfRated)) {
+            participationService.setDateToReturnDeposit(participationEntity, LocalDate.now().plusDays(NEXT_DAY));
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
 
-        //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경(보증금 지급일을 -23일함)
-        if(entity.getDepositReturnDate().isAfter(LocalDate.now())){
-            participationService.setDateToReturnDeposit(entity,
-                entity.getDepositReturnDate().minusDays(DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED));
-
-            participationService.checkAndChangeStatusParticipation(
-                entity,
-                ParticipationEntity.afterTravelFinishStatusesUnRated,
-                ParticipationEntity.afterTravelFinishStatusesRated
-            );
+        //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경
+        if (LocalDate.now().isBefore(returnDateIfRated)) {
+            participationService.setDateToReturnDeposit(participationEntity, returnDateIfRated);
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
     }
 
     // 6 여행을 왼료한 후에 보증금이 반환됨
     @Transactional
-    public void returnDepositAfterTravelFinished(ParticipationEntity participationEntity) {
+    public void returnDepositAfterTravelFinished(
+        ParticipationEntity participationEntity) {
 
         // 보증금 반환 상태를 검증 후 상태 변환
-        participationService.checkAndChangeStatusParticipation(
-            participationEntity,
-            ParticipationEntity.afterTravelFinishStatusesExcludeRating,
-            ParticipationEntity.afterDepositReturnedExcludeRating
-        );
+
+        participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesExcludeRating);
+        participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterDepositReturnedExcludeRating);
 
         // 배당금 반환 API 호출
-        payApi.payDepositRefund(participationEntity.getParticipationId(),participationEntity.getUserId());
+        payApi.payDepositRefund(participationEntity.getParticipationId(),
+            participationEntity.getUserId());
 
         participationService.saveParticipation(participationEntity);
-
 
 
     }

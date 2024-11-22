@@ -53,6 +53,9 @@ public class ParticipationManagementService {
     private final int DEPOSIT_RETURN_DATE_DEFAULT = 30;
     private final int DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED = 23;
     private final int NEXT_DAY = 1;
+    private final int DEPOSIT_RETURN_IF_RATED = 1;
+
+
 
 
     // 1. 여행을 참가 ; 여행참가 ~ 지불까지를 하나의 트랜잭션으로 묶기에는 과도하게 길어서 분리.
@@ -158,8 +161,7 @@ public class ParticipationManagementService {
             participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
 
             // 보증금 반환일자를 확정
-            participationService.setDateToReturnDeposit(participationEntity,
-                LocalDate.now().plusDays(DEPOSIT_RETURN_DATE_DEFAULT));
+            participationService.setDateToReturnDeposit(participationEntity, LocalDate.now().plusDays(DEPOSIT_RETURN_DATE_DEFAULT));
         }
 
         participationService.saveParticipations(participationEntities);
@@ -171,58 +173,44 @@ public class ParticipationManagementService {
     //5.2 평점을 여행완료 후 7일이나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경 ? 확인필요
     //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경(보증금 지급일을 -23일함)
 
-    // todo : 아래의 의문사항이 있지만 일단 단순한 상황을 가정해서 코딩후 리팩토링필요
-    // what if1. 여행보증금 지급일로 보증금지급시점을 관리하는데, 보증금 지급일 변경과 지급이 동시에
-    // 이루어지는 경쟁상황은 어떻게 처리할 것인지? 정책적 해결, 기술적 해결.
-    // what if2. 평점을 매긴 날짜가 여행완료후 7일이후일경우에 바로 보증금 반환 혹은 다음날 반환?
-
 
     public void giveRatingParticipation(Long postId, String userId) {
 
-        ParticipationEntity entity = participationService
+        ParticipationEntity participationEntity = participationService
             .getParticipationByPostIdAndUserId(postId, userId);
 
+        LocalDate travelEndDate = participationEntity.getPostEntity().getTravelEndDate();
+        LocalDate returnDateDefault = travelEndDate.plusDays(DEPOSIT_RETURN_DATE_DEFAULT);
+        LocalDate returnDateIfRated = travelEndDate.plusDays(DEPOSIT_RETURN_IF_RATED);
+
+
+
         // 보증금 일자가 정해지지 않았다면 여행이 미완료된 것으로 간주하여 fail
-        if (entity.getDepositReturnDate() == null) {
+        if (participationEntity.getDepositReturnDate() == null) {
             throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
         }
 
-        if(entity.getRatingStatus()==RatingStatus.RATED) return;
+        if(participationEntity.getRatingStatus()==RatingStatus.RATED) return;
 
 
         //5.1 보증금 기본 반환일이나 그 이후에 평가한 경우, 평점상태만 변경
-        if (LocalDate.now().isAfter(entity.getDepositReturnDate().minusDays(
-            NEXT_DAY))) {
-
-            // 자정에 평가하는 문제때문에 우선 deposit 상태는 우선 검증 x
-            participationService.checkStatusParticipation(entity,ParticipationEntity.afterTravelFinishStatusesUnRated);
-            participationService.changeStatusParticipation(entity,List.of(RatingStatus.RATED));
-
+        if (LocalDate.now().isAfter(returnDateDefault)|| LocalDate.now().isEqual(returnDateDefault)) {
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
 
-        //5.2 평점을 여행완료 후 7일이거나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경 ? 확인필요
-
-        if (LocalDate.now().isBefore(entity.getDepositReturnDate())
-            && LocalDate.now().isAfter(entity.getDepositReturnDate()
-            .minusDays(DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED))) {
-
-            // 보증금 반환일자를 다음날로 설정
-            participationService.setDateToReturnDeposit(entity,
-                LocalDate.now().plusDays(NEXT_DAY));
-
-
-            participationService.checkStatusParticipation(entity,ParticipationEntity.afterTravelFinishStatusesUnRated);
-            participationService.changeStatusParticipation(entity,ParticipationEntity.afterTravelFinishStatusesRated);
+        //5.2 평점을 여행완료 후 7일이거나 그 이후 그리고 30일이전에 매긴 경우, 다음날을 보증금 지급일 변경
+        if (LocalDate.now().isBefore(returnDateDefault) && LocalDate.now().isAfter(returnDateIfRated)) {
+            participationService.setDateToReturnDeposit(participationEntity, LocalDate.now().plusDays(NEXT_DAY));
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
 
-        //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경(보증금 지급일을 -23일함)
-        if (entity.getDepositReturnDate().isAfter(LocalDate.now())) {
-            participationService.setDateToReturnDeposit(entity,
-                entity.getDepositReturnDate()
-                    .minusDays(DEPOSIT_RETURN_DATE_SHORTENED_IF_RATED));
-
-            participationService.checkStatusParticipation(entity,ParticipationEntity.afterTravelFinishStatusesUnRated);
-            participationService.changeStatusParticipation(entity,ParticipationEntity.afterTravelFinishStatusesRated);
+        //5.3 평점을 여행완료 후 7일 전에 매긴 경우, 보증금 지급일을 여행완료 후 7일후로 변경
+        if (LocalDate.now().isBefore(returnDateIfRated)) {
+            participationService.setDateToReturnDeposit(participationEntity, returnDateIfRated);
+            participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
+            participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
     }
 

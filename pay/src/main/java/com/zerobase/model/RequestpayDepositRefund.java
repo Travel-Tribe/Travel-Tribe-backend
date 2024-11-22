@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class RequestpayDepositRefund {
 
-    private long depositId;
+    private long participationId;
     private String userId;
 
 }

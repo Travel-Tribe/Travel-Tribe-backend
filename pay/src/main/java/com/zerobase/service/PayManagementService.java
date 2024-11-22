@@ -140,23 +140,16 @@ public class PayManagementService {
     client 측에서는 participation을 기준으로 취소요청을 할 것으로 생각됨.
     */
 
+    @Transactional
     public void refundDepositPay(
-        long depositId, String userId) {
+        long participationId, String userId) {
         log.info("refund customer DepositPay");
 
-        DepositEntity depositEntity = depositService.getPaymentInProgressAndchangeStatusByOrderId(
-            depositId, PaymentStatus.PAY_REFUNDED);
+        DepositEntity depositEntity = depositService.SetToRefundDepositPay(participationId, userId);
 
-        PaymentEntity paymentEntity = paymentService.getPaymentsInProgressAndChangeStatusByOrderId(
-            depositId, PaymentStatus.PAY_REFUNDED);
+        PaymentEntity paymentEntity = paymentService.SetToRefundPayment(depositEntity.getDepositId(), userId);
 
-        if(!Objects.equals(depositEntity.getUserId(), userId)
-            || !Objects.equals(paymentEntity.getUserId(), userId)){
-            throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
-        }
-
-        kakaopayApi.sendPayRefundSign(
-                paymentEntity.getPaykey(), constants.DEPOSIT_AMOUNT, constants.TAX_FREE_AMOUNT);
+        kakaopayApi.sendPayRefundSign(paymentEntity.getPaykey());
 
         paymentService.save(paymentEntity);
         depositService.save(depositEntity);

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,9 +27,9 @@ public class InternalPayController {
     // client 결제환불시 url 신호받기
     @PutMapping(value = "/deposit/refund")
     public ResponseEntity<Object> payDepositRefund(
-        RequestpayDepositRefund request) {
+        @RequestBody RequestpayDepositRefund request) {
         log.info(" pay deposit refund sign from client");
-         payManagementService.refundDepositPay(request.getDepositId(), request.getUserId());
+         payManagementService.refundDepositPay(request.getParticipationId(), request.getUserId());
         return ResponseEntity.ok().build();
     }
 

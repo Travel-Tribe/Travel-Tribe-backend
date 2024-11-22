@@ -61,6 +61,9 @@ public class RequestApi {
         @JsonProperty("tax_free_amount")
         private String taxFreeAmount;
 
+        @JsonProperty("vat_amount")
+        private String vatAmount;
+
         @JsonProperty("approval_url")
         private  String approvalUrl;
 
@@ -87,6 +90,12 @@ public class RequestApi {
 
         @JsonProperty("cancel_tax_free_amount")
         private String cancelTaxFreeAmount;
+
+        @JsonProperty("cancel_vat_amount")
+        private String cancelVatAmount;
+
+
+
 
 
 

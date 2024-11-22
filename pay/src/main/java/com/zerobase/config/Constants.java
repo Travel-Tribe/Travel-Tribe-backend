@@ -35,6 +35,10 @@ public class Constants {
     @Value("${kakaopay.tax-free-amount}")
     public long TAX_FREE_AMOUNT;
 
+    @Value("${kakaopay.vat-amount}")
+    public long VAT_AMOUNT;
+
+
     @Value("${kakaopay.secret-key}")
     public String SECRET_KEY;
 

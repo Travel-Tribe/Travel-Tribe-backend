@@ -7,6 +7,7 @@ import com.zerobase.exception.errorCode.PaymentErrorCode;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.DepositRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class DepositService {
     }
 
 
-    public DepositDto findByParticipationId(Long participationId) {
+    public DepositDto findByParticipationIdAndChangStatus(Long participationId) {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
                 () -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING)));
@@ -56,7 +57,7 @@ public class DepositService {
         }
 
         if(depositRepository.existsByParticipationIdAndPaymentStatus(participationId,PaymentStatus.PAY_COMPLETED))
-            throw new BizException(PaymentErrorCode.DESPOSIT_ALREADY_PAID);
+            throw new BizException(PaymentErrorCode.DEPOSIT_ALREADY_PAID);
 
 
     }
@@ -67,6 +68,8 @@ public class DepositService {
         DepositEntity depositEntity = depositRepository.findById(depositId)
             .orElseThrow(() -> new BizException(
                 PaymentErrorCode.DEPOSIT_NOT_EXSITING));
+
+
 
         depositEntity.setPaymentStatus(paymentStatus);
 
@@ -83,5 +86,27 @@ public class DepositService {
         depositEntity.setPaymentStatus(paymentStatus);
 
         return depositEntity;
+    }
+
+    public DepositEntity SetToRefundDepositPay(long participationId, String userId) {
+        DepositEntity depositEntity = depositRepository.findByParticipationId(
+            participationId).orElseThrow(() -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING));
+
+        this.validateDepositInfo(depositEntity,participationId,userId,PaymentStatus.PAY_COMPLETED);
+
+        depositEntity.setPaymentStatus(PaymentStatus.PAY_REFUNDED);
+
+        return depositEntity;
+
+    }
+
+    private void validateDepositInfo(DepositEntity depositEntity, long participationId, String userId, PaymentStatus paymentStatus) {
+
+        if(depositEntity.getParticipationId()!=participationId) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
+
+        if(!Objects.equals(depositEntity.getUserId(), userId)) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
+
+        if(depositEntity.getPaymentStatus()!=paymentStatus) throw new BizException(PaymentErrorCode.INVALID_DEPOSIT_INFORMATION);
+
     }
 }

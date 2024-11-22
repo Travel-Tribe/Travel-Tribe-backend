@@ -1,6 +1,7 @@
 package com.zerobase.travel.communities.repository;
 
 import com.zerobase.travel.communities.entity.CommunityEntity;
+import com.zerobase.travel.communities.type.CommunityStatus;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,8 @@ public interface CommunityRepository extends JpaRepository<CommunityEntity, Long
 
     Optional<CommunityEntity> findByCommunityId(Long communityId);
 
-    Page<CommunityEntity> findAll( Pageable pageable);
+    Page<CommunityEntity> findAllByStatus( Pageable pageable,
+        CommunityStatus posted);
 
     void deleteByCommunityId(long communityId);
 

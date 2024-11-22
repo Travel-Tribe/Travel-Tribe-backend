@@ -186,8 +186,11 @@ public class ParticipationManagementService {
         if (entity.getDepositReturnDate() == null) {
             throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
         }
-        //5.1 보증금 기본 반환일이나 그 이후에 평가한 경우, 평점상태만 변경
 
+        if(entity.getRatingStatus()==RatingStatus.RATED) return;
+
+
+        //5.1 보증금 기본 반환일이나 그 이후에 평가한 경우, 평점상태만 변경
         if (LocalDate.now().isAfter(entity.getDepositReturnDate().minusDays(
             NEXT_DAY))) {
 

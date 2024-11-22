@@ -78,10 +78,10 @@ public class ParticipationEntity {
     @Transient
     public static List<Enum<?>> afterCancelStatuses = List.of(ParticipationStatus.JOIN_CANCEL,DepositStatus.FORFEITED,RatingStatus.NOT_RATED);
     @Transient
-    public static List<Enum<?>> afterTravelFinishStatusesUnRated = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID,RatingStatus.NOT_RATED);
+    public static List<Enum<?>> afterTravelFinishStatusesUnRated = List.of(ParticipationStatus.TRAVEL_FINISHED,RatingStatus.NOT_RATED);
 
     @Transient
-    public static List<Enum<?>> afterTravelFinishStatusesRated = List.of(ParticipationStatus.TRAVEL_FINISHED,DepositStatus.PAID,RatingStatus.RATED);
+    public static List<Enum<?>> afterTravelFinishStatusesRated = List.of(ParticipationStatus.TRAVEL_FINISHED,RatingStatus.RATED);
 
 
     @Transient

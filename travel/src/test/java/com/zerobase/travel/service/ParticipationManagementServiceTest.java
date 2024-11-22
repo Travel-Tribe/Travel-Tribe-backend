@@ -66,7 +66,7 @@ class ParticipationManagementServiceTest {
         participationManagementService.failedPaymentParticipation(PARTICIPATION_ID, USER_ID);
 
         // Then
-        verify(participationService).checkAndChangeStatusParticipation(
+        verify(participationService).checkStatusParticipation(
             participationEntity,
             List.of(ParticipationStatus.JOIN_READY, DepositStatus.UNPAID),
             List.of(ParticipationStatus.JOIN_FAILED));
@@ -83,7 +83,7 @@ class ParticipationManagementServiceTest {
         participationManagementService.successPaymentParticipation(PARTICIPATION_ID, USER_ID);
 
         // Then
-        verify(participationService).checkAndChangeStatusParticipation(
+        verify(participationService).checkStatusParticipation(
             participationEntity,
             List.of(ParticipationStatus.JOIN_READY, DepositStatus.UNPAID),
             List.of(ParticipationStatus.JOIN, DepositStatus.PAID));
@@ -102,7 +102,7 @@ class ParticipationManagementServiceTest {
         participationManagementService.unjoinParticipationWithDepositReturned(POST_ID, USER_ID);
 
         // Then
-        verify(participationService).checkAndChangeStatusParticipation(
+        verify(participationService).checkStatusParticipation(
             participationEntity,
             List.of(ParticipationStatus.JOIN, DepositStatus.PAID),
             List.of(ParticipationStatus.JOIN_CANCEL, DepositStatus.RETURNED));
@@ -121,7 +121,7 @@ class ParticipationManagementServiceTest {
         participationManagementService.unjoinParticipationWithDepositForfeited(POST_ID, USER_ID);
 
         // Then
-        verify(participationService).checkAndChangeStatusParticipation(
+        verify(participationService).checkStatusParticipation(
             participationEntity,
             List.of(ParticipationStatus.JOIN, DepositStatus.PAID),
             List.of(ParticipationStatus.JOIN_CANCEL, DepositStatus.FORFEITED));
@@ -141,7 +141,7 @@ class ParticipationManagementServiceTest {
 
 
         // Then
-        verify(participationService).checkAndChangeStatusParticipation(
+        verify(participationService).checkStatusParticipation(
             participationEntity,
             List.of(ParticipationStatus.TRAVEL_FINISHED, DepositStatus.PAID),
             List.of(DepositStatus.RETURNED));

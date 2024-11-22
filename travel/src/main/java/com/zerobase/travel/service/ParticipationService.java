@@ -3,7 +3,7 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.controller.ResponseParticipationsByUserDto;
+import com.zerobase.travel.controller.ResponseMyParticipationsDto;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;
@@ -104,12 +104,11 @@ public class ParticipationService {
         validatePostLimitAndUserProfile(userInfo, postEntity);
 
         // 4. 게시글의 상태가 현재 모집중인지 확인, 단 참여신청자가 user인 경우 post의 상태와 관련없이 참여함
-        if(Objects.equals(String.valueOf(postEntity.getUserId()), userId)){
+        if (Objects.equals(String.valueOf(postEntity.getUserId()), userId)) {
             return;
-        }
-        else if (postEntity.getStatus() != PostStatus.RECRUITING) {
+        } else if (postEntity.getStatus() != PostStatus.RECRUITING) {
             throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
-       }
+        }
 
 
     }
@@ -131,20 +130,22 @@ public class ParticipationService {
         }
 
         // 흡연자 검증
-        if (!PostEntity.validateSmoking(postEntity,userInfo.getSmoking())) {
+        if (!PostEntity.validateSmoking(postEntity, userInfo.getSmoking())) {
             throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
         }
 
     }
 
-        // 3가지 정보의 연관관계를 검증하여 옳지않으면 false, 옳으면 true를 반환
+    // 3가지 정보의 연관관계를 검증하여 옳지않으면 false, 옳으면 true를 반환
     public Boolean validateParticipationInfoUserIdAndPostId(long postId,
         long participationId, String userId) {
 
+        Optional<ParticipationEntity> optioinal = participationRepository.findById(
+            participationId);
 
-        Optional<ParticipationEntity> optioinal = participationRepository.findById(participationId);
-
-        if (optioinal.isEmpty()) {return false;}
+        if (optioinal.isEmpty()) {
+            return false;
+        }
 
         ParticipationEntity participationEntity = optioinal.get();
 
@@ -181,9 +182,9 @@ public class ParticipationService {
     }
 
     // participation 의 상태를 검증하고 상태를 변화시켜서 그대로 저장함
-    public void checkAndChangeStatusParticipation(
+    public void checkStatusParticipation(
         ParticipationEntity participationEntity
-        , List<Enum<?>> expectedEnums, List<Enum<?>> updateEnums) {
+        , List<Enum<?>> expectedEnums) {
 
         // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
         for (Enum<?> expectedEnum : expectedEnums) {
@@ -191,7 +192,11 @@ public class ParticipationService {
                 throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
             }
         }
+    }
 
+    // participation 의 상태를 검증하고 상태를 변화시켜서 그대로 저장함
+    public void changeStatusParticipation(
+        ParticipationEntity participationEntity, List<Enum<?>> updateEnums) {
         for (Enum<?> updateEnum : updateEnums) {
             participationEntity.updateStatus(updateEnum);
         }
@@ -256,16 +261,17 @@ public class ParticipationService {
 
 
     // 현재 자신이  참여하고 있는 게시글의 리스트 반환
-    public List<ResponseParticipationsByUserDto> getParticipationsByUserStatusOfJoinAndJoinReady(
+    public List<ResponseMyParticipationsDto> getMyParticipationsStatusOfJoinAndJoinReady(
         String userId) {
         log.info("service getParticipationsByUserStatusOfJoinAndJoinReady");
 
         List<ParticipationEntity> participationEntities
             = participationRepository.findAllByUserIdAndParticipationStatusIn(
-            userId, List.of(ParticipationStatus.JOIN,ParticipationStatus.JOIN_READY));
+            userId,
+            List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY));
 
         return participationEntities.stream().map(
-                ResponseParticipationsByUserDto::fromEntity)
+                ResponseMyParticipationsDto::fromEntity)
             .toList();
     }
 

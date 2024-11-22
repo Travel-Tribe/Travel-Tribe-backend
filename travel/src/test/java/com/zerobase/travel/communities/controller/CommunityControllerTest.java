@@ -67,9 +67,6 @@ class CommunityControllerTest {
         sampleCommunityResponse = ResponseCommunityDto.builder()
             .communityId(1L)
             .userId(SAMPLE_USER_ID)
-            .continent(Continent.ASIA)
-            .country(Country.KR)
-            .region("Seoul")
             .title("Sample Community")
             .content("Sample content")
             .files(Collections.emptyList())
@@ -158,9 +155,6 @@ class CommunityControllerTest {
         request.setCommunityId(1L);
         request.setTitle("Updated Title");
         request.setContent("Updated Content");
-        request.setContinent(Continent.ASIA);
-        request.setCountry(Country.KR);
-        request.setRegion("Busan");
 
         // Mocking the service's response to return a sample community response
         given(communityManagementService.updatePost(any(RequestUpdateCommunity.class), anyString()))

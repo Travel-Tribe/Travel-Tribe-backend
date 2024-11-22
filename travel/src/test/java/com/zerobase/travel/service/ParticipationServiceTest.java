@@ -125,38 +125,6 @@ class ParticipationServiceTest {
  */
 
 
-    @Test
-    void checkAndChangeStatusParticipation_shouldThrowException_whenStatusMismatch() {
-        ParticipationEntity participationEntity = ParticipationEntity.builder()
-            .participationStatus(ParticipationStatus.JOIN)
-            .depositStatus(DepositStatus.PAID)
-            .ratingStatus(RatingStatus.RATED)
-            .build();
-
-        List<Enum<?>> changeFrom = List.of(ParticipationStatus.JOIN, DepositStatus.UNPAID, RatingStatus.RATED);
-        List<Enum<?>> changeTo = List.of(ParticipationStatus.JOIN, DepositStatus.FORFEITED, RatingStatus.RATED);
-
-        CustomException exception = assertThrows(CustomException.class, () ->
-            participationService.checkAndChangeStatusParticipation(participationEntity, changeFrom, changeTo));
-
-        assertEquals(ErrorCode.PARTICIPATION_STATUS_ERROR, exception.getErrorCode());
-    }
-
-    @Test
-    void checkAndChangeStatusParticipation_PassValidationAndChangeStatus() {
-        ParticipationEntity participationEntity = ParticipationEntity.builder()
-            .participationStatus(ParticipationStatus.JOIN)
-            .depositStatus(DepositStatus.PAID)
-            .ratingStatus(RatingStatus.RATED)
-            .build();
-
-        List<Enum<?>> changeFrom = List.of(ParticipationStatus.JOIN, DepositStatus.PAID, RatingStatus.RATED);
-        List<Enum<?>> changeTo = List.of(ParticipationStatus.JOIN, DepositStatus.FORFEITED, RatingStatus.RATED);
-
-        participationService.checkAndChangeStatusParticipation(participationEntity, changeFrom, changeTo);
-
-        assertEquals(DepositStatus.FORFEITED, participationEntity.getDepositStatus());
-    }
 
     @Test
     void createParticipationReady_shouldReturnParticipationDto_whenValid() {

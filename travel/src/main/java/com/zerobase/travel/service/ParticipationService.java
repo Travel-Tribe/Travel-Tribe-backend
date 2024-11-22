@@ -7,6 +7,8 @@ import com.zerobase.travel.controller.ResponseMyParticipationsDto;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.ParticipationErrorCode;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
 import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.repository.PostRepository;
@@ -62,10 +64,10 @@ public class ParticipationService {
 
         // 비교대상인 postentity 와 userinfo 호출
         PostEntity postEntity = postRepository.findByPostId(postId).orElseThrow(
-            () -> new CustomException(ErrorCode.POST_NOT_EXISTING));
+            () -> new BizException(ParticipationErrorCode.POST_NOT_EXISTING));
 
-        UserInfoResponseDTO userInfo = userApi.getUserInfoByUserEmail(userEmail)
-            .getBody().getData();
+        UserInfoResponseDTO userInfo = userApi.getUserInfoByUserEmail(userEmail).getBody()
+            .getData();
 
         //  유저의 참여중인 정보를 호출
         List<ParticipationDto> participations =
@@ -74,29 +76,27 @@ public class ParticipationService {
         // 1.1 유저는 최대 두개까지만 참여가능
         if (participations.size() >= 2) {
             log.info("participation validation service start ");
-            throw new CustomException(ErrorCode.USER_PARTICIPATION_LIMIT);
+            throw new BizException(ParticipationErrorCode.USER_PARTICIPATION_LIMIT);
         }
 
         // 1.2 유저는 이미 참여중이면 다시 참여할수 없음
         for (ParticipationDto participation : participations) {
             if (Objects.equals(participation.getPostId(), postId)) {
-                throw new CustomException(ErrorCode.PARTICIPATION_ALREADY_MADE);
+                throw new BizException(ParticipationErrorCode.PARTICIPATION_ALREADY_MADE);
             }
         }
 
         // 1.3 PayReady인 상태가 하나가 넘어서는 안됨
         for (ParticipationDto participation : participations) {
-            if (Objects.equals(participation.getParticipationStatus(),
-                ParticipationStatus.JOIN_READY)) {
-                throw new CustomException(
-                    ErrorCode.PARTICIPATION_JOINREADY_ALREADYEXISTING);
+            if (Objects.equals(participation.getParticipationStatus(), ParticipationStatus.JOIN_READY)) {
+                throw new BizException(ParticipationErrorCode.PARTICIPATION_JOINREADY_ALREADYEXISTING);
             }
         }
 
         // 2. 포스트당 최대 참여자수를 넘겨서는 안될것
         if (this.countParticipationsJoinAndJoinReadyByPostId(postId)
             >= postEntity.getMaxParticipants()) {
-            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            throw new BizException(ParticipationErrorCode.POST_PARTICIPATION_LIMIT);
         }
 
         // 3. post 제한사항과 user 프로필 필터링 여러가지 취향에 따른 제한들 - user 의 정보를 호출
@@ -110,7 +110,6 @@ public class ParticipationService {
             throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
         }
 
-
     }
 
     private static void validatePostLimitAndUserProfile(
@@ -121,17 +120,18 @@ public class ParticipationService {
             .getYears();
 
         if (!PostEntity.validateUserAge(postEntity, userAge)) {
-            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
+
         }
 
         // 성별검증
         if (!PostEntity.validateUserGEnder(postEntity, userInfo.getGender())) {
-            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
         }
 
         // 흡연자 검증
         if (!PostEntity.validateSmoking(postEntity, userInfo.getSmoking())) {
-            throw new CustomException(ErrorCode.POST_PARTICIPATION_LIMIT);
+            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
         }
 
     }
@@ -189,7 +189,7 @@ public class ParticipationService {
         // entity의 enum type을 순회하여 기대한 status와 다르면 예외발생
         for (Enum<?> expectedEnum : expectedEnums) {
             if (!participationEntity.hasStatus(expectedEnum)) {
-                throw new CustomException(ErrorCode.PARTICIPATION_STATUS_ERROR);
+                throw new BizException(ParticipationErrorCode.PARTICIPATION_STATUS_ERROR);
             }
         }
     }
@@ -241,7 +241,7 @@ public class ParticipationService {
 
         return participationRepository.findByPostEntityPostIdAndUserId(
             postId, userId).orElseThrow(
-            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+            () -> new BizException(ParticipationErrorCode.PARTICIPATION_NOT_EXIST));
     }
 
 

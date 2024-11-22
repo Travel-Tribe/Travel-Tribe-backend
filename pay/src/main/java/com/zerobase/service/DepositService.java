@@ -2,9 +2,9 @@ package com.zerobase.service;
 
 import com.zerobase.api.ParticipationApi;
 import com.zerobase.entity.DepositEntity;
+import com.zerobase.exception.BizException;
+import com.zerobase.exception.errorCode.PaymentErrorCode;
 import com.zerobase.model.DepositDto;
-import com.zerobase.model.exception.CustomException;
-import com.zerobase.model.exception.ErrorCode;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.DepositRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class DepositService {
     public DepositDto findByParticipationId(Long participationId) {
         return DepositDto.fromEntity(depositRepository
             .findByParticipationId(participationId).orElseThrow(
-                () -> new CustomException(ErrorCode.DEPOSIT_NOT_EXSITING)));
+                () -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING)));
     }
 
     public void save(DepositEntity depositEntity) {
@@ -52,11 +52,11 @@ public class DepositService {
         String userId) {
         if (Boolean.FALSE.equals(participationAPi.validateParticipationInfo
                 (postId, participationId, userId).getBody())) {
-            throw new CustomException(ErrorCode.INVALID_CLIENT_REQUEST);
+            throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
         }
 
         if(depositRepository.existsByParticipationIdAndPaymentStatus(participationId,PaymentStatus.PAY_COMPLETED))
-            throw new CustomException(ErrorCode.DESPOSIT_ALREADY_PAID);
+            throw new BizException(PaymentErrorCode.DESPOSIT_ALREADY_PAID);
 
 
     }
@@ -65,8 +65,8 @@ public class DepositService {
         long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
-            .orElseThrow(() -> new CustomException(
-                ErrorCode.DEPOSIT_NOT_EXSITING));
+            .orElseThrow(() -> new BizException(
+                PaymentErrorCode.DEPOSIT_NOT_EXSITING));
 
         depositEntity.setPaymentStatus(paymentStatus);
 
@@ -77,8 +77,8 @@ public class DepositService {
         long depositId,
         PaymentStatus paymentStatus) {
         DepositEntity depositEntity = depositRepository.findById(depositId)
-            .orElseThrow(() -> new CustomException(
-                ErrorCode.DEPOSIT_NOT_EXSITING));
+            .orElseThrow(() -> new BizException(
+                PaymentErrorCode.DEPOSIT_NOT_EXSITING));
 
         depositEntity.setPaymentStatus(paymentStatus);
 

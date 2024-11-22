@@ -362,23 +362,29 @@ public class PostService {
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
-    @Transactional
     public void updatePostStatus() {
         LocalDate now = LocalDate.now();
 
-        // 마감일이 지났고, 상태가 RECRUITING인 게시물 조회
-        List<PostEntity> postsToUpdate = postRepository.findByDeadlineBeforeAndStatus(
-            now, PostStatus.RECRUITING);
+        int batchSize = 10000; // 한 번에 처리할 배치 크기
+        int updatedCount = 0;
 
+        while (true) {
+            int affectedRows = postRepository.updateStatusForExpiredPosts(
+                now,
+                PostStatus.RECRUITING.name(), // Enum 값을 문자열로 변환
+                PostStatus.RECRUITMENT_COMPLETED.name(), // Enum 값을 문자열로 변환
+                batchSize
+            );
+            updatedCount += affectedRows;
 
-        for (PostEntity post : postsToUpdate) {
-            post.setStatus(PostStatus.RECRUITMENT_COMPLETED);
-            // 필요한 경우 추가 로직 수행( 더티 체킹으로 변경내영 저장)
+            // 더 이상 업데이트할 행이 없으면 종료
+            if (affectedRows == 0) break;
+
+            log.info("벌크 업데이트 진행 중... 현재까지 업데이트된 게시물 수: {}", updatedCount);
         }
 
-        log.info(
-            "마감일이 지난 게시물의 상태를 RECRUITMENT_COMPLETED로 업데이트했습니다. 업데이트된 게시물 수: {}",
-            postsToUpdate.size());
+        log.info("마감일이 지난 게시물 상태를 RECRUITMENT_COMPLETED로 업데이트 완료. 총 업데이트된 게시물 수: {}", updatedCount);
+
     }
 
     public void changeStatusToRecruiting(Long postId) {

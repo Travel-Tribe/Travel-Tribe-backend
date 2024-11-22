@@ -73,7 +73,7 @@ public class CommunityController {
     }
 
     // 커뮤니티 수정
-    @PutMapping(value = "/{communityId}")
+    @PutMapping
     public ResponseEntity<ResponseMessage<ResponseCommunityDto>> updateCommunity(
         @Valid @RequestBody RequestUpdateCommunity request,
         @RequestHeader("X-User-Id") String userId) {

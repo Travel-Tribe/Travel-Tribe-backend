@@ -68,20 +68,33 @@ public class PaymentService {
         return paymentEntity;
     }
 
-    public PaymentEntity getPaymentsInPayCompletedByOrderId( String userId,long orderId) {
-        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderIdAndPaymentStatus(
-            orderId, PaymentStatus.PAY_COMPLETED).orElseThrow(() -> new BizException(
-            PaymentErrorCode.PAYMENT_NOT_EXSITING));
-
-        if(!Objects.equals(paymentEntity.getUserId(), userId)) throw new BizException(
-            PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
-
-        return paymentEntity;
-    }
-
 
 
     public void save(PaymentEntity paymentEntity) {
          paymentRepository.save(paymentEntity);
+    }
+
+    public PaymentEntity SetToRefundPayment(long orderId, String userId) {
+        PaymentEntity paymentEntity = paymentRepository.findByReferentialOrderId(orderId)
+            .orElseThrow(() -> new BizException(PaymentErrorCode.PAYMENT_NOT_EXSITING));
+
+        this.validatePayment(paymentEntity,userId,PaymentStatus.PAY_COMPLETED);
+
+
+        return paymentEntity;
+
+
+
+
+    }
+
+    private void validatePayment(PaymentEntity paymentEntity, String userId, PaymentStatus paymentStatus) {
+
+        if(paymentEntity.getPaymentStatus() != paymentStatus)
+            throw new BizException(PaymentErrorCode.INVALID_PAYMENT_INFORMATION);
+
+        if(!Objects.equals(paymentEntity.getUserId(), userId))
+            throw new BizException(PaymentErrorCode.INVALID_PAYMENT_INFORMATION);
+
     }
 }

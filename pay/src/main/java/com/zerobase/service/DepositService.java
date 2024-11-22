@@ -7,6 +7,7 @@ import com.zerobase.exception.errorCode.PaymentErrorCode;
 import com.zerobase.model.DepositDto;
 import com.zerobase.model.type.PaymentStatus;
 import com.zerobase.repository.DepositRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class DepositService {
         }
 
         if(depositRepository.existsByParticipationIdAndPaymentStatus(participationId,PaymentStatus.PAY_COMPLETED))
-            throw new BizException(PaymentErrorCode.DESPOSIT_ALREADY_PAID);
+            throw new BizException(PaymentErrorCode.DEPOSIT_ALREADY_PAID);
 
 
     }
@@ -87,7 +88,7 @@ public class DepositService {
         return depositEntity;
     }
 
-    public void refundDepositPay(long participationId, String userId) {
+    public DepositEntity SetToRefundDepositPay(long participationId, String userId) {
         DepositEntity depositEntity = depositRepository.findByParticipationId(
             participationId).orElseThrow(() -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING));
 
@@ -95,14 +96,15 @@ public class DepositService {
 
         depositEntity.setPaymentStatus(PaymentStatus.PAY_REFUNDED);
 
-        depositRepository.save(depositEntity);
+        return depositEntity;
+
     }
 
     private void validateDepositInfo(DepositEntity depositEntity, long participationId, String userId, PaymentStatus paymentStatus) {
 
         if(depositEntity.getParticipationId()!=participationId) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
 
-        if(depositEntity.getUserId()!=userId) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
+        if(!Objects.equals(depositEntity.getUserId(), userId)) throw new BizException(PaymentErrorCode.INVALID_PARTICIPATION_INFORMATION);
 
         if(depositEntity.getPaymentStatus()!=paymentStatus) throw new BizException(PaymentErrorCode.INVALID_DEPOSIT_INFORMATION);
 

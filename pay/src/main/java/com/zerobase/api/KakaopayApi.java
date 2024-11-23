@@ -28,7 +28,7 @@ public class KakaopayApi implements ApiInterface {
     @Override
     public ResponseApi.PayReadyApiDto sendPayReadySign(long postId, long depositId,
         String userId) {
-        log.info("KakaopayApiService sendPayReadySign");
+        log.info("Start KakaopayApiService sendPayReadySign");
         // webclient url, header입력
 
         WebClient webclient = WebClient.builder()
@@ -60,6 +60,8 @@ public class KakaopayApi implements ApiInterface {
             .bodyToMono(ResponseApi.PayReadyApiDto.class)
             .block();
 
+        log.info("success KakaopayApiService sendPayReadySign");
+
         return payReadyApiDto;
     }
 
@@ -67,7 +69,7 @@ public class KakaopayApi implements ApiInterface {
 
     public ResponseApi.PayConfirmDto sendPayConfirmSign(
         String tid, Long orderId, String userId, String pgToken) {
-        log.info("KakaopayApiService payconfirmsign");
+        log.info("Start KakaopayApiService payconfirmsign");
         // webclient url, header입력
 
         WebClient webclient = WebClient.builder()
@@ -93,12 +95,15 @@ public class KakaopayApi implements ApiInterface {
             .bodyToMono(ResponseApi.PayConfirmDto.class)
             .block();
 
+        log.info("Success KakaopayApiService payconfirmsign");
+
+
         return payConfirmDto;
     }
 
     public PayRefundApiDto sendPayRefundSign(
          String tid ) {
-        log.info("KakaopayApiService payRefundSign");
+        log.info("Start KakaopayApiService payRefundSign");
         // webclient url, header입력
 
         WebClient webclient = WebClient.builder()
@@ -123,6 +128,8 @@ public class KakaopayApi implements ApiInterface {
             .retrieve()
             .bodyToMono(PayRefundApiDto.class)
             .block();
+
+        log.info("Success KakaopayApiService payRefundSign");
 
         return payRefundApiDto;
     }

@@ -35,11 +35,12 @@ user-service:
 travel-service:
   url: http://10.178.0.4:8081
 
+
 kakaopay:
   cid: TC0ONETIME
-  approval-url: http://localhost/api/v1/payment/result
-  fail-url: http://localhost/api/v1/payment/result
-  cancel-url: http://localhost/api/v1/payment/result
+  approval-url: http://localhost:3000/payment/result
+  fail-url: http://localhost:3000/payment/result
+  cancel-url: http://localhost:3000/payment/result
   item-name: "여행참여 보증금"
   quantity: 1
   deposit-amount: 100000

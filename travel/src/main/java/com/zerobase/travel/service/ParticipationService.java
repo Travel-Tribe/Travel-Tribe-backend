@@ -18,6 +18,7 @@ import com.zerobase.travel.type.DepositStatus;
 import com.zerobase.travel.type.ParticipationStatus;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.Objects;
@@ -332,4 +333,11 @@ public class ParticipationService {
     }
 
 
+    public List<ParticipationDto> getParticipationsByJoinReadyFor24Hours() {
+        List<ParticipationEntity> participationEntities
+            = participationRepository.findAllByParticipationStatusAndCreatedAtBefore
+            (ParticipationStatus.JOIN_READY, LocalDateTime.now().minusDays(1L));
+
+        return participationEntities.stream().map(ParticipationDto::fromEntity).toList();
+    }
 }

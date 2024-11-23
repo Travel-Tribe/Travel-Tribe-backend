@@ -1,6 +1,8 @@
 package com.zerobase.travel.service;
 
+import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.type.ParticipationStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ScheduleTask {
+public class ParticipationScheduleTask {
 
     private final ParticipationManagementService participationManagementService;
     private final ParticipationService participationService;
@@ -19,6 +21,17 @@ public class ScheduleTask {
     @Scheduled(cron = "0 0 1 * * *")
     public void performParticipationTravelFinish() {
         participationManagementService.travelFinishedParticipations();
+    }
+
+    // 매시간 정각마다 JoinReady인 상태의 Participation이 24시간이 지나면 정리진행함.
+    @Scheduled(cron = "0 0 * * * *")
+    public void clearParticipationJoinReady() {
+        List<ParticipationDto> participationDtos
+            = participationService.getParticipationsByJoinReadyFor24Hours();
+
+        participationDtos.stream()
+            .forEach(e->participationManagementService.failedPaymentParticipation
+                (e.getParticipationId(),e.getUserId()));
     }
 
 

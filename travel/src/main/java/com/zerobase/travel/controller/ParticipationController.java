@@ -3,6 +3,7 @@ package com.zerobase.travel.controller;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
+import com.zerobase.travel.redis.PostLock;
 import com.zerobase.travel.service.ParticipationManagementService;
 import com.zerobase.travel.service.ParticipationService;
 import java.util.List;

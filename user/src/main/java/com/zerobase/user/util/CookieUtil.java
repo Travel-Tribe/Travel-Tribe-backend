@@ -10,7 +10,7 @@ public class CookieUtil {
 
         return ResponseCookie.from(key, value)
             .sameSite("None")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(true)
             .maxAge(24 * 60 * 60)
             .build();
@@ -20,7 +20,7 @@ public class CookieUtil {
 
         return ResponseCookie.from(key, value)
             .sameSite("None")
-            .httpOnly(false)
+            .httpOnly(true)
             .secure(true)
             .maxAge(24 * 60 * 60)
             .build();

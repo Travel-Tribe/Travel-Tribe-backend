@@ -46,7 +46,7 @@ public class KakaopayApi implements ApiInterface {
             .totalAmount(String.valueOf(constants.DEPOSIT_AMOUNT))
             .taxFreeAmount(String.valueOf(constants.TAX_FREE_AMOUNT))
             .vatAmount(String.valueOf(constants.VAT_AMOUNT))
-            .approvalUrl(constants.KAKAO_APPROVAL_URL+"/"+postId+"?depositId="+depositId)
+            .approvalUrl(constants.KAKAO_APPROVAL_URL+"?depositId="+depositId)
             .cancelUrl(constants.KAKAO_CANCEL_URL+"?depositId="+depositId)
             .failUrl(constants.KAKAO_FAIL_URL+"?depositId="+depositId)
             .build();

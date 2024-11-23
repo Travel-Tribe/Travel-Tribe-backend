@@ -9,9 +9,9 @@ import java.util.List;
 @Data
 @Builder
 public class DayDTO {
-    @NotEmpty(message = "일차 상세는 최소 1개 이상이어야 합니다.")
+    @NotEmpty(message = "ERROR-POST-00003")
     private List<DayDetailDTO> dayDetails;
 
-    @NotEmpty(message = "여행 일정 방문지는 최소 1개 이상이어야 합니다.")
+    @NotEmpty(message = "ERROR-POST-00004")
     private List<ItineraryVisitDTO> itineraryVisits;
 }

@@ -148,12 +148,27 @@ public class ParticipationService {
         }
 
         ParticipationEntity participationEntity = optioinal.get();
+        PostEntity postEntity = participationEntity.getPostEntity();
 
-        if (participationEntity.getPostEntity().getPostId() != postId
-            || !Objects.equals(participationEntity.getUserId(), userId)) {
+        if (postEntity.getPostId() != postId ){
             return false;
         }
-        return true;
+
+        if(postEntity.getStatus() != PostStatus.RECRUITING) {
+            return false;
+        }
+
+        if(!Objects.equals(participationEntity.getUserId(), userId)) {
+            return false;
+        }
+
+        if(participationEntity.getParticipationStatus()!= ParticipationStatus.JOIN_READY) {
+            return false;
+        }
+
+
+
+            return true;
     }
 
     public ParticipationDto createParticipationReady(Long postId,

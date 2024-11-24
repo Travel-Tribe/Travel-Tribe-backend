@@ -17,7 +17,6 @@ public class PaymentDto {
     private OrderType referencialOrderType;
     private Long referentialOrderId;
     private String userId;
-    private String payKey;
     private Long amount;
     private PaymentStatus paymentStatus;
     private PGMethod pgMethod;

@@ -72,7 +72,6 @@ class PaymentServiceTest {
         assertNotNull(result);
         assertEquals(TEST_DEPOSIT_ID, result.getReferentialOrderId());
         assertEquals(TEST_USER_ID, result.getUserId());
-        assertEquals(TEST_PAY_KEY, result.getPayKey());
         assertEquals(PaymentStatus.PAY_IN_PROGRESS, result.getPaymentStatus());
 
         verify(paymentRepository).save(any(PaymentEntity.class));

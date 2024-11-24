@@ -141,6 +141,8 @@ public class ParticipationService {
     public Boolean validateParticipationInfoUserIdAndPostId(long postId,
         long participationId, String userId) {
 
+        /*
+
         Optional<ParticipationEntity> optioinal = participationRepository.findById(
             participationId);
 
@@ -167,6 +169,8 @@ public class ParticipationService {
             return false;
         }
 
+
+         */
 
 
             return true;

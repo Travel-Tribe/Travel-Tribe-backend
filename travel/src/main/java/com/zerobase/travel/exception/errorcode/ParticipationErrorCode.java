@@ -16,7 +16,8 @@ public enum ParticipationErrorCode implements ErrorCode {
     PARTICIPATION_STATUS_ERROR("ERROR-PARTICIPATION-00007", "참여자의 참여상태가 예상과 다릅니다"),
     PARTICIPATION_NOT_EXIST("ERROR-PARTICIPATION-00008", "찾고자하는 참여가 존재하지 않습니다"),
     PARTICIPATION_CONTENTION("ERROR-PARTICIPATION-00009", "Lock 획득에 실패하였습니다."),
-    LOCK_ACQUISITION_ERROR("ERROR-PARTICIPATION-00010", "Lock 획득 중 예외가 발생하였습니다");
+    LOCK_ACQUISITION_ERROR("ERROR-PARTICIPATION-00010", "Lock 획득 중 예외가 발생하였습니다"),
+    LOCK_PARAM_PROCESSING_ERROR("ERROR-PARTICIPATION-00011", "Lock 파라미터 획득 중 예외가 발생하였습니다");
 
 
     private final String errorCode;

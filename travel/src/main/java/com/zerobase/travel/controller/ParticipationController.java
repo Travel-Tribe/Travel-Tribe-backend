@@ -2,6 +2,7 @@ package com.zerobase.travel.controller;
 
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.ParticipationDto;
+import com.zerobase.travel.dto.ResponseMyParticipationsDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.redis.PostLock;
 import com.zerobase.travel.service.ParticipationManagementService;
@@ -28,9 +29,10 @@ public class ParticipationController {
     private final ParticipationManagementService participationManagementService;
 
     // 참여
+    @PostLock
     @PostMapping("{postId}/participations")
     public ResponseEntity<ResponseMessage<ParticipationDto>> readyParticipation(
-        @PathVariable Long postId, @RequestHeader("X-User-Id") String userId,
+        @PathVariable long postId, @RequestHeader("X-User-Id") String userId,
         @RequestHeader("X-User-Email") String userEmail) {
         log.info("createParticipation controller start");
         return ResponseEntity.ok(ResponseMessage.success(

@@ -42,7 +42,7 @@ public class LockService {
 
     public void unlock(long postId) {
         RLock lock = redisson.getLock(getLockName(postId));
-        log.debug("Trying Unlock for PostId : {}", postId);
+        log.info("Trying Unlock for PostId : {}", postId);
         lock.unlock();
     }
 

@@ -1,8 +1,6 @@
-package com.zerobase.travel.controller;
+package com.zerobase.travel.dto;
 
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.type.ParticipationStatus;
-import com.zerobase.travel.type.RatingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -3,7 +3,7 @@ package com.zerobase.travel.service;
 import com.zerobase.travel.api.UserApi;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
-import com.zerobase.travel.controller.ResponseMyParticipationsDto;
+import com.zerobase.travel.dto.ResponseMyParticipationsDto;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;

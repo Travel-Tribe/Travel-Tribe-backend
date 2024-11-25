@@ -17,6 +17,7 @@ import com.zerobase.user.dto.request.EditUserPasswordDTO;
 import com.zerobase.user.dto.request.JoinDTO;
 import com.zerobase.user.dto.request.ResetPasswordEmailDTO;
 import com.zerobase.user.dto.request.UserEmailAuthenticationDTO;
+import com.zerobase.user.dto.response.ProfileResponseDTO;
 import com.zerobase.user.dto.response.UserInfoResponseDTO;
 import com.zerobase.user.entity.EmailVerificationEntity;
 import com.zerobase.user.entity.ProfileEntity;
@@ -271,30 +272,13 @@ public class UserService {
 
         profileEntity.setRatingAvg(avg);
 
-        String cacheKey = "userInfo:" + userId;
+        String cacheKey = "userInfo:" + userEntity.getId();
+        String profileKey = "userProfile:" + userEntity.getId();
+
         // 기존 캐시 삭제
         redisTemplate.delete(cacheKey);
+        redisTemplate.delete(profileKey);
+
         log.info("Cache deleted for user ID: {}", userId);
-
-        // 변경된 UserInfoResponseDTO 생성
-        UserInfoResponseDTO updatedUserInfo = UserInfoResponseDTO.builder()
-            .id(userEntity.getId())
-            .username(userEntity.getUsername())
-            .nickname(userEntity.getNickname())
-            .phone(userEntity.getPhone())
-            .email(userEntity.getEmail())
-            .status(userEntity.getStatus().getUserStatus())
-            // 프로필 관련 정보도 업데이트하는 경우 ProfileEntity를 다시 조회하여 설정
-            .introduction(profileEntity.getIntroduction())
-            .mbti(profileEntity.getMbti())
-            .gender(profileEntity.getGender().getGender())
-            .smoking(profileEntity.getSmoking().getSmoke())
-            .birth(profileEntity.getBirth())
-            .ratingAvg(profileEntity.getRatingAvg())
-            .build();
-
-        // Redis 캐시에 갱신된 데이터 저장 (만료 시간 1시간 설정)
-        redisTemplate.opsForValue().set(cacheKey, updatedUserInfo, 1, TimeUnit.HOURS);
-        log.info("Cache updated for user ID: {}", userId);
     }
 }

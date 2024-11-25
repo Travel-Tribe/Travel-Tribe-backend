@@ -86,7 +86,7 @@ public class ParticipationManagementService {
         participationService.saveParticipation(participationEntity);
     }
 
-    // 1.2 여행 참가를 눌러서 결재 완료 혹은 결제실패 처리가 정상처리가 된 경우
+    // 1.2 여행 참가를 눌러서 결재 완료 정상처리가 된 경우
     @Transactional
     public void successPaymentParticipation(long participationId,
         String userId) {

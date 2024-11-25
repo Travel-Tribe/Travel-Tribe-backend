@@ -87,11 +87,12 @@ public class CommunityManagementService {
     }
 
     @Transactional
-    public ResponseCommunityDto updatePost( RequestUpdateCommunity request,
+    public ResponseCommunityDto updatePost(long communityId,
+        RequestUpdateCommunity request,
         String userId) {
 
 
-        CommunityDto communityDto = communityService.updatePost(request.getCommunityId(),
+        CommunityDto communityDto = communityService.updatePost(communityId,
             request.getTitle(),request.getContent(),userId);
 
         communityFileService.deleteAllByCommunityId(request.getCommunityId());

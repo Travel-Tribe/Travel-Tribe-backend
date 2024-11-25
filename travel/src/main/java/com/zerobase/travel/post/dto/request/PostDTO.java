@@ -4,6 +4,8 @@ import com.zerobase.travel.post.type.LimitSex;
 import com.zerobase.travel.post.type.LimitSmoke;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -16,57 +18,60 @@ import lombok.Data;
 @Data
 public class PostDTO {
 
-    @NotBlank(message = "제목은 필수입니다.")
+    @NotBlank(message = "ERROR-POST-00001")
     private String title;
 
-    @NotNull(message = "여행 시작 날짜는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00008")
+    @FutureOrPresent(message = "ERROR-POST-00009")
     private LocalDate travelStartDate;
 
-    @NotNull(message = "여행 종료 날짜는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00010")
+    @Future(message = "ERROR-POST-00011")
     private LocalDate travelEndDate;
 
-    @NotNull(message = "최대 참여 인원은 필수입니다.")
-    @Min(value = 1, message = "최소 1명 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00012")
+    @Min(value = 1, message = "ERROR-POST-00013")
     private Integer maxParticipants;
 
-    @NotNull(message = "여행 국가는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00014")
     private Country travelCountry;
 
-    @NotNull(message = "대륙은 필수입니다.")
+    @NotNull(message = "ERROR-POST-00015")
     private Continent continent;
 
-    @NotBlank(message = "지역은 필수입니다.")
+    @NotBlank(message = "ERROR-POST-00016")
     private String region;
 
-    @NotNull(message = "숙박비는 필수입니다.")
-    @Min(value = 0, message = "숙박비는 0 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00017")
+    @Min(value = 0, message = "ERROR-POST-00018")
     private Integer accommodationFee;
 
-    @NotNull(message = "기타 경비는 필수입니다.")
-    @Min(value = 0, message = "기타 경비는 0 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00019")
+    @Min(value = 0, message = "ERROR-POST-00020")
     private Integer otherExpenses;
 
-    @NotNull(message = "비행기표는 필수입니다.")
-    @Min(value = 0, message = "비행기표는 0 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00021")
+    @Min(value = 0, message = "ERROR-POST-00022")
     private Integer airplaneFee;
 
-    @NotNull(message = "최대 나이는 필수입니다.")
-    @Min(value = 0, message = "최대 나이는 0 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00023")
+    @Min(value = 0, message = "ERROR-POST-00024")
     private Integer limitMaxAge;
 
-    @NotNull(message = "최소 나이는 필수입니다.")
-    @Min(value = 0, message = "최소 나이는 0 이상이어야 합니다.")
+    @NotNull(message = "ERROR-POST-00025")
+    @Min(value = 0, message = "ERROR-POST-00026")
     private Integer limitMinAge;
 
-    @NotNull(message = "성별 제한은 필수입니다.")
+    @NotNull(message = "ERROR-POST-00027")
     private LimitSex limitSex;
 
-    @NotNull(message = "흡연 여부는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00028")
     private LimitSmoke limitSmoke;
 
-    @NotNull(message = "마감 날짜는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00029")
+    @Future(message = "ERROR-POST-00030")
     private LocalDate deadline;
 
-    @NotEmpty(message = "여행 일정은 최소 1일 이상이어야 합니다.")
+    @NotEmpty(message = "ERROR-POST-00031")
     private List<DayDTO> days;
 }

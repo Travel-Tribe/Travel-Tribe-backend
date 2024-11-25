@@ -71,14 +71,14 @@ public class RatingService {
         }
 
         //주는 사람 여행 참여상태가 travel_finish 일때 가능
-        if (ParticipationStatus.TRAVEL_FINISHED
+        if (!ParticipationStatus.TRAVEL_FINISHED
             .equals(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(senderUserId)).get().getParticipationStatus())
         ) {
             throw new BizException(RatingErrorCode.NOT_YET_GIVE_RATING);
         }
 
         //받는 사람 여행 참여상태가 travel_finish 일때 가능
-        if (ParticipationStatus.TRAVEL_FINISHED
+        if (!ParticipationStatus.TRAVEL_FINISHED
             .equals(participationRepository.findByPostEntityPostIdAndUserId(postId, String.valueOf(receiverUserId)).get().getParticipationStatus())
         ) {
             throw new BizException(RatingErrorCode.NOT_YET_GIVE_RATING);

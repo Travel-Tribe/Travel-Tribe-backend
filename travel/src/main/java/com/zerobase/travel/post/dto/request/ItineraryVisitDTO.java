@@ -7,12 +7,12 @@ import lombok.Data;
 @Data
 @Builder
 public class ItineraryVisitDTO {
-    @NotNull(message = "위치 정보는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00005")
     private Double latitude;
 
-    @NotNull(message = "위치 정보는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00006")
     private Double longitude;
 
-    @NotNull(message = "순서는 필수입니다.")
+    @NotNull(message = "ERROR-POST-00007")
     private Integer orderNumber;
 }

@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DepositRepository extends JpaRepository<DepositEntity,Long> {
 
-    Optional<DepositEntity> findByParticipationId(Long participationId);
+    Optional<DepositEntity> findByParticipationIdAndPaymentStatus(Long participationId,
+        PaymentStatus payCompleted);
 
     boolean existsByParticipationIdAndPaymentStatus(long participationId,
         PaymentStatus paymentStatus);

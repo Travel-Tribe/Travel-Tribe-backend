@@ -1,7 +1,5 @@
 package com.zerobase.travel.post.entity;
 
-import com.zerobase.travel.communities.type.CustomException;
-import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.post.type.Gender;
 import com.zerobase.travel.post.type.LimitSex;
 import com.zerobase.travel.post.type.LimitSmoke;
@@ -117,13 +115,13 @@ public class PostEntity {
         return true;
     }
 
-    public static boolean validateUserGEnder(PostEntity postEntity, Gender userGender) {
+    public static boolean validateUserGender(PostEntity postEntity, Gender userGender) {
         if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
-            if(userGender.equals(Gender.FEMALE)){
+            if(userGender.equals(Gender.MALE)){
                 return false;
             }
         } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {
-            if(userGender.equals(Gender.MALE)){
+            if(userGender.equals(Gender.FEMALE)){
                 return false;
             }
         }
@@ -134,11 +132,11 @@ public class PostEntity {
     public static boolean validateSmoking(PostEntity postEntity, Smoking userSmoking) {
 
         if (postEntity.getLimitSmoke().equals(LimitSmoke.SMOKER)) {
-            if (userSmoking.equals(Smoking.YES)) {
+            if (userSmoking.equals(Smoking.NO)) {
                     return false;
             }
         } else if (postEntity.getLimitSmoke().equals(LimitSmoke.NON_SMOKER)) {
-            if (userSmoking.equals(Smoking.NO)) {
+            if (userSmoking.equals(Smoking.YES)) {
                 return false;
             }
         }

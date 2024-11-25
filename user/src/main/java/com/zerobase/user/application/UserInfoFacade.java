@@ -23,10 +23,21 @@ public class UserInfoFacade {
 
         // Redis에서 캐시된 데이터 조회
         Object cachedData = redisTemplate.opsForValue().get(cacheKey);
+
         if (cachedData != null) {
             log.info("Cache hit for user ID: {}", userId);
-            return (UserInfoFacadeDto) cachedData;
+
+            // 캐싱된 데이터가 UserInfoResponseDTO 타입으로 저장된 경우 처리
+            if (cachedData instanceof UserInfoFacadeDto) {
+                return (UserInfoFacadeDto) cachedData;
+            }
+
+            // 데이터 타입이 일치하지 않을 경우 예외 처리
+            throw new IllegalStateException(
+                "Unexpected cached data type: " + cachedData.getClass());
         }
+
+        // Redis 캐시에 데이터가 없는 경우
         UserServiceDto userInfo = userService.getUserInfo(userId);
 
         Integer completedTripsCount = userParticipationService.getCompletedTripsCount(

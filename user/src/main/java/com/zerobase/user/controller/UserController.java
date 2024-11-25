@@ -129,10 +129,10 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfo() {
         String email = authenticationUtil.getLoginedUserEmail();
-        UserInfoFacadeDto otherUserInfo = userInfoFacade.getUserInfo(
+        UserInfoFacadeDto userInfoFacadeDto = userInfoFacade.getUserInfo(
             userService.getCurrentUser(email).getId());
         return ResponseEntity.status(OK)
-            .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(otherUserInfo)));
+            .body(ResponseMessage.success(UserInfoResponseDTO.fromDto(userInfoFacadeDto)));
     }
 
     // 다른 회원 정보 조회

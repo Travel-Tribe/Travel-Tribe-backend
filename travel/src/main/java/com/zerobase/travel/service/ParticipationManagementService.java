@@ -210,6 +210,8 @@ public class ParticipationManagementService {
             participationService.checkStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesUnRated);
             participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterTravelFinishStatusesRated);
         }
+
+        participationService.saveParticipation(participationEntity);
     }
 
     // 6 여행을 왼료한 후에 보증금이 반환됨

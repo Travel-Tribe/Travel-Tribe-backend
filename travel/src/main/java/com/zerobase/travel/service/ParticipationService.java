@@ -299,6 +299,23 @@ public class ParticipationService {
             .toList();
     }
 
+    public List<ResponseMyParticipationsDto> getMyParticipationsStatusOfTravelFinished(
+        String userId) {
+
+        log.info("service getMyParticipationsStatusOfTravelFinished");
+
+        List<ParticipationEntity> participationEntities
+            = participationRepository.findAllByUserIdAndParticipationStatusIn(
+            userId,
+            List.of(ParticipationStatus.TRAVEL_FINISHED));
+
+        return participationEntities.stream().map(
+                ResponseMyParticipationsDto::fromEntity)
+            .toList();
+    }
+
+
+
 
     public List<ParticipationDto> getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(
         String userId) {
@@ -348,4 +365,6 @@ public class ParticipationService {
 
         return participationEntities.stream().map(ParticipationDto::fromEntity).toList();
     }
+
+
 }

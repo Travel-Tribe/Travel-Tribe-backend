@@ -63,13 +63,23 @@ public class ParticipationController {
     }
 
     // 참여자 조회시에Join/joinready 상태의 자신의 참여 게시글 리스트 확인
-    @GetMapping("/participations")
+    @GetMapping("/participations/by-join-joinready")
     public ResponseEntity<ResponseMessage<List<ResponseMyParticipationsDto>>> getMyParticipationsStatusofJoninAndJoinReady(
         @RequestHeader("X-User-Id") String userId) {
-        log.info("getParticipationsByPost controller start");
+        log.info("getMyParticipationsStatusofJoninAndJoinReady controller start");
         return ResponseEntity.ok(
             ResponseMessage.success(
                 participationService.getMyParticipationsStatusOfJoinAndJoinReady(userId)));
+    }
+
+    // 참여자 조회시에Join/joinready 상태의 자신의 참여 게시글 리스트 확인
+    @GetMapping("/participations/by-travelfinished")
+    public ResponseEntity<ResponseMessage<List<ResponseMyParticipationsDto>>> getMyParticipationsStatusofTravelFinished(
+        @RequestHeader("X-User-Id") String userId) {
+        log.info("getMyParticipationsStatusofTravelFinished controller start");
+        return ResponseEntity.ok(
+            ResponseMessage.success(
+                participationService.getMyParticipationsStatusOfTravelFinished(userId)));
     }
 
 

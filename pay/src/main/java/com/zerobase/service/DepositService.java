@@ -39,12 +39,6 @@ public class DepositService {
     }
 
 
-    public DepositDto findByParticipationIdAndChangStatus(Long participationId) {
-        return DepositDto.fromEntity(depositRepository
-            .findByParticipationIdAndPaymentStatus(participationId,
-                PaymentStatus.PAY_COMPLETED).orElseThrow(
-                () -> new BizException(PaymentErrorCode.DEPOSIT_NOT_EXSITING)));
-    }
 
     public void save(DepositEntity depositEntity) {
         depositRepository.save(depositEntity);
@@ -77,17 +71,6 @@ public class DepositService {
         return depositEntity;
     }
 
-    public DepositEntity getPaymentCompletedAndChangeStatusByOrderId(
-        long depositId,
-        PaymentStatus paymentStatus) {
-        DepositEntity depositEntity = depositRepository.findById(depositId)
-            .orElseThrow(() -> new BizException(
-                PaymentErrorCode.DEPOSIT_NOT_EXSITING));
-
-        depositEntity.setPaymentStatus(paymentStatus);
-
-        return depositEntity;
-    }
 
     public DepositEntity SetToRefundDepositPay(long participationId, String userId) {
         DepositEntity depositEntity = depositRepository.findByParticipationIdAndPaymentStatus(

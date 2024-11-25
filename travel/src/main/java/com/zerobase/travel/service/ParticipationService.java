@@ -60,6 +60,7 @@ public class ParticipationService {
     // 참여를 초기화하고 생성시키는 기능
     // todo : lock 잠금처리 할 것
 
+    // 결제전, 최초 참여정보를 생성할때 검증하는 메소드
     public void validateParticipationApplicant(Long postId, String userId,
         String userEmail) {
 
@@ -74,23 +75,11 @@ public class ParticipationService {
         List<ParticipationDto> participations =
             this.getParticipationsByStatusOfJoinAndJoinReadyAndByUserId(userId);
 
-        // 1.1 유저는 최대 두개까지만 참여가능
-        if (participations.size() >= 2) {
-            log.info("participation validation service start ");
-            throw new BizException(ParticipationErrorCode.USER_PARTICIPATION_LIMIT);
-        }
 
-        // 1.2 유저는 이미 참여중이면 다시 참여할수 없음
+        // 1 유저는 이미 참여중이면 다시 참여할수 없음
         for (ParticipationDto participation : participations) {
             if (Objects.equals(participation.getPostId(), postId)) {
                 throw new BizException(ParticipationErrorCode.PARTICIPATION_ALREADY_MADE);
-            }
-        }
-
-        // 1.3 PayReady인 상태가 하나가 넘어서는 안됨
-        for (ParticipationDto participation : participations) {
-            if (Objects.equals(participation.getParticipationStatus(), ParticipationStatus.JOIN_READY)) {
-                throw new BizException(ParticipationErrorCode.PARTICIPATION_JOINREADY_ALREADYEXISTING);
             }
         }
 
@@ -103,16 +92,34 @@ public class ParticipationService {
         // 3. post 제한사항과 user 프로필 필터링 여러가지 취향에 따른 제한들 - user 의 정보를 호출
 
         validatePostLimitAndUserProfile(userInfo, postEntity);
+        
+        // 4. 유저는 최대 두개까지만 참여가능
+        if (participations.size() >= 2) {
+            log.info("participation validation service start ");
+            throw new BizException(ParticipationErrorCode.USER_PARTICIPATION_LIMIT);
+        }
 
-        // 4. 게시글의 상태가 현재 모집중인지 확인, 단 참여신청자가 user인 경우 post의 상태와 관련없이 참여함
+        
+
+        // 5. PayReady인 상태가 하나가 넘어서는 안됨
+        for (ParticipationDto participation : participations) {
+            if (Objects.equals(participation.getParticipationStatus(), ParticipationStatus.JOIN_READY)) {
+                throw new BizException(ParticipationErrorCode.PARTICIPATION_JOINREADY_ALREADYEXISTING);
+            }
+        }
+
+      
+
+        // 6. 게시글의 상태가 현재 모집중인지 확인, 단 참여신청자가 user인 경우 post의 상태와 관련없이 참여함
         if (Objects.equals(String.valueOf(postEntity.getUserId()), userId)) {
             return;
         } else if (postEntity.getStatus() != PostStatus.RECRUITING) {
-            throw new CustomException(ErrorCode.POST_STATUS_NOTRECRUITING);
+            throw new BizException(ParticipationErrorCode.POST_STATUS_NOTRECRUITING);
         }
 
     }
 
+    // 결제전, 최초 참여정보를 생성할때 검증하는 메소드, 포스트의 제약사항과 유저의 프로필 검증
     private static void validatePostLimitAndUserProfile(
         UserInfoResponseDTO userInfo, PostEntity postEntity) {
 
@@ -121,27 +128,27 @@ public class ParticipationService {
             .getYears();
 
         if (!PostEntity.validateUserAge(postEntity, userAge)) {
-            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
+            throw new BizException(ParticipationErrorCode.APPLICANT_AGE_LIMIT_UNMATCHED);
 
         }
 
         // 성별검증
-        if (!PostEntity.validateUserGEnder(postEntity, userInfo.getGender())) {
-            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
+        if (!PostEntity.validateUserGender(postEntity, userInfo.getGender())) {
+            throw new BizException(ParticipationErrorCode.APPLICANT_GENDER_LIMIT_UNMATCHED);
         }
 
         // 흡연자 검증
         if (!PostEntity.validateSmoking(postEntity, userInfo.getSmoking())) {
-            throw new BizException(ParticipationErrorCode.APPLICANT_POST_LIMIT_MATCHED);
+            throw new BizException(ParticipationErrorCode.APPLICANT_SMOKING_LIMIT_MATCHED);
         }
 
     }
 
-    // 3가지 정보의 연관관계를 검증하여 옳지않으면 false, 옳으면 true를 반환
+    // 결제준비시에 유저로부터 전해받은 Participation 정보가 맞는지 검증
     public Boolean validateParticipationInfoUserIdAndPostId(long postId,
         long participationId, String userId) {
 
-        /*
+        
 
         Optional<ParticipationEntity> optioinal = participationRepository.findById(
             participationId);
@@ -157,9 +164,6 @@ public class ParticipationService {
             return false;
         }
 
-        if(postEntity.getStatus() != PostStatus.RECRUITING) {
-            return false;
-        }
 
         if(!Objects.equals(participationEntity.getUserId(), userId)) {
             return false;
@@ -168,12 +172,12 @@ public class ParticipationService {
         if(participationEntity.getParticipationStatus()!= ParticipationStatus.JOIN_READY) {
             return false;
         }
+        
+        if(postEntity.getStatus()!=PostStatus.RECRUITING&&postEntity.getStatus()!=PostStatus.PAYMENT_PENDING)
+            return false;
 
 
-         */
-
-
-            return true;
+        return true;
     }
 
     public ParticipationDto createParticipationReady(Long postId,

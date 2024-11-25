@@ -1,0 +1,6 @@
+FROM openjdk:17
+EXPOSE 8082
+RUN mkdir -p deploy
+WORKDIR /deploy
+COPY pay/build/libs/pay-0.0.1-SNAPSHOT.jar api.jar
+ENTRYPOINT ["java", "-jar", "/deploy/api.jar", "--spring.profiles.active=dev"]

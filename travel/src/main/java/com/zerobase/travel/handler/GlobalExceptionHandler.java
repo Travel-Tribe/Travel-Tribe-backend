@@ -48,6 +48,8 @@ public class GlobalExceptionHandler {
 
     }
 
+
+
     // 토큰 예외 처리
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<?> handleBizException(TokenException ex) {
@@ -62,7 +64,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
 
-        log.error(ex.getMessage());
+        log.error(ex.getMessage(), ex);
 
         // 500 Internal Server Error 상태 코드와 함께 반환
         return ResponseEntity

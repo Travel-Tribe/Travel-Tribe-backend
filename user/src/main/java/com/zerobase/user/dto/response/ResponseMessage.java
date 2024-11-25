@@ -1,10 +1,15 @@
 package com.zerobase.user.dto.response;
 
+import static com.zerobase.user.dto.response.ResponseMessage.Result.FAIL;
+import static com.zerobase.user.dto.response.ResponseMessage.Result.SUCCESS;
+import static org.springframework.http.HttpStatus.*;
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
@@ -21,31 +26,30 @@ public class ResponseMessage<T> {
     }
 
     public static <T> ResponseMessage<T> success(T data) {
-        return new ResponseMessage<T>(Result.SUCCESS.toString(), null, data);
+        return new ResponseMessage<T>(SUCCESS.toString(), null, data);
     }
 
-    public static ResponseMessage fail(ErrorCode errorCode) {
-        return ResponseMessage.builder()
-            .result(Result.FAIL.toString())
+    public static <T> ResponseMessage<T> fail(ErrorCode errorCode) {
+        return ResponseMessage.<T>builder()
+            .result(FAIL.toString())
             .errors(List.of(new Errors(errorCode)))
             .build();
     }
 
-    public static ResponseMessage fail(ErrorCode errorCode, Object data) {
-        return ResponseMessage.builder()
-            .result(Result.FAIL.toString())
-            .data(data)
-            .errors(List.of(new Errors(errorCode)))
-            .build();
-    }
+//    public static ResponseMessage<Object> fail(ErrorCode errorCode, Object data) {
+//        return ResponseMessage.builder()
+//            .result(FAIL.toString())
+//            .data(data)
+//            .errors(List.of(new Errors(errorCode)))
+//            .build();
+//    }
 
-    public static ResponseMessage fail(List<Errors> errors) {
-        return ResponseMessage.builder()
-            .result(Result.FAIL.toString())
+    public static <T> ResponseMessage<T> fail(List<Errors> errors) {
+        return ResponseMessage.<T>builder()
+            .result(FAIL.toString())
             .errors(errors)
             .build();
     }
-
 
     public enum Result {
         SUCCESS, FAIL

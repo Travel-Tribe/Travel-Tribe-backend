@@ -1,0 +1,43 @@
+server:
+  port: 80
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            exposedHeaders: "Authorization, access"
+            allowCredentials: true
+      routes:
+        - id: user-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/v1/users/**, /login, /logout  # '/api/v1/users' 및 하위 경로 포함
+        # User 모듈로의 요청에는 필터를 적용하지 않음
+        - id: post-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/posts/**, /api/v1/reviews/**, /api/v1/communities/**, /api/v1/file/**
+          filters:
+            - Jwt
+        - id: pay-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/pay/**, /internal/api/v1/pay/**
+          filters:
+            - Jwt
+          # post-service로의 요청에만 JwtFilter 적용
+
+
+  jwt:
+    secret: dlstoddmsgksqjsQnsdlslchljsdmfekgotkfwkvhrlgkwlakfwk
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8000/eureka/

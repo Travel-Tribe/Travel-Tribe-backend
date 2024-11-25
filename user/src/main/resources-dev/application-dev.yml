@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: TravelTribe
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: seoksmin@gmail.com
+    password: actzaznihhlpahkb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://travel_mysql:3306/travel_user?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
+    password: 1q2w3e4r@@
+
+  jwt:
+    secret: dlstoddmsgksqjsQnsdlslchljsdmfekgotkfwkvhrlgkwlakfwk
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        #show_sql: true
+  kafka:
+    bootstrap-servers: travel_kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  data:
+    redis:
+      host: travel_redis
+      port: 6379
+
+app:
+  kafka:
+    topics:
+      user-mbti-changed: user-mbti-changed-topic
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+
+logging:
+  level:
+    root: INFO # 기본 로그 레벨은 INFO로 설정
+    com.springboot.user: DEBUG # 필요한 패키지만 DEBUG로 설정
+    org.hibernate.SQL: INFO # Hibernate의 SQL 로그를 INFO로 제한
+    org.hibernate.type: OFF # Hibernate 타입 로그는 OFF로 설정하여 상세 로그 비활성화
+
+post-service:
+  url: http://10.178.0.4:8081
+
+#  file:
+#    name: logs/noticeboard.log
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+#    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8000/eureka/

@@ -1,6 +1,16 @@
 package com.zerobase.user.jwt;
 
+import static com.zerobase.user.dto.response.BasicErrorCode.CREATE_TOKEN_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.DEACTIVATED_USER_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.INTERNAL_SERVER_ERROR;
+import static com.zerobase.user.dto.response.BasicErrorCode.SUSPENDED_USER_ERROR;
 import static com.zerobase.user.dto.response.ValidErrorCode.LOGIN_FAIL_ERROR;
+import static com.zerobase.user.dto.response.ValidErrorCode.USER_NOT_FOUND_ERROR;
+import static com.zerobase.user.type.UserStatus.DEACTIVATED;
+import static com.zerobase.user.type.UserStatus.INACTIVE;
+import static jakarta.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.user.dto.request.LoginRequestDTO;
@@ -8,12 +18,14 @@ import com.zerobase.user.dto.response.LoginSuccessDTO;
 import com.zerobase.user.entity.ProfileEntity;
 import com.zerobase.user.entity.RefreshEntity;
 import com.zerobase.user.entity.UserEntity;
+import com.zerobase.user.exception.BizException;
 import com.zerobase.user.repository.ProfileRepository;
 import com.zerobase.user.repository.RefreshRepository;
 import com.zerobase.user.repository.UserRepository;
 import com.zerobase.user.util.CookieUtil;
 import com.zerobase.user.util.JWTUtil;
 import com.zerobase.user.util.ResponseUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,6 +79,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         log.debug("Attempting to authenticate user with email: {}", email);
 
+        // 사용자 정보 조회 및 상태 확인
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        if (DEACTIVATED.equals(userEntity.getStatus())) {
+            ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), DEACTIVATED_USER_ERROR);
+            return null;
+        } else if (INACTIVE.equals(userEntity.getStatus())) {
+            ResponseUtil.setJsonResponse(response, FORBIDDEN.value(), SUSPENDED_USER_ERROR);
+            return null;
+        }
+
+
         //스프링 시큐리티에서 email과 password를 검증하기 위해서는 token에 담아야 함
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
             email, password, null);
@@ -89,24 +114,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        //토큰 생성
-        String access = jwtUtil.createJwt("access", email, role, 1800000L);
-        String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L);
-        log.info("Generated access and refresh tokens for user: {}", email);
-
-        //Refresh 토큰 저장
-        addRefreshEntity(email, refresh, 86400000L);
-
-        //응답 설정
-        response.setHeader("access", access);
-        response.addCookie(cookieUtil.createCookie("refresh", refresh));
+        UserEntity userEntity = userRepository.findByEmail(email)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+        Long userEntityId = userEntity.getId();
 
         try {
-            // JSON 응답 생성
-            Optional<UserEntity> OptionalUserEntity = userRepository.findByEmail(email);
-            UserEntity userEntity = OptionalUserEntity.get();
-            Long userEntityId = userEntity.getId();
+            //토큰 생성
+            String access = jwtUtil.createJwt("access", email, role, 1800000L, userEntityId);
+            String refresh = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);
+            log.info("Generated access and refresh tokens for user: {}", email);
 
+            //Refresh 토큰 저장
+            addRefreshEntity(email, refresh, 86400000L);
+
+            //응답 설정
+            response.setHeader("access", access);
+            response.setHeader("Set-Cookie", cookieUtil.createCookie("refresh", refresh).toString());
+
+            // JSON 응답 생성
             Optional<ProfileEntity> OptionalProfileEntity = profileRepository.findByUserId(
                 userEntityId);
 
@@ -117,9 +142,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .profileCheck(OptionalProfileEntity.isPresent())
                 .build();
 
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_OK, loginSuccessDTO);
-        } catch (IOException e) {
-            log.error("Failed to write the response", e);
+            ResponseUtil.setJsonResponse(response, SC_OK, loginSuccessDTO);
+        } catch (JwtException e) { // jwtUtil.createJwt(...) 에서 발생할 수 있는 예외
+            log.error("Failed to create JWT token", e);
+            //throw new BizException(CREATE_TOKEN_ERROR);
+            ResponseUtil.setJsonResponse(response, SC_OK, CREATE_TOKEN_ERROR);
+        } catch (Exception e) { // 기타 모든 예외
+            log.error("Unexpected error during authentication", e);
+            //throw new BizException(INTERNAL_SERVER_ERROR);
+            ResponseUtil.setJsonResponse(response, SC_OK, INTERNAL_SERVER_ERROR);
         }
 
         log.debug("Access and refresh tokens sent in response for user: {}", email);
@@ -143,16 +174,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
         HttpServletResponse response, AuthenticationException failed) {
+
         log.warn("Authentication failed for user: {}", request.getParameter("email"), failed);
 
         // 로그인 실패 시 401 응답 코드 반환
-        try {
-            // JSON 응답 생성
-            ResponseUtil.setJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
-                LOGIN_FAIL_ERROR);
-        } catch (IOException e) {
-            log.error("Failed to write the response", e);
-        }
+
+        // JSON 응답 생성
+        ResponseUtil.setJsonResponse(response, SC_UNAUTHORIZED,
+            LOGIN_FAIL_ERROR);
+
     }
 }
 

@@ -1,0 +1,69 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: travel
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://travel_mysql:3306/travel_travel?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1q2w3e4r@@
+
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  kafka:
+    bootstrap-servers: travel_kafka:9092
+    consumer:
+      group-id: travel-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+
+  data:
+    redis:
+      host: travel_redis
+      port: 6379
+
+app:
+  kafka:
+    topics:
+      user-mbti-changed: user-mbti-changed-topic
+
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8000/eureka/
+
+file:
+  upload:
+    path: /travel/upload
+
+user-service:
+  url: http://10.178.0.4:8080
+
+pay-service:
+  url : http://10.178.0.4:8082
+
+

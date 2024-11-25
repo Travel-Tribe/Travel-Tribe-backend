@@ -12,6 +12,8 @@ import com.zerobase.user.exception.BizException;
 import com.zerobase.user.exception.TokenException;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 // 전역 예외 처리 핸들러 추가
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // 유효성 검증 실패 시 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -48,7 +52,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBizException(BizException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseMessage.fail(ex.getErrorCode()));
-
     }
 
     // 토큰 예외 처리
@@ -77,6 +80,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
         // 500 Internal Server Error 상태 코드와 함께 반환
+        log.error(ex.getMessage(), ex);
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ResponseMessage.fail(INTERNAL_SERVER_ERROR));
     }

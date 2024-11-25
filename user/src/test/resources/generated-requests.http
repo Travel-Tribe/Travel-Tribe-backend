@@ -1,0 +1,1323 @@
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "seokseungmin",
+  "password": "1234",
+  "email": "seoksmin@naver.com",
+  "nickname": "SEOK",
+  "phone": "010-1111-1111"
+}
+
+###
+POST http://localhost:8080/join
+Content-Type: application/json
+
+{
+  "username": "seokseungmin",
+  "password": "1234",
+  "email": "seok@gmail.com",
+  "role": "ROLE_ADMIN"
+}
+
+
+<> 2024-10-28T162617.409.json
+<> 2024-10-28T140124.200.json
+<> 2024-10-25T163332.200.json
+<> 2024-10-14T233555.200.json
+<> 2024-10-14T233121.200.json
+<> 2024-10-14T231827.409.json
+<> 2024-10-14T231826.200.json
+<> 2024-10-14T230232.200.json
+<> 2024-10-14T010954.200.json
+<> 2024-10-10T232554.200.json
+<> 2024-09-13T100613.200.txt
+<> 2024-09-13T092848.200.txt
+<> 2024-09-12T200313.200.txt
+<> 2024-09-12T200128.200.txt
+<> 2024-09-12T195557.200.txt
+<> 2024-09-12T194752.200.txt
+<> 2024-09-12T190228.200.txt
+<> 2024-09-12T182432.200.txt
+<> 2024-09-12T181404.200.txt
+<> 2024-09-12T181000.200.txt
+
+###
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "email": "seoksmin@naver.com",
+  "password": 1234
+}
+
+<> 2024-10-28T161752.200.json
+<> 2024-10-28T140334.200.json
+<> 2024-10-25T164158.200.json
+<> 2024-10-25T163352.200.json
+<> 2024-10-14T233858.200.json
+<> 2024-10-14T233559.401.json
+<> 2024-10-14T233126.401.json
+<> 2024-10-14T230235.200.json
+<> 2024-10-14T225531.200.json
+
+###
+POST http://localhost:8080/reissue
+Cookie: refresh=eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQURNSU4iLCJpYXQiOjE3MzAxNjk2MTQsImV4cCI6MTczMDI1NjAxNH0.TCMKf5gNlCge0OnE4P2trjfqpfw88-J39iDj5GEgn7A
+
+###
+POST http://localhost:8080/logout
+Cookie: refresh=eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tzbWluQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MzAzNzc5MjksImV4cCI6MTczMDQ2NDMyOX0.DspsIbtCL9e6C_drdpokPir_5kjchaSXD8tOpPMVLXI
+
+###
+GET http://localhost:8080/admin
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQURNSU4iLCJpYXQiOjE3Mjg4NDAxODUsImV4cCI6MTcyODkyNjU4NX0.4c-7jId_FU4C74jOUFzJWeQluXgSFWKu9fJ_Cm3balQ
+
+###
+POST http://localhost:8080/reissue
+Cookie: refresh=eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfQURNSU4iLCJpYXQiOjE3Mjg5MTEwNDAsImV4cCI6MTcyODk5NzQ0MH0.cE7BOwMrguK5BDaJuhPXCGwI4fDhsgt7eraT163PFHY
+
+###
+GET http://localhost:8080/admin
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyNzA1MTM4MywiZXhwIjoxNzI3MDUxOTgzfQ.uLRHGGhDQe0E8RnaRY_l6pjGY8426dHaUqNM9J0YnwE
+
+###
+POST http://localhost:8080/posts
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxNDU1NSwiZXhwIjoxNzI4OTE1MTU1fQ.6ZFhoe4oy0hV-TAUJY1N4-Cmm6VIO2_Fx_hoGtKWmd8
+Content-Type: application/json
+
+{
+  "title": "제목 작성 필수",
+  "content": "내용 작성 필수"
+}
+
+<> 2024-10-14T230253.200.json
+<> 2024-10-14T230248.200.json
+<> 2024-10-14T225646.200.json
+<> 2024-10-14T225645.200.json
+<> 2024-10-14T225543.200.json
+<> 2024-10-14T225542.200.json
+<> 2024-10-14T225524.401.json
+<> 2024-09-25T173155.200.json
+<> 2024-09-25T172138.200.json
+<> 2024-09-25T172137-2.200.json
+
+###
+PUT http://localhost:8080/posts/1
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxNDU1NSwiZXhwIjoxNzI4OTE1MTU1fQ.6ZFhoe4oy0hV-TAUJY1N4-Cmm6VIO2_Fx_hoGtKWmd8
+Content-Type: application/json
+
+{
+  "title": "Boot",
+  "content": "내용 수정 필수"
+}
+
+<> 2024-10-14T230333.200.json
+<> 2024-10-14T230257.401.json
+<> 2024-10-14T225515.401.json
+
+###
+DELETE http://localhost:8080/posts/1
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxMzM0MSwiZXhwIjoxNzI4OTEzOTQxfQ.Qqpgb819JjQ_e5eZoZUmXTEnQ88SQhzK2OKCHkC12MY
+
+###
+GET http://localhost:8080/posts
+
+###
+GET http://localhost:8080/posts/2
+
+
+###
+POST http://localhost:8080/comments/2
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxMzM0MSwiZXhwIjoxNzI4OTEzOTQxfQ.Qqpgb819JjQ_e5eZoZUmXTEnQ88SQhzK2OKCHkC12MY
+
+{
+  "content": "이거 댓글 달림?"
+}
+
+<> 2024-10-14T011539.200.json
+<> 2024-10-14T010547.200.json
+
+###
+DELETE http://localhost:8080/comments/1
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxMzM0MSwiZXhwIjoxNzI4OTEzOTQxfQ.Qqpgb819JjQ_e5eZoZUmXTEnQ88SQhzK2OKCHkC12MY
+
+###
+GET http://localhost:8080/comments/2
+
+###
+PUT http://localhost:8080/comments/2
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcyODkxMzM0MSwiZXhwIjoxNzI4OTEzOTQxfQ.Qqpgb819JjQ_e5eZoZUmXTEnQ88SQhzK2OKCHkC12MY
+Content-Type: application/json
+
+{
+  "content": "수정 기능 작동 잘하나?"
+}
+
+
+###
+GET http://localhost:8080/comments/2
+
+<> 2024-10-14T224943.200.json
+
+###
+GET http://localhost:8080/posts
+
+### 1. 기본 게시글 목록 조회
+GET http://localhost:8080/posts?page=0&size=10&sortBy=createDate&direction=desc
+Accept: application/json
+
+<> 2024-10-14T230301.200.json
+
+### 2. 특정 키워드로 게시글 검색
+GET http://localhost:8080/posts?page=0&size=10&sortBy=createDate&direction=desc&keyword=Boot
+Accept: application/json
+
+<> 2024-10-14T230359.200.json
+<> 2024-10-14T230353.200.json
+<> 2024-10-14T230342.200.json
+<> 2024-10-14T230318.200.json
+<> 2024-10-14T230310.200.json
+<> 2024-10-14T225430.200.json
+<> 2024-10-14T225423.200.json
+
+### 3. 키워드 포함, 날짜 오름차순으로 게시글 조회
+GET http://localhost:8080/posts?page=0&size=5&sortBy=createDate&direction=asc&keyword=boot
+Accept: application/json
+
+<> 2024-10-14T230458.200.json
+<> 2024-10-14T230416.200.json
+<> 2024-10-14T230406.200.json
+<> 2024-10-14T230323.200.json
+<> 2024-10-14T225650.200.json
+<> 2024-10-14T225546.200.json
+<> 2024-10-14T225504.200.json
+
+### 4. 댓글 수 기준으로 내림차순 정렬하여 게시글 조회
+GET http://localhost:8080/posts?page=0&size=20&sortBy=commentCount&direction=desc
+Accept: application/json
+
+<> 2024-10-14T230450.200.json
+<> 2024-10-14T230423.200.json
+<> 2024-10-14T225558.200.json
+
+### 5. 키워드 없이 최신순으로 게시글 조회
+GET http://localhost:8080/posts?page=0&size=15&sortBy=createDate&direction=desc
+Accept: application/json
+
+<> 2024-10-14T230442.200.json
+<> 2024-10-14T230437.200.json
+<> 2024-10-14T230426.200.json
+<> 2024-10-14T225614.200.json
+
+###
+POST http://localhost:56562/users
+Content-Type: application/json
+
+{
+  "email": "seok@gmail.com",
+  "name": "seok",
+  "pwd": "test1234"
+}
+
+<> 2024-10-20T153343.201.json
+<> 2024-10-20T152109.200.txt
+<> 2024-10-20T151801.500.json
+
+###
+GET http://localhost/user-service/health_check
+
+
+
+
+###
+POST http://localhost/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "seokseungmin",
+  "password": "1234",
+  "email": "seoksmin@naver.com",
+  "nickname": "SEOK",
+  "phone": "010-1111-1111"
+}
+
+<> 2024-11-10T200953.201.json
+<> 2024-11-10T013750.201.json
+<> 2024-11-09T235023.201.json
+<> 2024-11-09T232254.201.json
+<> 2024-11-09T211719.201.json
+<> 2024-11-05T160319.201.json
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "",
+  "password": "",
+  "email": "seok",
+  "nickname": "",
+  "phone": ""
+}
+
+<> 2024-10-30T170623.201.json
+<> 2024-10-29T175214.201.json
+
+###
+POST http://localhost/login
+Content-Type: application/json
+
+{
+  "email": "seoksmin@naver.com",
+  "password": 1234
+}
+
+<> 2024-11-10T200959.200.json
+<> 2024-11-10T020602.200.json
+<> 2024-11-10T013752.200.json
+<> 2024-11-10T001004.200.json
+<> 2024-11-09T235026.200.json
+<> 2024-11-09T232258.200.json
+<> 2024-11-09T211721.200.json
+<> 2024-10-30T170939.200.json
+<> 2024-10-30T114117.200.json
+<> 2024-10-29T190051.401.json
+<> 2024-10-29T175220.200.json
+<> 2024-10-28T161752.200.json
+<> 2024-10-28T140334.200.json
+<> 2024-10-25T164158.200.json
+<> 2024-10-25T163352.200.json
+<> 2024-10-14T233858.200.json
+<> 2024-10-14T233559.401.json
+<> 2024-10-14T233126.401.json
+<> 2024-10-14T230235.200.json
+<> 2024-10-14T225531.200.json
+
+###
+POST http://localhost:8080/api/v1/users/reissue
+cookie: refresh=eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tzbWluQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3MzAzNzkxMzEsImV4cCI6MTczMDQ2NTUzMX0.mpj-37DwQR8NZI6UZrWvPDKtumJ79Qf5xN6Wq8PLeAI
+
+<> 2024-10-29T200731.200.json
+
+###
+POST http://localhost:8080/logout
+Cookie: refresh=eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6InJlZnJlc2giLCJlbWFpbCI6InNlb2tAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDM1MTk1MCwiZXhwIjoxNzMwNDM4MzUwfQ.DAj_V7LG_gnEjKroq_JvBkK9F23dI2328JGes8LUfLk
+
+###
+POST http://localhost/api/v1/users/profile
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzEyMzY5OTksImV4cCI6MTczMTIzODc5OX0.D0UpIMLswT7_loSHIvuXxj6ch-KBaTzn0NtSw3MOCRE
+
+{
+"introduction": "안녕하세요! 여행을 좋아하는 개발자입니다.",
+"mbti": "ISTJ",
+"smoking": "NO",
+"gender": "MALE",
+"fileAddress": "dsacopnasl;acl;xmacnvpodadmpxs.casonasp",
+"birth": "1990-01-01",
+"visitedCountries": ["Japan", "Canada", "France"],
+"langAbilities": ["Korean", "English", "Japanese"]
+}
+
+<> 2024-11-10T201011.201.json
+<> 2024-11-10T013814.201.json
+<> 2024-11-09T235038.201.json
+<> 2024-11-09T232311.201.json
+<> 2024-11-09T211810.201.json
+
+###
+PATCH http://localhost:8080/api/v1/users/Info
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMjc1NTg2LCJleHAiOjE3MzAyNzYxODZ9.Ner6fBTpCINrnBpsk92HYONyhFeXNYQuAtdeTRewlm8
+
+{
+  "nickname": "STONE",
+  "phone": "010-4444-5555"
+}
+
+###
+PATCH http://localhost:8080/api/v1/users/password
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzUyMTY3LCJleHAiOjE3MzAzNTI3Njd9.HK9HTpZwhLZIxXgiiCsrkNOLuGmYuZ-OKSFFysGBpWs
+
+{
+  "password": "1234",
+  "newPassword": "3333"
+}
+
+###
+POST http://localhost:8080/api/v1/users/profile
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzU0OTM0LCJleHAiOjE3MzAzNTU1MzR9.tbRYD4M0H2HiXw4tiBoAQ0zDyP1sB3iNPjsn_MHE7rQ
+
+{
+  "introduction": "",
+  "mbti": "",
+  "smoking": "",
+  "gender": "",
+  "fileAddress": "",
+  "birth": "",
+  "visitedCountries": [],
+  "langAbilities": []
+}
+
+<> 2024-10-30T114945.400.json
+
+
+###
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMjc3NzYyLCJleHAiOjE3MzAyNzgzNjJ9.heI0DYjJlpK0euSMNFhBmMjDL0XTuon6oZKO6w5Omis
+
+{
+  "username": "",
+  "nickname": "",
+  "phone": "",
+  "password": "",
+  "email": "seok"
+}
+
+<> 2024-10-30T174402.400.json
+
+###
+POST http://localhost:8080/api/v1/users/duplicate?
+    type=phone&
+    query=010-1111-1111
+
+<> 2024-10-29T203919.200.json
+<> 2024-10-29T203031.409.json
+
+### email,nickname,phone
+
+###
+GET http://localhost/api/v1/users/1/profile
+Content-Type: application/json
+
+###
+PATCH http://localhost/api/v1/users/profile
+Content-Type: application/json
+access:  eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzEyMzY5OTksImV4cCI6MTczMTIzODc5OX0.D0UpIMLswT7_loSHIvuXxj6ch-KBaTzn0NtSw3MOCRE
+
+{
+"introduction": "수정된 내용입니다.",
+"mbti": "ENFP",
+"smoking": "YES",
+"gender": "MALE",
+"fileAddress": "xxxxxxxxxxxxx",
+"birth": "1990-01-01",
+"visitedCountries": ["Kaguri", "Hangati", "France"],
+"langAbilities": ["Korean", "Chinese", "Japanese"]
+}
+
+<> 2024-11-10T201112.200.json
+<> 2024-11-10T020714.200.json
+<> 2024-11-10T013945.200.json
+<> 2024-11-09T232855.200.json
+
+###
+PATCH http://localhost:8080/api/v1/users/Info
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzUyNjQzLCJleHAiOjE3MzAzNTMyNDN9.xTIoGS7fBPeJFu_uqL1AkMQheLxmtfzFGRAaSrZ056k
+
+{
+  "nickname": "korea",
+  "phone": "010-3333-3333"
+}
+
+###
+GET http://localhost/api/v1/users
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzUyNjQzLCJleHAiOjE3MzAzNTMyNDN9.xTIoGS7fBPeJFu_uqL1AkMQheLxmtfzFGRAaSrZ056k
+
+###
+GET http://localhost/api/v1/users/1
+Content-Type: application/json
+
+###
+DELETE http://localhost:8080/api/v1/users
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDM3ODIxNiwiZXhwIjoxNzMwMzc4ODE2fQ.5EpO9lDBAhMDq_CXu1FsGRj8BUesl_ZMC7PLzhiedK0
+
+###
+POST http://localhost:8080/api/v1/users/change-email/request
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzYxMTgzLCJleHAiOjE3MzAzNjE3ODN9.ydKvb3eUM1MksDZLw00HwzXoMu9Ol070-FGTv3a1V_8
+
+{
+  "email": "seoksmin@naver.com"
+}
+
+###
+POST http://localhost:8080/api/v1/users/change-email/verify
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva0BnbWFpbC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzMwMzYxMTgzLCJleHAiOjE3MzAzNjE3ODN9.ydKvb3eUM1MksDZLw00HwzXoMu9Ol070-FGTv3a1V_8
+
+{
+  "email": "seoksmin@naver.com",
+  "code": "670127"
+
+}
+
+###
+POST http://localhost:8080/api/v1/users/reset-password
+Content-Type: application/json
+
+{
+  "email": "seoksmin@naver.com"
+}
+
+###
+POST http://localhost/api/v1/posts/test
+Content-Type: application/x-www-form-urlencoded
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDYxNjgwOCwiZXhwIjoxNzMwNjE4NjA4fQ.EDSgUAVtNcGsQq4UTHeBmvepCljMfOXSpkr-I45ROYc
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExNTQ2NDEsImV4cCI6MTczMTE1NjQ0MX0.oHS-0L5KzbU7JFrAC1BHADCaCcitmJ4AvcbCloGO9Ns
+
+{
+  "title": "강릉 4박 5일 해변 여행",
+  "travelStartDate": "2024-08-15",
+  "travelEndDate": "2024-08-19",
+  "maxParticipants": 12,
+  "travelCountry": "KR",
+  "continent": "ASIA",
+  "region": "Gangneung",
+  "accommodationFee": 600000,
+  "otherExpenses": 250000,
+  "airplaneFee": 180000,
+  "limitMaxAge": 65,
+  "limitMinAge": 25,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Family",
+  "deadline": "2024-08-01",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "강릉 도착",
+          "description": "강릉역 도착 후 호텔 체크인 및 휴식",
+          "fileAddress": "http://example.com/gangneung1.jpg"
+        },
+        {
+          "title": "오죽헌 방문",
+          "description": "신사임당과 율곡 이이의 오죽헌 방문",
+          "fileAddress": "http://example.com/gangneung2.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7514,
+          "longitude": 128.8965,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7650,
+          "longitude": 128.8973,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "경포대 해변 산책",
+          "description": "경포대 해변에서 산책 및 사진 촬영",
+          "fileAddress": "http://example.com/gangneung3.jpg"
+        },
+        {
+          "title": "안목해변 커피 거리",
+          "description": "안목해변의 다양한 카페 방문 및 커피 즐기기",
+          "fileAddress": "http://example.com/gangneung4.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7556,
+          "longitude": 128.9135,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7578,
+          "longitude": 128.9180,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "주문진 수산시장 탐방",
+          "description": "주문진 수산시장에서 신선한 해산물 구입 및 식사",
+          "fileAddress": "http://example.com/gangneung5.jpg"
+        },
+        {
+          "title": "정동진 레일바이크",
+          "description": "정동진 레일바이크를 타고 바다 풍경 감상",
+          "fileAddress": "http://example.com/gangneung6.jpg"
+        },
+        {
+          "title": "호텔 휴식",
+          "description": "호텔에서 휴식 및 자유 시간",
+          "fileAddress": "http://example.com/gangneung7.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7131,
+          "longitude": 128.8842,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.6963,
+          "longitude": 128.9058,
+          "orderNumber": 2
+        },
+        {
+          "latitude": 37.7005,
+          "longitude": 128.8957,
+          "orderNumber": 3
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "솔향수목원 방문",
+          "description": "솔향수목원에서 다양한 식물 감상",
+          "fileAddress": "http://example.com/gangneung8.jpg"
+        },
+        {
+          "title": "하슬라아트월드",
+          "description": "하슬라아트월드에서 예술 작품 감상",
+          "fileAddress": "http://example.com/gangneung9.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7543,
+          "longitude": 128.9147,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7621,
+          "longitude": 128.9185,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "출발 준비",
+          "description": "호텔 체크아웃 후 출발 준비",
+          "fileAddress": "http://example.com/gangneung10.jpg"
+        },
+        {
+          "title": "강릉역 출발",
+          "description": "강릉역에서 출발하여 귀가",
+          "fileAddress": "http://example.com/gangneung11.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7532,
+          "longitude": 128.8956,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7510,
+          "longitude": 128.8894,
+          "orderNumber": 2
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-09T211818.201.json
+<> 2024-11-09T211741.500.json
+<> 2024-11-09T154924.201.json
+<> 2024-11-06T184407.201.json
+<> 2024-11-06T184406.201.json
+<> 2024-11-06T184405.201.json
+<> 2024-11-06T184402.201.json
+<> 2024-11-06T184401.201.json
+
+###
+GET http://localhost/api/v1/users/seoksmin@naver.com
+
+###
+GET http://localhost:8080/internal/api/v1/users/seoksmin@naver.com
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDc4NzMxMywiZXhwIjoxNzMwNzg5MTEzfQ.u-bVEmPCo4F5MjrMSoVJqb7n5Ejme5TZ7Nya5Q0UuHc
+
+{
+  "title": "강릉 4박 5일 해변 여행",
+  "travelStartDate": "2024-08-15",
+  "travelEndDate": "2024-08-19",
+  "maxParticipants": 12,
+  "travelCountry": "KR",
+  "continent": "ASIA",
+  "region": "Gangneung",
+  "accommodationFee": 600000,
+  "transportationFee": 250000,
+  "airplaneFee": 180000,
+  "foodFee": 120000,
+  "limitMaxAge": 65,
+  "limitMinAge": 25,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Family",
+  "deadline": "2024-08-01",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "강릉 도착",
+          "description": "강릉역 도착 후 호텔 체크인 및 휴식",
+          "fileAddress": "http://example.com/gangneung1.jpg"
+        },
+        {
+          "title": "오죽헌 방문",
+          "description": "신사임당과 율곡 이이의 오죽헌 방문",
+          "fileAddress": "http://example.com/gangneung2.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7514,
+          "longitude": 128.8965,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7650,
+          "longitude": 128.8973,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "경포대 해변 산책",
+          "description": "경포대 해변에서 산책 및 사진 촬영",
+          "fileAddress": "http://example.com/gangneung3.jpg"
+        },
+        {
+          "title": "안목해변 커피 거리",
+          "description": "안목해변의 다양한 카페 방문 및 커피 즐기기",
+          "fileAddress": "http://example.com/gangneung4.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7556,
+          "longitude": 128.9135,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7578,
+          "longitude": 128.9180,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "주문진 수산시장 탐방",
+          "description": "주문진 수산시장에서 신선한 해산물 구입 및 식사",
+          "fileAddress": "http://example.com/gangneung5.jpg"
+        },
+        {
+          "title": "정동진 레일바이크",
+          "description": "정동진 레일바이크를 타고 바다 풍경 감상",
+          "fileAddress": "http://example.com/gangneung6.jpg"
+        },
+        {
+          "title": "호텔 휴식",
+          "description": "호텔에서 휴식 및 자유 시간",
+          "fileAddress": "http://example.com/gangneung7.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7131,
+          "longitude": 128.8842,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.6963,
+          "longitude": 128.9058,
+          "orderNumber": 2
+        },
+        {
+          "latitude": 37.7005,
+          "longitude": 128.8957,
+          "orderNumber": 3
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "솔향수목원 방문",
+          "description": "솔향수목원에서 다양한 식물 감상",
+          "fileAddress": "http://example.com/gangneung8.jpg"
+        },
+        {
+          "title": "하슬라아트월드",
+          "description": "하슬라아트월드에서 예술 작품 감상",
+          "fileAddress": "http://example.com/gangneung9.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7543,
+          "longitude": 128.9147,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7621,
+          "longitude": 128.9185,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "출발 준비",
+          "description": "호텔 체크아웃 후 출발 준비",
+          "fileAddress": "http://example.com/gangneung10.jpg"
+        },
+        {
+          "title": "강릉역 출발",
+          "description": "강릉역에서 출발하여 귀가",
+          "fileAddress": "http://example.com/gangneung11.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7532,
+          "longitude": 128.8956,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7510,
+          "longitude": 128.8894,
+          "orderNumber": 2
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-04T211157.500.json
+<> 2024-11-04T210535.500.json
+<> 2024-11-04T204050.500.json
+
+###
+PUT http://localhost/api/v1/posts/1
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExNjM4MjYsImV4cCI6MTczMTE2NTYyNn0.5OcKE_L7MZaAjQnHNE6Kcc60wwkqUTqrP-9JX18I5fY
+
+{
+  "title": "강릉 4박 5일 해변 여행",
+  "travelStartDate": "2024-08-15",
+  "travelEndDate": "2024-08-19",
+  "maxParticipants": 12,
+  "travelCountry": "KR",
+  "continent": "ASIA",
+  "region": "Gangneung",
+  "accommodationFee": 600000,
+  "otherExpenses": 250000,
+  "airplaneFee": 180000,
+  "limitMaxAge": 65,
+  "limitMinAge": 25,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Family",
+  "deadline": "2024-10-02",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "ㄱㄷㅈ",
+          "description": "강릉역 도착 후 호텔 체크인 및 휴식",
+          "fileAddress": "http://example.com/gangneung1.jpg"
+        },
+        {
+          "title": "오죽헌 방문",
+          "description": "ㄱㄷㄴㅇㄹ",
+          "fileAddress": "http://example.com/gangneung2.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7514,
+          "longitude": 128.8965,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7650,
+          "longitude": 128.8973,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "ㄱㄱㄱ",
+          "description": "경포대 해변에서 산책 및 사진 촬영",
+          "fileAddress": "http://example.com/gangneung3.jpg"
+        },
+        {
+          "title": "안목해변 커피 거리",
+          "description": "ㅇㅇㅇ",
+          "fileAddress": "http://example.com/gangneung4.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7556,
+          "longitude": 128.9135,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7578,
+          "longitude": 128.9180,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "ㅈㅈㅈ",
+          "description": "ㅈㅈㅈ",
+          "fileAddress": "http://example.com/gangneung5.jpg"
+        },
+        {
+          "title": "정동진 레일바이크",
+          "description": "정동진 레일바이크를 타고 바다 풍경 감상",
+          "fileAddress": "http://example.com/gangneung6.jpg"
+        },
+        {
+          "title": "호텔 휴식",
+          "description": "호텔에서 휴식 및 자유 시간",
+          "fileAddress": "http://example.com/gangneung7.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7131,
+          "longitude": 128.8842,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.6963,
+          "longitude": 128.9058,
+          "orderNumber": 2
+        },
+        {
+          "latitude": 37.7005,
+          "longitude": 128.8957,
+          "orderNumber": 3
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "ㅅㅅ",
+          "description": "ㅅㅅ",
+          "fileAddress": "http://example.com/gangneung8.jpg"
+        },
+        {
+          "title": "ㅎㅎ",
+          "description": "ㅎㅎ",
+          "fileAddress": "http://example.com/gangneung9.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7543,
+          "longitude": 128.9147,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.7621,
+          "longitude": 128.9185,
+          "orderNumber": 2
+        }
+      ]
+    },
+    {
+      "dayDetails": [
+        {
+          "title": "ㅅㅅ",
+          "description": "ㅅㅅ",
+          "fileAddress": "http://example.com/gangneung10.jpg"
+        },
+        {
+          "title": "ㅌㅌ",
+          "description": "ㅌㅌ",
+          "fileAddress": "http://example.com/gangneung11.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.7532,
+          "longitude": 129.8956,
+          "orderNumber": 1
+        },
+        {
+          "latitude": 37.123123,
+          "longitude": 127.8894,
+          "orderNumber": 2
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-09T211827.200.json
+
+###
+DELETE http://localhost/api/v1/posts/1
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDc4NTE2MCwiZXhwIjoxNzMwNzg2OTYwfQ.kbIGA3r7dtOEkEqNAfQubILAIFQ-AzRf1nggf5fU9Uc
+
+###
+GET http://localhost/api/v1/posts/2
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTczMDc5NjU1NiwiZXhwIjoxNzMwNzk4MzU2fQ.HjOb-3CkyD0tAUI6xF2A8lKogpWx5mX4k7aDbcLMXMo
+
+###
+GET http://localhost/api/v1/posts?
+    title=
+    &content=
+    &continent=
+    &country=others
+    &page=0
+    &size=8
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExMzcxNjYsImV4cCI6MTczMTEzODk2Nn0.S-dZNlkrveLM0wJ4hL7EPlqwGThGBRFDXKuuT2gRHMA
+
+<> 2024-11-06T184424.200.json
+
+###
+GET http://localhost:8080/api/v1/users/1
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access:  eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzEyMzY5OTksImV4cCI6MTczMTIzODc5OX0.D0UpIMLswT7_loSHIvuXxj6ch-KBaTzn0NtSw3MOCRE
+
+{
+  "title": "서울 3박 4일 문화 탐방",
+  "travelStartDate": "2024-09-01",
+  "travelEndDate": "2024-09-04",
+  "maxParticipants": 10,
+  "travelCountry": "KR",
+  "continent": "ASIA",
+  "region": "Seoul",
+  "accommodationFee": 500000,
+  "otherExpenses": 150000,
+  "airplaneFee": 0,
+  "limitMaxAge": 60,
+  "limitMinAge": 20,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Cultural",
+  "deadline": "2024-08-15",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "경복궁 방문",
+          "description": "조선시대 궁궐 경복궁 탐방",
+          "fileAddress": "http://example.com/seoul1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 37.5796,
+          "longitude": 126.9770,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-10T201026.201.json
+<> 2024-11-10T020624.201.json
+<> 2024-11-10T013832.201.json
+<> 2024-11-10T000221.201.json
+<> 2024-11-10T000106.201.json
+<> 2024-11-09T235059.201.json
+<> 2024-11-09T232348.201.json
+<> 2024-11-09T232338.201.json
+<> 2024-11-09T211836.201.json
+<> 2024-11-09T184157.201.json
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzEyMzY5OTksImV4cCI6MTczMTIzODc5OX0.D0UpIMLswT7_loSHIvuXxj6ch-KBaTzn0NtSw3MOCRE
+
+{
+  "title": "뉴욕 5박 6일 도시 탐험",
+  "travelStartDate": "2024-10-10",
+  "travelEndDate": "2024-10-15",
+  "maxParticipants": 15,
+  "travelCountry": "US",
+  "continent": "NORTH_AMERICA",
+  "region": "New York",
+  "accommodationFee": 1000000,
+  "otherExpenses": 300000,
+  "airplaneFee": 500000,
+  "limitMaxAge": 70,
+  "limitMinAge": 25,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Urban",
+  "deadline": "2024-09-25",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "타임스퀘어 방문",
+          "description": "세계적으로 유명한 타임스퀘어 탐방",
+          "fileAddress": "http://example.com/ny1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 40.7580,
+          "longitude": -73.9855,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-10T201033.201.json
+<> 2024-11-10T020629.201.json
+<> 2024-11-10T013837.201.json
+<> 2024-11-10T001018.201.json
+<> 2024-11-09T232425.201.json
+<> 2024-11-09T232356.400.json
+<> 2024-11-09T232342.400.json
+<> 2024-11-09T184201.201.json
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzEyMzY5OTksImV4cCI6MTczMTIzODc5OX0.D0UpIMLswT7_loSHIvuXxj6ch-KBaTzn0NtSw3MOCRE
+
+{
+  "title": "파리 4박 5일 예술 여행",
+  "travelStartDate": "2024-11-05",
+  "travelEndDate": "2024-11-09",
+  "maxParticipants": 8,
+  "travelCountry": "FR",
+  "continent": "EUROPE",
+  "region": "Paris",
+  "accommodationFee": 800000,
+  "otherExpenses": 200000,
+  "airplaneFee": 400000,
+  "limitMaxAge": 65,
+  "limitMinAge": 22,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Artistic",
+  "deadline": "2024-10-20",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "루브르 박물관 방문",
+          "description": "세계적인 루브르 박물관 탐방",
+          "fileAddress": "http://example.com/paris1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 48.8606,
+          "longitude": 2.3376,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+<> 2024-11-10T201043.201.json
+<> 2024-11-10T020634.201.json
+<> 2024-11-10T013842.201.json
+<> 2024-11-10T001023.201.json
+<> 2024-11-09T232437.201.json
+<> 2024-11-09T184207.201.json
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExMzcxNjYsImV4cCI6MTczMTEzODk2Nn0.S-dZNlkrveLM0wJ4hL7EPlqwGThGBRFDXKuuT2gRHMA
+
+{
+  "title": "안도라 2박 3일 산악 여행",
+  "travelStartDate": "2024-12-01",
+  "travelEndDate": "2024-12-03",
+  "maxParticipants": 6,
+  "travelCountry": "AD",
+  "continent": "EUROPE",
+  "region": "Andorra la Vella",
+  "accommodationFee": 300000,
+  "otherExpenses": 100000,
+  "airplaneFee": 200000,
+  "limitMaxAge": 50,
+  "limitMinAge": 18,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Adventure",
+  "deadline": "2024-11-15",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "산악 하이킹",
+          "description": "안도라의 아름다운 산악 지대 하이킹",
+          "fileAddress": "http://example.com/ad1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 42.5063,
+          "longitude": 1.5218,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExMzcxNjYsImV4cCI6MTczMTEzODk2Nn0.S-dZNlkrveLM0wJ4hL7EPlqwGThGBRFDXKuuT2gRHMA
+
+{
+  "title": "BW 나라 1박 2일 미지의 여행",
+  "travelStartDate": "2025-01-10",
+  "travelEndDate": "2025-01-11",
+  "maxParticipants": 5,
+  "travelCountry": "BW",
+  "continent": "ASIA",
+  "region": "Unknown",
+  "accommodationFee": 100000,
+  "otherExpenses": 50000,
+  "airplaneFee": 300000,
+  "limitMaxAge": 40,
+  "limitMinAge": 20,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Mystery",
+  "deadline": "2024-12-25",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "미지의 장소 탐험",
+          "description": "ZZ 나라의 미지의 장소를 탐험",
+          "fileAddress": "http://example.com/zz1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 0.0000,
+          "longitude": 0.0000,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+###
+POST http://localhost/api/v1/posts
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExMzcxNjYsImV4cCI6MTczMTEzODk2Nn0.S-dZNlkrveLM0wJ4hL7EPlqwGThGBRFDXKuuT2gRHMA
+
+{
+  "title": "CU 도시 3박 4일 모험",
+  "travelStartDate": "2025-02-05",
+  "travelEndDate": "2025-02-08",
+  "maxParticipants": 7,
+  "travelCountry": "CU",
+  "continent": "ASIA",
+  "region": "Unknown",
+  "accommodationFee": 200000,
+  "otherExpenses": 80000,
+  "airplaneFee": 250000,
+  "limitMaxAge": 55,
+  "limitMinAge": 21,
+  "limitSex": "UNRELATED",
+  "limitSmoke": "UNRELATED",
+  "preferenceType": "Exploration",
+  "deadline": "2025-01-20",
+  "status": "POSTING",
+  "days": [
+    {
+      "dayDetails": [
+        {
+          "title": "XY 산악 트레킹",
+          "description": "XY 나라의 산악 트레킹을 즐기기",
+          "fileAddress": "http://example.com/xy1.jpg"
+        }
+      ],
+      "itineraryVisits": [
+        {
+          "latitude": 0.0000,
+          "longitude": 0.0000,
+          "orderNumber": 1
+        }
+      ]
+    }
+  ]
+}
+
+
+### 모든 게시글 조회 (필터 없음)
+GET http://localhost/api/v1/posts?mbti=ENFJ&page=0&size=8
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExNDUyODcsImV4cCI6MTczMTE0NzA4N30.0FiclIr1NuwpqZeks5oZZu91LHZpDi3O1NYOLQd30SU
+
+<> 2024-11-09T184243.200.json
+<> 2024-11-09T184227.200.json
+
+### 대표 국가 검색: 대한민국 (KR)
+GET http://localhost/api/v1/posts?country=ZZ&page=0&size=8
+Content-Type: application/json
+access: eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoic2Vva3NtaW5AbmF2ZXIuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsInVzZXJJZCI6IjEiLCJpYXQiOjE3MzExMzcxNjYsImV4cCI6MTczMTEzODk2Nn0.S-dZNlkrveLM0wJ4hL7EPlqwGThGBRFDXKuuT2gRHMA
+
+

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class TokenException extends BaseException {
+public class TokenException extends BizException {
 
     private final ErrorCode errorCode;
     private final HttpStatus httpStatus;

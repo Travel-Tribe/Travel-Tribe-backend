@@ -1,17 +1,30 @@
 package com.zerobase.user.util;
 
-import jakarta.servlet.http.Cookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CookieUtil {
 
-    public Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60); // 1 day
-        cookie.setHttpOnly(true); // Set HttpOnly flag
-        // cookie.setSecure(true); // Uncomment to use only with HTTPS
-        // cookie.setPath("/"); // Uncomment to set path for the cookie
-        return cookie;
+    public ResponseCookie createCookie(String key, String value) {
+
+        return ResponseCookie.from(key, value)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .secure(true)
+            .maxAge(24 * 60 * 60)
+            .build();
+    }
+
+    public static ResponseCookie createCookie1(String key, String value) {
+
+        return ResponseCookie.from(key, value)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .secure(true)
+            .maxAge(24 * 60 * 60)
+            .build();
     }
 }

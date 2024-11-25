@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,15 +21,12 @@ public class ReportingController {
     
     @PostMapping("/posts/{postId}/reporting")
     public ResponseEntity<ResponseMessage<Void>> reportingUser(
+        @RequestHeader("X-User-Id") long userId,
         @PathVariable long postId,
         @RequestBody ReportingRequestDto.ReportUser request
     ) {
 
-        //TODO 김용민 추후 스프링 시큐리티 개발시 authentic에서 가져오기
-        long userId = 1L;
-
         reportingService.reportingUser(request, postId, userId);
-
         return ResponseEntity.ok(ResponseMessage.success());
     }
 

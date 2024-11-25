@@ -1,0 +1,6 @@
+FROM openjdk:17
+EXPOSE 8081
+RUN mkdir -p deploy
+WORKDIR /deploy
+COPY travel/build/libs/travel-0.0.1-SNAPSHOT.jar api.jar
+ENTRYPOINT ["java", "-jar", "/deploy/api.jar", "--spring.profiles.active=dev"]

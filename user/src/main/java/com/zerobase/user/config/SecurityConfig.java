@@ -1,5 +1,9 @@
 package com.zerobase.user.config;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
+import com.zerobase.user.exception.CustomAuthenticationEntryPoint;
 import com.zerobase.user.jwt.CustomLogoutFilter;
 import com.zerobase.user.jwt.JWTFilter;
 import com.zerobase.user.jwt.LoginFilter;
@@ -13,6 +17,7 @@ import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,6 +43,7 @@ public class SecurityConfig {
     private final ProfileRepository profileRepository;
     private final RefreshRepository refreshRepository;
     private final CookieUtil cookieUtil;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint; // 추가된 부분
 
     //AuthenticationManager Bean 등록
     @Bean
@@ -55,24 +61,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            .cors(
-                corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
-                    @Override
-                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                        CorsConfiguration configuration = new CorsConfiguration();
-
-                        configuration.setAllowedOrigins(
-                            Collections.singletonList("http://localhost:3000"));
-                        configuration.setAllowedMethods(Collections.singletonList("*"));
-                        configuration.setAllowCredentials(true);
-                        configuration.setAllowedHeaders(Collections.singletonList("*"));
-                        configuration.setMaxAge(3600L);
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                        return configuration;  // CorsConfiguration 객체를 반환해야 함
-                    }
-                }));
+//        http
+//            .cors(
+//                corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+//                    @Override
+//                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+//                        CorsConfiguration configuration = new CorsConfiguration();
+//
+//                        configuration.setAllowedOrigins(
+//                            Collections.singletonList("http://localhost:3000"));
+//                        configuration.setAllowedMethods(Collections.singletonList("*"));
+//                        configuration.setAllowCredentials(true);
+//                        configuration.setAllowedHeaders(Collections.singletonList("*"));
+//                        configuration.setMaxAge(3600L);
+//                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+//
+//                        return configuration;  // CorsConfiguration 객체를 반환해야 함
+//                    }
+//                }));
 
         //csrf disable
         http
@@ -86,19 +92,27 @@ public class SecurityConfig {
         http
             .httpBasic((auth) -> auth.disable());
 
-        //경로별 인가 작업
+        // 수정된 예외 처리 구성
+        http.exceptionHandling((exceptionHandling) -> exceptionHandling
+            .authenticationEntryPoint(customAuthenticationEntryPoint));
+
+        // 경로별 인가 작업
         // 경로별 접근 권한 설정
+        // 비로그인 기능만 permitAll로 처리, 토큰이 넘어오지 않음.
+        // SecurityContextHolder에 setAuthentication 설정을 안해줌.
+        // 인증 실패가 발생!
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("api/**", "/login", "/", "/join", "/reissue").permitAll()
+                 // 공통
+                .requestMatchers(  "/", "/internal/**").permitAll()
+                 // 로그인, 로그아웃, 회원가입, 재발급
+                .requestMatchers( "/login","/logout", "/join","/reissue").permitAll()
 
-//                .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
-//                .requestMatchers(HttpMethod.POST, "/posts/**").hasAnyRole("USER", "ADMIN")
-//                .requestMatchers(HttpMethod.PUT, "/posts/**").hasAnyRole("USER", "ADMIN")
-//                .requestMatchers(HttpMethod.DELETE, "/posts/**").hasAnyRole("USER", "ADMIN")
-//                .requestMatchers("/admin").hasRole("ADMIN")
+                 // 사용자 기능
+                .requestMatchers(POST, "/api/v1/users/reset-password", "/api/v1/users").permitAll()
+                .requestMatchers(GET,"/api/v1/users/*","/api/v1/users/*/profile", "/api/v1/users/duplicate").permitAll()
 
+                // SecurityContextHolder에 setAuthentication 설정 안해둬서 authenticated 실패 발생.
                 .anyRequest().authenticated()
-
         );
 
         http

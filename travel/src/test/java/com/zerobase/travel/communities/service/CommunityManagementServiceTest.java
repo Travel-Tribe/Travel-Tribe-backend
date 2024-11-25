@@ -56,6 +56,12 @@ class CommunityManagementServiceTest {
         sampleFiles = List.of(new CommunityFileDto(1L, "file1.jpg"),
             new CommunityFileDto(2L, "file2.jpg"));
 
+        createRequest = new RequestCreateCommunity();
+
+        createRequest.setContent("Sample Content");
+        createRequest.setFiles(List.of("file1.jpg","file2.jpg"));
+        createRequest.setTitle("Sample Title");
+
     }
 
     @Test
@@ -69,6 +75,8 @@ class CommunityManagementServiceTest {
 
         // Then
         assertThat(response.getCommunityId()).isEqualTo(1L);
+        assertThat(response.getUserId()).isEqualTo("user1");
+
         assertThat(response.getTitle()).isEqualTo("Sample Title");
         assertThat(response.getFiles()).hasSize(2);
 
@@ -137,9 +145,6 @@ class CommunityManagementServiceTest {
         request.setCommunityId(1L);
         request.setTitle("Updated Title");
         request.setContent("Updated Content");
-        request.setContinent(Continent.ASIA);
-        request.setCountry(Country.KR);
-        request.setRegion("Busan");
         request.setFiles(List.of("updated_file1.jpg", "updated_file2.jpg"));
 
 
@@ -160,7 +165,7 @@ class CommunityManagementServiceTest {
         given(communityFileService.saveFiles(anyLong(), any())).willReturn(updatedFiles);
 
         // When
-        ResponseCommunityDto response = communityManagementService.updatePost(request, "user1");
+        ResponseCommunityDto response = communityManagementService.updatePost(1L,request, "user1");
 
         // Then
         assertThat(response.getTitle()).isEqualTo("Updated Title");

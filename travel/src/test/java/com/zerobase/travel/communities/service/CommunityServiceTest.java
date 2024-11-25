@@ -1,20 +1,15 @@
 package com.zerobase.travel.communities.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.zerobase.travel.communities.entity.CommunityEntity;
 import com.zerobase.travel.communities.repository.CommunityRepository;
 import com.zerobase.travel.communities.type.CommunityDto;
 import com.zerobase.travel.communities.type.CommunityStatus;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
+import com.zerobase.travel.exception.BizException;
+import com.zerobase.travel.exception.errorcode.CommunityErrorCode;
 import java.util.List;
-import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,175 +20,120 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class CommunityServiceTest {
-
-    @Mock
-    private CommunityRepository communityRepository;
 
     @InjectMocks
     private CommunityService communityService;
 
-    @Test
-    void createPost() {
-        // Given input
-        String userId = "user1";
-        CommunityEntity entity = CommunityEntity.builder()
-            .userId(userId)
-            .title("Sample Title")
-            .content("Sample Content")
+    @Mock
+    private CommunityRepository communityRepository;
+
+    private CommunityEntity mockEntity;
+
+    @BeforeEach
+    void setUp() {
+        mockEntity = CommunityEntity.builder()
+            .communityId(1L)
+            .userId("testUser")
+            .title("Test Title")
+            .content("Test Content")
+            .status(CommunityStatus.POSTED)
+            .createdAt(LocalDateTime.now())
             .build();
+    }
 
-        // Mock return for any CommunityEntity
-        given(communityRepository.save(any(CommunityEntity.class))).willReturn(entity);
+    @Test
+    void createPost_shouldReturnCommunityDto() {
+        when(communityRepository.save(any(CommunityEntity.class))).thenReturn(mockEntity);
 
-        // When
-        CommunityDto result = communityService.createPost( "Sample Title", "Sample Content", userId);
+        CommunityDto result = communityService.createPost("Test Title", "Test Content", "testUser");
 
-        // Then
-        assertThat(result.getUserId()).isEqualTo(userId);
-        assertThat(result.getTitle()).isEqualTo("Sample Title");
-        assertThat(result.getContent()).isEqualTo("Sample Content");
-
-        // Verify that the repository's save method was called once with any CommunityEntity
+        assertThat(result).isNotNull();
+        assertThat(result.getTitle()).isEqualTo("Test Title");
+        assertThat(result.getContent()).isEqualTo("Test Content");
+        assertThat(result.getCommunityId()).isEqualTo(1L);
         verify(communityRepository, times(1)).save(any(CommunityEntity.class));
     }
 
     @Test
-    void getPost() {
-        // Given
-        Long communityId = 1L;
-        CommunityEntity entity = CommunityEntity.builder()
-            .communityId(communityId)
-            .title("Sample Title")
-            .build();
+    void getPost_shouldReturnCommunityDto_whenPostExists() {
+        when(communityRepository.findByCommunityId(1L)).thenReturn(Optional.of(mockEntity));
 
-        given(communityRepository.findByCommunityId(communityId)).willReturn(Optional.of(entity));
+        CommunityDto result = communityService.getPost(1L);
 
-        // When
-        CommunityDto result = communityService.getPost(communityId);
-
-        // Then
-        assertThat(result.getCommunityId()).isEqualTo(communityId);
-        assertThat(result.getTitle()).isEqualTo("Sample Title");
-        verify(communityRepository, times(1)).findByCommunityId(communityId);
+        assertThat(result).isNotNull();
+        assertThat(result.getCommunityId()).isEqualTo(1L);
+        verify(communityRepository, times(1)).findByCommunityId(1L);
     }
 
     @Test
-    void getPost_nonExistent() {
-        // Given
-        Long communityId = 1L;
-        given(communityRepository.findByCommunityId(communityId)).willReturn(Optional.empty());
+    void getPost_shouldThrowException_whenPostIsDeleted() {
+        mockEntity.setStatus(CommunityStatus.DELETED);
+        when(communityRepository.findByCommunityId(1L)).thenReturn(Optional.of(mockEntity));
 
-        // When & Then
-        assertThatThrownBy(() -> communityService.getPost(communityId))
-            .isInstanceOf(CustomException.class)
-            .extracting("errorCode")
-            .isEqualTo(ErrorCode.COMMUNITY_NON_EXISTENT);
-
-        verify(communityRepository, times(1)).findByCommunityId(communityId);
+        BizException exception = assertThrows(BizException.class, () -> communityService.getPost(1L));
+        assertThat(exception.getErrorCode()).isEqualTo(CommunityErrorCode.COMMUNITY_DELETED);
     }
 
     @Test
-    void getPosts() {
-        // Given
+    void getPosts_shouldReturnPageOfCommunityDtos() {
         Pageable pageable = PageRequest.of(0, 8);
-        List<CommunityEntity> entities = List.of(
-            CommunityEntity.builder().communityId(1L).title("Sample 1").build(),
-            CommunityEntity.builder().communityId(2L).title("Sample 2").build()
-        );
-        Page<CommunityEntity> page = new PageImpl<>(entities, pageable, entities.size());
-        given(communityRepository.findAllByStatus(pageable,
-            CommunityStatus.POSTED)).willReturn(page);
+        Page<CommunityEntity> page = new PageImpl<>(List.of(mockEntity));
+        when(communityRepository.findAllByStatus(pageable, CommunityStatus.POSTED)).thenReturn(page);
 
-        // When
         Page<CommunityDto> result = communityService.getPosts(pageable);
 
-        // Then
-        assertThat(result.getContent()).hasSize(2);
-        assertThat(result.getContent().get(0).getTitle()).isEqualTo("Sample 1");
-        assertThat(result.getContent().get(1).getTitle()).isEqualTo("Sample 2");
-        verify(communityRepository, times(1)).findAllByStatus(pageable,
-            CommunityStatus.POSTED);
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(communityRepository, times(1)).findAllByStatus(pageable, CommunityStatus.POSTED);
     }
 
     @Test
-    void deletePost() {
-        // Given
-        long communityId = 1L;
-        String userId = "user1";
-        CommunityEntity entity = CommunityEntity.builder().communityId(communityId).userId(userId).build();
-        given(communityRepository.findByUserId(userId)).willReturn(Optional.of(entity));
+    void deletePost_shouldSetStatusDeleted_whenUserIsAuthorized() {
+        when(communityRepository.findById(1L)).thenReturn(Optional.of(mockEntity));
 
-        // When
-        communityService.deletePost(communityId, userId);
+        communityService.deletePost(1L, "testUser");
 
-        // Then
-        verify(communityRepository, times(1)).deleteByCommunityId(communityId);
+        assertThat(mockEntity.getStatus()).isEqualTo(CommunityStatus.DELETED);
+        verify(communityRepository, times(1)).save(mockEntity);
     }
 
     @Test
-    void deletePost_Unauthorized() {
-        // Given
-        long communityId = 1L;
-        String userId = "unauthorizedUser";
-        given(communityRepository.findByUserId(userId)).willReturn(Optional.empty());
+    void deletePost_shouldThrowException_whenUserIsUnauthorized() {
+        when(communityRepository.findById(1L)).thenReturn(Optional.of(mockEntity));
 
-        // When & Then
-        assertThatThrownBy(() -> communityService.deletePost(communityId, userId))
-            .isInstanceOf(CustomException.class)
-            .extracting("errorCode")
-            .isEqualTo(ErrorCode.USER_UNAUTHORIZED_REQUEST);
-
-        verify(communityRepository, times(1)).findByUserId(userId);
+        CustomException exception = assertThrows(CustomException.class, () -> communityService.deletePost(1L, "wrongUser"));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_UNAUTHORIZED_REQUEST);
     }
 
     @Test
-    void updatePost() {
-        // Given
-        long communityId = 1L;
-        String userId = "user1";
+    void updatePost_shouldReturnUpdatedDto_whenUserIsAuthorized() {
+        when(communityRepository.findByCommunityId(1L)).thenReturn(Optional.of(mockEntity));
+        when(communityRepository.save(any())).thenReturn(mockEntity);
 
-        CommunityEntity entity = CommunityEntity.builder()
-            .communityId(communityId)
-            .userId(userId)
-            .title("Old Title")
-            .content("Old Content")
-            .build();
+        CommunityDto result = communityService.updatePost(1L, "Updated Title", "Updated Content", "testUser");
 
-        // Mock the find and save methods of the repository
-        given(communityRepository.findByCommunityId(communityId)).willReturn(Optional.of(entity));
-        given(communityRepository.save(any(CommunityEntity.class))).willReturn(entity);
+        assertThat(result).isNotNull();
+        assertThat(result.getTitle()).isEqualTo("Updated Title");
+        assertThat(result.getContent()).isEqualTo("Updated Content");
 
-        // When
-        CommunityDto updatedDto = communityService.updatePost(
-            communityId, "Updated Title", "Updated Content", userId);
-
-        // Then
-        assertThat(updatedDto.getTitle()).isEqualTo("Updated Title");
-        assertThat(updatedDto.getContent()).isEqualTo("Updated Content");
-
-        // Verify that find and save were called exactly once
-        verify(communityRepository, times(1)).findByCommunityId(communityId);
-        verify(communityRepository, times(1)).save(any(CommunityEntity.class));
+        verify(communityRepository, times(1)).save(mockEntity);
     }
 
     @Test
-    void updatePost_Unauthorized() {
-        // Given
-        long communityId = 1L;
-        String userId = "unauthorizedUser";
-        CommunityEntity entity = CommunityEntity.builder().communityId(communityId).userId("differentUser").build();
+    void updatePost_shouldThrowException_whenUserIsUnauthorized() {
+        when(communityRepository.findByCommunityId(1L)).thenReturn(Optional.of(mockEntity));
 
-        given(communityRepository.findByCommunityId(communityId)).willReturn(Optional.of(entity));
+        BizException exception = assertThrows(BizException.class, () -> communityService.updatePost(1L, "Updated Title", "Updated Content", "wrongUser"));
 
-        // When & Then
-        assertThatThrownBy(() -> communityService.updatePost(
-            communityId, "Updated Title", "Updated Content", userId))
-            .isInstanceOf(CustomException.class)
-            .extracting("errorCode")
-            .isEqualTo(ErrorCode.USER_UNAUTHORIZED_REQUEST);
-
-        verify(communityRepository, times(1)).findByCommunityId(communityId);
+        assertThat(exception.getErrorCode()).isEqualTo(CommunityErrorCode.USER_UNAUTHORIZED_REQUEST);
     }
 }

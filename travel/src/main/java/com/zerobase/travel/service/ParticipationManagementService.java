@@ -84,7 +84,7 @@ public class ParticipationManagementService {
         // fail에 따른 상태검증과 상태변경
         participationService.checkStatusParticipation(participationEntity, ParticipationEntity.beforePayStatuses);
         participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterPayFailStatuses);
-        participationService.save(participationEntity);
+        participationService.saveParticipation(participationEntity);
     }
 
     // 1.2 여행 참가를 눌러서 결재 완료 정상처리가 된 경우
@@ -100,7 +100,7 @@ public class ParticipationManagementService {
         participationService.checkStatusParticipation(entity, ParticipationEntity.beforePayStatuses);
         participationService.changeStatusParticipation(entity, ParticipationEntity.afterPaySuccessStatuses);
 
-        participationService.save(entity);
+        participationService.saveParticipation(entity);
 
         postService.changeStatusToRecruiting(
             entity.getPostEntity().getPostId());
@@ -125,7 +125,7 @@ public class ParticipationManagementService {
         participationService.setDateToReturnDeposit(entity, LocalDate.now());
 
         // 검증 - 보증금반환까지 fail 이 안나면 저장
-        participationService.save(entity);
+        participationService.saveParticipation(entity);
     }
 
     // 3. 여행을 자진, 신고를 통해서 개인 취소하여 배당금 몰수
@@ -139,7 +139,7 @@ public class ParticipationManagementService {
         // 상태를 검증하고 변환
         participationService.checkStatusParticipation(participationEntity, ParticipationEntity.afterPaySuccessStatuses);
         participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterCancelStatuses);
-        participationService.save(participationEntity);
+        participationService.saveParticipation(participationEntity);
 
     }
 
@@ -224,7 +224,7 @@ public class ParticipationManagementService {
         // 배당금 반환 API 호출
         payApi.payDepositRefund(participationEntity.getParticipationId(), participationEntity.getUserId());
 
-        participationService.save(participationEntity);
+        participationService.saveParticipation(participationEntity);
     }
 
 

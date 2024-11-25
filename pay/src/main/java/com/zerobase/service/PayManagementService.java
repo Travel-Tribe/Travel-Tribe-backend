@@ -6,14 +6,11 @@ import com.zerobase.api.ParticipationApi;
 import com.zerobase.config.Constants;
 import com.zerobase.entity.DepositEntity;
 import com.zerobase.entity.PaymentEntity;
-import com.zerobase.exception.BizException;
-import com.zerobase.exception.errorCode.PaymentErrorCode;
 import com.zerobase.model.PaymentDto;
 import com.zerobase.model.ResponseApi;
 import com.zerobase.model.ResponseDepositPayDto;
 import com.zerobase.model.type.PGMethod;
 import com.zerobase.model.type.PaymentStatus;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +26,7 @@ public class PayManagementService {
     private final PaymentService paymentService;
     private final ParticipationApi participationApi;
     private final Constants constants;
+    private final PayTransactionalService payTransactionalService;
 
     /*
     1. travel 모듈에서 여행참가(participationId) 데이터가 생성될 때 pay module로 참가 데이터를 발송함.
@@ -79,7 +77,6 @@ public class PayManagementService {
 
      */
 
-    @Transactional
     public void clientSuccessDepositPay(long depositId,
          String userId, String pgToken) {
         log.info("success customer DepositPay");
@@ -96,22 +93,15 @@ public class PayManagementService {
         kakaopayApi.sendPayConfirmSign(paymentEntity.getPaykey(),
             paymentEntity.getReferentialOrderId(), userId, pgToken);
 
-        // travel 모듈쪽에 결제확정 통신
-        participationApi.confirmParticipation(depositEntity.getParticipationId(),userId);
-
-        // 두가지가 성공하고나면 payment, deposit entity저장
-        paymentService.save(paymentEntity);
-        depositService.save(depositEntity);
-
-
+        payTransactionalService.informInitPayToTravelModuleAndSaveEntities(userId, depositEntity, paymentEntity);
     }
+
 
     /*
     1. 사용자는 pg사 로부터 결제 인증을 실패하면 실패 url로 연결되어 해당 메소드를 실행함
     2. 페이 히스토리 entity에 이력을 저장하고 deposit과 payment entity의 상태를 변경함
     */
 
-    @Transactional
     public void clientFailedDepositPay(String userId, long depositId) {
         log.info("fail customer DepositPay");
 
@@ -129,8 +119,7 @@ public class PayManagementService {
 
 
         // 두가지가 성공하고나면 payment, deposit entity저장
-        depositService.save(depositEntity);
-        paymentService.save(paymentEntity);
+        payTransactionalService.saveDepositAndPaymentEntities(depositEntity, paymentEntity);
     }
 
 
@@ -140,7 +129,6 @@ public class PayManagementService {
     client 측에서는 participation을 기준으로 취소요청을 할 것으로 생각됨.
     */
 
-    @Transactional
     public void refundDepositPay(
         long participationId, String userId) {
         log.info("refund customer DepositPay");
@@ -151,10 +139,42 @@ public class PayManagementService {
 
         kakaopayApi.sendPayRefundSign(paymentEntity.getPaykey());
 
-        paymentService.save(paymentEntity);
-        depositService.save(depositEntity);
+
+        payTransactionalService.saveDepositAndPaymentEntities(depositEntity,paymentEntity);
+    }
+
+
+    @Service
+    @RequiredArgsConstructor
+    @Slf4j
+    public static class PayTransactionalService {
+
+        private final DepositService depositService;
+        private final PaymentService paymentService;
+        private final ParticipationApi participationApi;
+
+
+        @Transactional
+        public void informInitPayToTravelModuleAndSaveEntities(String userId, DepositEntity depositEntity,
+            PaymentEntity paymentEntity) {
+            // travel 모듈쪽에 결제확정 통신
+            participationApi.confirmParticipation(depositEntity.getParticipationId(),
+                userId);
+
+            // 두가지가 성공하고나면 payment, deposit entity저장
+            paymentService.save(paymentEntity);
+            depositService.save(depositEntity);
+        }
+
+        @Transactional
+        public void saveDepositAndPaymentEntities(DepositEntity depositEntity,
+            PaymentEntity paymentEntity) {
+            depositService.save(depositEntity);
+            paymentService.save(paymentEntity);
+        }
+
+
     }
 }
-
 
 

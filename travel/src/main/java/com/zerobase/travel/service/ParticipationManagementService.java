@@ -5,6 +5,7 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
 import com.zerobase.travel.entity.ParticipationEntity;
+import com.zerobase.travel.post.entity.PostEntity;
 import com.zerobase.travel.post.service.PostService;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
@@ -81,7 +82,7 @@ public class ParticipationManagementService {
         // fail에 따른 상태검증과 상태변경
         participationService.checkStatusParticipation(participationEntity, ParticipationEntity.beforePayStatuses);
         participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterPayFailStatuses);
-        participationService.saveParticipation(participationEntity);
+        participationService.save(participationEntity);
     }
 
     // 1.2 여행 참가를 눌러서 결재 완료 정상처리가 된 경우
@@ -97,37 +98,32 @@ public class ParticipationManagementService {
         participationService.checkStatusParticipation(entity, ParticipationEntity.beforePayStatuses);
         participationService.changeStatusParticipation(entity, ParticipationEntity.afterPaySuccessStatuses);
 
-        participationService.saveParticipation(entity);
+        participationService.save(entity);
 
         postService.changeStatusToRecruiting(
             entity.getPostEntity().getPostId());
     }
 
     //2. 여행을 투표를 통해서 취소, 투표완료시 해당 메소드 호출
-    @Transactional
     public void unjoinParticipationWithDepositReturned(Long postId,
         String userId) {
 
         // postId, userId를 통해서 participationEntity호출
-        ParticipationEntity entity = participationService
-            .getParticipationByPostIdAndUserId(postId, userId);
+        ParticipationEntity entity = participationService.getParticipationByPostIdAndUserId(postId, userId);
 
         // 상태를 검증하고 변환
-
         participationService.checkStatusParticipation(entity, ParticipationEntity.afterPaySuccessStatuses);
         participationService.changeStatusParticipation(entity, ParticipationEntity.afterVotingStatuses);
 
 
         // pay모듈에 취소요청
-        payApi.payDepositRefund(entity.getParticipationId(),
-            entity.getUserId());
+        payApi.payDepositRefund(entity.getParticipationId(), entity.getUserId());
 
         // deposit 반환시점 기록
-        participationService.setDateToReturnDeposit(entity,
-            LocalDate.now());
+        participationService.setDateToReturnDeposit(entity, LocalDate.now());
 
         // 검증 - 보증금반환까지 fail 이 안나면 저장
-        participationService.saveParticipation(entity);
+        participationService.save(entity);
     }
 
     // 3. 여행을 자진, 신고를 통해서 개인 취소하여 배당금 몰수
@@ -141,7 +137,7 @@ public class ParticipationManagementService {
         // 상태를 검증하고 변환
         participationService.checkStatusParticipation(participationEntity, ParticipationEntity.afterPaySuccessStatuses);
         participationService.changeStatusParticipation(participationEntity, ParticipationEntity.afterCancelStatuses);
-        participationService.saveParticipation(participationEntity);
+        participationService.save(participationEntity);
 
     }
 
@@ -215,7 +211,6 @@ public class ParticipationManagementService {
     }
 
     // 6 여행을 왼료한 후에 보증금이 반환됨
-    @Transactional
     public void returnDepositAfterTravelFinished(
         ParticipationEntity participationEntity) {
 
@@ -225,12 +220,9 @@ public class ParticipationManagementService {
         participationService.changeStatusParticipation(participationEntity,ParticipationEntity.afterDepositReturnedExcludeRating);
 
         // 배당금 반환 API 호출
-        payApi.payDepositRefund(participationEntity.getParticipationId(),
-            participationEntity.getUserId());
+        payApi.payDepositRefund(participationEntity.getParticipationId(), participationEntity.getUserId());
 
-        participationService.saveParticipation(participationEntity);
-
-
+        participationService.save(participationEntity);
     }
 
 

@@ -19,7 +19,6 @@ import lombok.Setter;
 public class RequestUpdateCommunity {
 
 
-    @Min(1)
     private long communityId;
     @NotBlank
     private String title;

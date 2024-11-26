@@ -19,8 +19,8 @@ public class ResponsePostDTO {
     private LocalDate travelStartDate;
     private LocalDate travelEndDate;
     private Integer maxParticipants;
-    private Country travelCountry;
-    private Continent continent;
+    private String travelCountry;
+    private String continent;
     private String region;
     private Integer accommodationFee;
     private Integer airplaneFee;

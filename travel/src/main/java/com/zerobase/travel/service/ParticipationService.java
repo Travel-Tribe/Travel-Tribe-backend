@@ -248,10 +248,10 @@ public class ParticipationService {
         long participationId, String userId) {
         ParticipationEntity participationEntity = participationRepository.findById(
             participationId).orElseThrow(
-            () -> new CustomException(ErrorCode.PARTICIPATION_NOT_FOUND));
+            () -> new BizException(ParticipationErrorCode.PARTICIPATION_NOT_EXIST));
 
         if (!Objects.equals(participationEntity.getUserId(), userId)) {
-            throw new CustomException(ErrorCode.USER_UNAUTHORIZED_REQUEST);
+            throw new BizException(ParticipationErrorCode.USER_UNAUTHORIZED_REQUEST);
         }
 
         return participationEntity;

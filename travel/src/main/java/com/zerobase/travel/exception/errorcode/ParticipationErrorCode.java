@@ -21,7 +21,8 @@ public enum ParticipationErrorCode implements ErrorCode {
     POST_STATUS_NOTRECRUITING("ERROR-PARTICIPATION-00012", "모집글의 상태가 모집상태가 아닙니다"),
     PARTICIPATION_CONTENTION("ERROR-PARTICIPATION-00013", "Lock 획득에 실패하였습니다."),
     LOCK_ACQUISITION_ERROR("ERROR-PARTICIPATION-00014", "Lock 획득 중 예외가 발생하였습니다"),
-    LOCK_PARAM_PROCESSING_ERROR("ERROR-PARTICIPATION-00015", "Lock 파라미터 획득 중 예외가 발생하였습니다");
+    LOCK_PARAM_PROCESSING_ERROR("ERROR-PARTICIPATION-00015", "Lock 파라미터 획득 중 예외가 발생하였습니다"),
+    USER_UNAUTHORIZED_REQUEST("ERROR-PARTICIPATION-00016", "유저에게 권한이 없습니다.");
 
 
 

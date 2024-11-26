@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 public interface CommunityRepository extends JpaRepository<CommunityEntity, Long> {
 
 
-    Optional<CommunityEntity> findByCommunityId(Long communityId);
 
     Page<CommunityEntity> findAllByStatus( Pageable pageable,
         CommunityStatus posted);

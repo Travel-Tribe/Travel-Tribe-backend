@@ -26,6 +26,7 @@ import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -279,23 +280,26 @@ public class PostService {
             .limitSmoke(existingPost.getLimitSmoke().getSmoke())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream()
+                .sorted(Comparator.comparingInt(existingPost.getDays()::indexOf))
                 .map(dayEntity -> DayDTO.builder()
-                    .dayDetails(
-                        dayEntity.getDayDetails().stream()
-                            .map(dayDetailEntity -> DayDetailDTO.builder()
-                                .title(dayDetailEntity.getTitle())
-                                .description(dayDetailEntity.getDescription())
-                                .fileAddress(dayDetailEntity.getFileAddress())
-                                .build()).collect(Collectors.toList()))
+                    .dayDetails(dayEntity.getDayDetails().stream()
+                        .sorted(Comparator.comparingInt(dayEntity.getDayDetails()::indexOf))
+                        .map(dayDetailEntity -> DayDetailDTO.builder()
+                            .title(dayDetailEntity.getTitle())
+                            .description(dayDetailEntity.getDescription())
+                            .fileAddress(dayDetailEntity.getFileAddress())
+                            .build())
+                        .collect(Collectors.toList()))
                     .itineraryVisits(dayEntity.getItineraryVisits().stream()
+                        .sorted(Comparator.comparingInt(ItineraryVisitEntity::getOrderNumber))
                         .map(visitEntity -> ItineraryVisitDTO.builder()
-                            .latitude(
-                                visitEntity.getPoint().getY()) // Latitude는 Y 좌표
-                            .longitude(visitEntity.getPoint()
-                                .getX()) // Longitude는 X 좌표
+                            .latitude(visitEntity.getPoint().getY())
+                            .longitude(visitEntity.getPoint().getX())
                             .orderNumber(visitEntity.getOrderNumber())
-                            .build()).collect(Collectors.toList()))
-                    .build()).collect(Collectors.toList()))
+                            .build())
+                        .collect(Collectors.toList()))
+                    .build())
+                .collect(Collectors.toList()))
             .build();
     }
 

@@ -1,9 +1,26 @@
 package com.zerobase.travel.post.entity;
 
-import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -25,20 +42,25 @@ public class DayEntity {
     private PostEntity post;
 
     // Day와 DayDetail 간의 연관관계 설정
+    @OrderColumn(name = "order_number")
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<DayDetailEntity> dayDetails = new HashSet<>();
+    private List<DayDetailEntity> dayDetails = new ArrayList<>();
 
     // Day와 ItineraryVisit 간의 연관관계 설정
+    @OrderColumn(name = "order_number")
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<ItineraryVisitEntity> itineraryVisits = new HashSet<>();
+    private List<ItineraryVisitEntity> itineraryVisits = new ArrayList<>();
 
     // 연관관계 편의 메서드 for DayDetailEntity
     public void addDayDetail(DayDetailEntity dayDetail) {
-        dayDetails.add(dayDetail);
-        dayDetail.setDay(this);
+        if (!dayDetails.contains(dayDetail)) {
+            dayDetails.add(dayDetail);
+            dayDetail.setDay(this);
+        }
     }
+
 
     public void removeDayDetail(DayDetailEntity dayDetail) {
         dayDetails.remove(dayDetail);
@@ -47,12 +69,27 @@ public class DayEntity {
 
     // 연관관계 편의 메서드 for ItineraryVisitEntity
     public void addItineraryVisit(ItineraryVisitEntity itineraryVisit) {
-        itineraryVisits.add(itineraryVisit);
-        itineraryVisit.setDay(this);
+        if (!itineraryVisits.contains(itineraryVisit)) {
+            itineraryVisits.add(itineraryVisit);
+            itineraryVisit.setDay(this);
+        }
     }
 
     public void removeItineraryVisit(ItineraryVisitEntity itineraryVisit) {
         itineraryVisits.remove(itineraryVisit);
         itineraryVisit.setDay(null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DayEntity)) return false;
+        DayEntity that = (DayEntity) o;
+        return Objects.equals(dayId, that.dayId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayId);
     }
 }

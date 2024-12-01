@@ -20,8 +20,8 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -106,22 +106,22 @@ public class PostEntity {
     // Post와 Day 간의 연관관계 설정
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<DayEntity> days = new HashSet<>();
-
-
+    private List<DayEntity> days = new ArrayList<>();
 
     public static boolean validateUserAge(PostEntity postEntity, int userAge) {
-        if (postEntity.getLimitMinAge() > userAge || postEntity.getLimitMaxAge() < userAge) return false;
+        if (postEntity.getLimitMinAge() > userAge || postEntity.getLimitMaxAge() < userAge) {
+            return false;
+        }
         return true;
     }
 
     public static boolean validateUserGender(PostEntity postEntity, Gender userGender) {
         if (postEntity.getLimitSex().equals(LimitSex.FEMALE)) {
-            if(userGender.equals(Gender.MALE)){
+            if (userGender.equals(Gender.MALE)) {
                 return false;
             }
         } else if (postEntity.getLimitSex().equals(LimitSex.MALE)) {
-            if(userGender.equals(Gender.FEMALE)){
+            if (userGender.equals(Gender.FEMALE)) {
                 return false;
             }
         }
@@ -133,7 +133,7 @@ public class PostEntity {
 
         if (postEntity.getLimitSmoke().equals(LimitSmoke.SMOKER)) {
             if (userSmoking.equals(Smoking.NO)) {
-                    return false;
+                return false;
             }
         } else if (postEntity.getLimitSmoke().equals(LimitSmoke.NON_SMOKER)) {
             if (userSmoking.equals(Smoking.YES)) {

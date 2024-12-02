@@ -29,7 +29,6 @@ public class ParticipationController {
     private final ParticipationManagementService participationManagementService;
 
     // 참여
-    @PostLock
     @PostMapping("{postId}/participations")
     public ResponseEntity<ResponseMessage<ParticipationDto>> readyParticipation(
         @PathVariable long postId, @RequestHeader("X-User-Id") String userId,

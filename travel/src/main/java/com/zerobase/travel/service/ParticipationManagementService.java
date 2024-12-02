@@ -61,8 +61,7 @@ public class ParticipationManagementService {
 
 
     // 1. 여행을 참가 ; 여행참가 ~ 지불까지를 하나의 트랜잭션으로 묶기에는 과도하게 길어서 분리.
-    // JoinReady 상태 임시저장 -> client 에서 결제준비요청 -> 결제완료/실패시 서버에 응답
-
+    @PostLock
     public ParticipationDto readyParticipation(Long postId, String userId,
         String userEmail) {
 

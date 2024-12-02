@@ -22,6 +22,7 @@ public class OtherUserInfoResponseDTO {
     private String fileAddress;
     private String gender;
     private String status;
+    private String mbti;
 
     public static OtherUserInfoResponseDTO fromDto(UserInfoFacadeDto userInfoFacadeDto) {
         return OtherUserInfoResponseDTO.builder()
@@ -30,6 +31,7 @@ public class OtherUserInfoResponseDTO {
             .email(userInfoFacadeDto.getEmail())
             .count(userInfoFacadeDto.getCount())
             .fileAddress(userInfoFacadeDto.getFileAddress())
+            .mbti(userInfoFacadeDto.getMbti().name())
             .ratingAvg(userInfoFacadeDto.getRatingAvg())
             .gender(userInfoFacadeDto.getGender().getGender())
             .status(userInfoFacadeDto.getStatus().getUserStatus())

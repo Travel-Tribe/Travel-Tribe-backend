@@ -28,5 +28,9 @@ public class DayDetailEntity {
 
     @Column(name = "file_address")
     private String fileAddress;
+
+    //순서를 위한 필드 추가
+    @Column(name = "order_number")
+    private Integer orderNumber;
 }
 

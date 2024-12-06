@@ -331,6 +331,7 @@ public class PostService {
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex().getSex())
             .limitSmoke(existingPost.getLimitSmoke().getSmoke())
+            .mbti(existingPost.getMbti().name())
             .status(existingPost.getStatus().getPostStatus())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream()

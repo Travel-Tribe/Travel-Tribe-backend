@@ -31,6 +31,7 @@ public class ResponsePostsDTO {
     private String limitSex;
     private String limitSmoke;
     private String status;
+    private String mbti;
     private LocalDate deadline;
     private List<DayDTO> days;
 }

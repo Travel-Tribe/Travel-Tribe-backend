@@ -35,4 +35,14 @@ public class UserClientService {
             throw new BizException(USER_INFO_CALL_ERROR);
         }
     }
+
+    public UserInfoResponseDTO getUserInfoByUserId(long userId) {
+        ResponseMessage<UserInfoResponseDTO> response = userClient.getUserInfoByUserId(userId);
+        if (response.getResult().equals(SUCCESS.toString())) {
+            return response.getData();
+        } else {
+            // 에러 처리 로직 추가
+            throw new BizException(USER_INFO_CALL_ERROR);
+        }
+    }
 }

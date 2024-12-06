@@ -32,6 +32,8 @@ public class ResponsePostsDTO {
     private String limitSmoke;
     private String status;
     private String mbti;
+    private String nickname;
+    private String profileFileAddress;
     private LocalDate deadline;
     private List<DayDTO> days;
 }

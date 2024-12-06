@@ -260,9 +260,14 @@ public class PostService {
             throw new BizException(POST_NOT_FOUND_ERROR);
         }
 
+        UserInfoResponseDTO userInfo = userClientService.getUserInfoByUserId(existingPost.getUserId());
+
         // ResponsePostDTO 빌드
         return ResponsePostDTO.builder()
             .userId(existingPost.getUserId())
+            .mbti(userInfo.getMbti().name())
+            .username(userInfo.getUsername())
+            .profilePicture(userInfo.getFileAddress())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())
@@ -310,6 +315,7 @@ public class PostService {
         // 'others=true'인 경우, country는 이미 criteria에 반영됨
         return postRepository.findAll(PostSpecification.getPosts(criteria),
                 pageable)
+
             .map(this::mapToDTO);
     }
 
@@ -317,6 +323,8 @@ public class PostService {
         return ResponsePostsDTO.builder()
             .postId(existingPost.getPostId())
             .userId(existingPost.getUserId())
+            .nickname(userClientService.getUserInfoByUserId(existingPost.getUserId()).getNickname())
+            .profileFileAddress(userClientService.getUserInfoByUserId(existingPost.getUserId()).getFileAddress())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())

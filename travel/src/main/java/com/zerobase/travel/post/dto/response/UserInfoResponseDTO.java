@@ -26,5 +26,6 @@ public class UserInfoResponseDTO {
     private String introduction;
     private Gender gender;
     private LocalDate birth;
+    private String fileAddress;
     private Double ratingAvg;
 }

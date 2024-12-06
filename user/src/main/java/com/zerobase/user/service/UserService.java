@@ -254,6 +254,7 @@ public class UserService {
             .smoking(profileEntity.getSmoking())
             .gender(profileEntity.getGender())
             .mbti(profileEntity.getMbti())
+            .fileAddress(profileEntity.getFileAddress())
             .birth(profileEntity.getBirth())
             .ratingAvg(profileEntity.getRatingAvg())
             .build();
@@ -280,5 +281,31 @@ public class UserService {
         redisTemplate.delete(profileKey);
 
         log.info("Cache deleted for user ID: {}", userId);
+    }
+
+    public UserServiceDto findByUserWithId(long userId) {
+        UserEntity userEntity = userRepository.findById(userId)
+            .orElseThrow(() -> new BizException(USER_NOT_FOUND_ERROR));
+
+        ProfileEntity profileEntity = profileRepository.findByUserId(userEntity.getId())
+            .orElseThrow(() -> new BizException(PROFILE_NOT_FOUND_ERROR));
+
+        UserServiceDto userInfo = UserServiceDto.builder()
+            .id(userEntity.getId())
+            .username(userEntity.getUsername())
+            .nickname(userEntity.getNickname())
+            .email(userEntity.getEmail())
+            .status(userEntity.getStatus())
+            .phone(userEntity.getPhone())
+            .introduction(profileEntity.getIntroduction())
+            .smoking(profileEntity.getSmoking())
+            .gender(profileEntity.getGender())
+            .mbti(profileEntity.getMbti())
+            .fileAddress(profileEntity.getFileAddress())
+            .birth(profileEntity.getBirth())
+            .ratingAvg(profileEntity.getRatingAvg())
+            .build();
+
+        return userInfo;
     }
 }

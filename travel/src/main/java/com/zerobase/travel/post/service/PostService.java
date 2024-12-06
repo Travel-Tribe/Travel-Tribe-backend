@@ -27,7 +27,6 @@ import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -260,9 +259,15 @@ public class PostService {
             throw new BizException(POST_NOT_FOUND_ERROR);
         }
 
+        UserInfoResponseDTO userInfo = userClientService.getUserInfoByUserId(
+            existingPost.getUserId());
+
         // ResponsePostDTO 빌드
         return ResponsePostDTO.builder()
             .userId(existingPost.getUserId())
+            .mbti(userInfo.getMbti().name())
+            .username(userInfo.getUsername())
+            .profilePicture(userInfo.getFileAddress())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())
@@ -310,13 +315,19 @@ public class PostService {
         // 'others=true'인 경우, country는 이미 criteria에 반영됨
         return postRepository.findAll(PostSpecification.getPosts(criteria),
                 pageable)
+
             .map(this::mapToDTO);
     }
 
     private ResponsePostsDTO mapToDTO(PostEntity existingPost) {
+        UserInfoResponseDTO userInfoByUserId = userClientService.getUserInfoByUserId(
+            existingPost.getUserId());
+
         return ResponsePostsDTO.builder()
             .postId(existingPost.getPostId())
             .userId(existingPost.getUserId())
+            .nickname(userInfoByUserId.getNickname())
+            .profileFileAddress(userInfoByUserId.getFileAddress())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())
@@ -331,6 +342,7 @@ public class PostService {
             .limitMaxAge(existingPost.getLimitMaxAge())
             .limitSex(existingPost.getLimitSex().getSex())
             .limitSmoke(existingPost.getLimitSmoke().getSmoke())
+            .mbti(existingPost.getMbti().name())
             .status(existingPost.getStatus().getPostStatus())
             .deadline(existingPost.getDeadline())
             .days(existingPost.getDays().stream()
@@ -382,7 +394,9 @@ public class PostService {
             updatedCount += affectedRows;
 
             // 더 이상 업데이트할 행이 없으면 종료
-            if (affectedRows == 0) break;
+            if (affectedRows == 0) {
+                break;
+            }
 
             log.info("벌크 업데이트 진행 중... 현재까지 업데이트된 게시물 수: {}", updatedCount);
         }

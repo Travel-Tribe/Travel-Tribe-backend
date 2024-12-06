@@ -30,6 +30,9 @@ public class ResponsePostDTO {
     private String limitSex;
     private String limitSmoke;
     private String status;
+    private String mbti;
+    private String username;
+    private String profilePicture;
     private LocalDate deadline;
     private List<DayDTO> days;
 }

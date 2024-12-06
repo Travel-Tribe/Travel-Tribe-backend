@@ -38,4 +38,7 @@ public interface UserClient {
     @GetMapping("/internal/api/v1/users/{userEmail}")
     ResponseEntity<ResponseMessage<UserInfoResponseDTO>> getUserInfoByUserEmail(
         @PathVariable String userEmail);
+
+    @GetMapping("/internal/api/v1/users/id/{userId}")
+    ResponseMessage<UserInfoResponseDTO> getUserInfoByUserId(@PathVariable long userId);
 }

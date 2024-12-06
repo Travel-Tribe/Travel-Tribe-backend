@@ -54,13 +54,23 @@ public class InternalUserController {
         ));
     }
 
-    // 프로필 조회
+    // 사용자 이메일로 프로필 조회
     @GetMapping("/{userEmail}")
     public ResponseEntity<ResponseMessage<InternalUserInfoResponseDTO>> getUserEmail(
         @PathVariable String userEmail) {
         UserServiceDto byUserWithEmail = userService.findByUserWithEmail(userEmail);
         return ResponseEntity.status(OK).body(ResponseMessage.success(
             InternalUserInfoResponseDTO.fromDto(byUserWithEmail))
+        );
+    }
+
+    // 사용자 아이디로 프로필 조회
+    @GetMapping("/id/{userId}")
+    public ResponseEntity<ResponseMessage<InternalUserInfoResponseDTO>> getUserInfoByUserId(
+        @PathVariable long userId) {
+        UserServiceDto byUserWithId = userService.findByUserWithId(userId);
+        return ResponseEntity.status(OK).body(ResponseMessage.success(
+            InternalUserInfoResponseDTO.fromDto(byUserWithId))
         );
     }
 

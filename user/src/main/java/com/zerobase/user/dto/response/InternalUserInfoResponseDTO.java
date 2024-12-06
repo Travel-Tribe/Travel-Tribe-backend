@@ -30,6 +30,7 @@ public class InternalUserInfoResponseDTO {
     private String email;
     private UserStatus status;
     private MBTI mbti;
+    private String fileAddress;
     private Smoking smoking;
     private String introduction;
     private Gender gender;
@@ -52,6 +53,7 @@ public class InternalUserInfoResponseDTO {
             .introduction(byUserWithEmail.getIntroduction())
             .gender(byUserWithEmail.getGender())
             .birth(byUserWithEmail.getBirth())
+            .fileAddress(byUserWithEmail.getFileAddress())
             .ratingAvg(byUserWithEmail.getRatingAvg())
             .build();
     }

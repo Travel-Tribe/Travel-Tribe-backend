@@ -32,7 +32,7 @@ public class InternalUserController {
     private final ProfileService profileService;
 
 
-    // 사용자 MBTI 보내주는 기능
+    // 사용자 정보 조회
     @GetMapping
     public ResponseEntity<ResponseMessage<InternalUserInfoResponseDTO>> searchUserInfo(
         @RequestParam String type,

@@ -27,7 +27,6 @@ import com.zerobase.travel.post.type.PostStatus;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -260,7 +259,8 @@ public class PostService {
             throw new BizException(POST_NOT_FOUND_ERROR);
         }
 
-        UserInfoResponseDTO userInfo = userClientService.getUserInfoByUserId(existingPost.getUserId());
+        UserInfoResponseDTO userInfo = userClientService.getUserInfoByUserId(
+            existingPost.getUserId());
 
         // ResponsePostDTO 빌드
         return ResponsePostDTO.builder()
@@ -320,11 +320,14 @@ public class PostService {
     }
 
     private ResponsePostsDTO mapToDTO(PostEntity existingPost) {
+        UserInfoResponseDTO userInfoByUserId = userClientService.getUserInfoByUserId(
+            existingPost.getUserId());
+
         return ResponsePostsDTO.builder()
             .postId(existingPost.getPostId())
             .userId(existingPost.getUserId())
-            .nickname(userClientService.getUserInfoByUserId(existingPost.getUserId()).getNickname())
-            .profileFileAddress(userClientService.getUserInfoByUserId(existingPost.getUserId()).getFileAddress())
+            .nickname(userInfoByUserId.getNickname())
+            .profileFileAddress(userInfoByUserId.getFileAddress())
             .title(existingPost.getTitle())
             .travelStartDate(existingPost.getTravelStartDate())
             .travelEndDate(existingPost.getTravelEndDate())
@@ -391,7 +394,9 @@ public class PostService {
             updatedCount += affectedRows;
 
             // 더 이상 업데이트할 행이 없으면 종료
-            if (affectedRows == 0) break;
+            if (affectedRows == 0) {
+                break;
+            }
 
             log.info("벌크 업데이트 진행 중... 현재까지 업데이트된 게시물 수: {}", updatedCount);
         }

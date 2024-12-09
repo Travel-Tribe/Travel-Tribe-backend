@@ -15,6 +15,7 @@ import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.repository.ReviewFileRepository;
 import com.zerobase.travel.repository.ReviewRepository;
 import com.zerobase.travel.repository.specification.ReviewSpecification;
+import com.zerobase.travel.service.dto.ReviewServiceDto;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import lombok.RequiredArgsConstructor;
@@ -93,10 +94,10 @@ public class ReviewService {
 
     }
 
-    public ReviewPage getReviews(ReviewSearchDto reviewSearchDto, PageRequest pageRequest) {
+    public Page<ReviewServiceDto.Review> getReviews(ReviewSearchDto reviewSearchDto, PageRequest pageRequest) {
 
-        return ReviewPage.fromPageEntity(
-            reviewRepository.findAll(ReviewSpecification.filter(reviewSearchDto), pageRequest)
+        return reviewRepository.findAll(ReviewSpecification.filter(reviewSearchDto), pageRequest).map(
+            ReviewServiceDto.Review::fromEntity
         );
     }
 

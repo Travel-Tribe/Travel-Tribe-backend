@@ -12,19 +12,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.zerobase.travel.dto.request.ReviewRequestDto;
-import com.zerobase.travel.dto.response.ReviewResponseDto;
 import com.zerobase.travel.dto.response.ReviewResponseDto.Review;
-import com.zerobase.travel.dto.response.ReviewResponseDto.ReviewPage;
 import com.zerobase.travel.entity.ReviewEntity;
 import com.zerobase.travel.entity.ReviewFileEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ReviewErrorCode;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
-import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.service.UserClientService;
-import com.zerobase.travel.repository.ReviewFileRepository;
 import com.zerobase.travel.repository.ReviewRepository;
 import com.zerobase.travel.repository.specification.ReviewSearchDto;
+import com.zerobase.travel.service.dto.ReviewServiceDto;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
 import java.util.List;
@@ -46,9 +43,6 @@ class ReviewServiceTest {
 
     @Mock
     private ReviewRepository reviewRepository;
-
-    @Mock
-    private ReviewFileRepository reviewFileRepository;
 
     @Mock
     private UserClientService userClientService;
@@ -483,52 +477,52 @@ class ReviewServiceTest {
             .willReturn(entityPage);
 
         // when
-        ReviewPage reviewPage = reviewService.getReviews(ReviewSearchDto.builder().build(), pageRequest);
+        Page<ReviewServiceDto.Review> reviewPage = reviewService.getReviews(ReviewSearchDto.builder().build(), pageRequest);
 
         // then
         assertNotNull(reviewPage);
-        assertEquals(0, reviewPage.getPageNumber());
-        assertEquals(3, reviewPage.getPageSize());
+        assertEquals(0, reviewPage.getNumber());
+        assertEquals(3, reviewPage.getSize());
         assertEquals(10, reviewPage.getTotalElements());
         assertEquals(4, reviewPage.getTotalPages());
         assertFalse(reviewPage.isLast());
 
         // Review 1 검증
-        ReviewResponseDto.Review review1 = reviewPage.getReviews().get(0);
+        ReviewServiceDto.Review review1 = reviewPage.getContent().get(0);
         assertEquals(1L, review1.getReviewId());
         assertEquals(1L, review1.getPostId());
         assertEquals(3L, review1.getUserId());
-        assertEquals(Continent.ASIA.toString(), review1.getContinent());
-        assertEquals(Country.KR.toString(), review1.getCountry());
+        assertEquals(Continent.ASIA, review1.getContinent());
+        assertEquals(Country.KR, review1.getCountry());
         assertEquals("서울", review1.getRegion());
         assertEquals("서울 여행", review1.getTitle());
         assertEquals("서울 여행 좋아요", review1.getContents());
-        assertEquals("/asd/asd/asd", review1.getFiles().get(0).getFileAddress());
-        assertEquals("/zxc/zxc/zxc", review1.getFiles().get(1).getFileAddress());
+        assertEquals("/asd/asd/asd", review1.getReviewFiles().get(0).getFileAddress());
+        assertEquals("/zxc/zxc/zxc", review1.getReviewFiles().get(1).getFileAddress());
 
         // Review 2 검증
-        ReviewResponseDto.Review review2 = reviewPage.getReviews().get(1);
+        ReviewServiceDto.Review review2 = reviewPage.getContent().get(1);
         assertEquals(2L, review2.getReviewId());
         assertEquals(1L, review2.getPostId());
         assertEquals(4L, review2.getUserId());
-        assertEquals(Continent.EUROPE.toString(), review2.getContinent());
-        assertEquals(Country.FR.toString(), review2.getCountry());
+        assertEquals(Continent.EUROPE, review2.getContinent());
+        assertEquals(Country.FR, review2.getCountry());
         assertEquals("파리", review2.getRegion());
         assertEquals("파리 여행", review2.getTitle());
         assertEquals("파리 여행 추천해요", review2.getContents());
-        assertEquals("/qwe/qwe/qwe", review2.getFiles().get(0).getFileAddress());
+        assertEquals("/qwe/qwe/qwe", review2.getReviewFiles().get(0).getFileAddress());
 
         // Review 3 검증
-        ReviewResponseDto.Review review3 = reviewPage.getReviews().get(2);
+        ReviewServiceDto.Review review3 = reviewPage.getContent().get(2);
         assertEquals(3L, review3.getReviewId());
         assertEquals(1L, review3.getPostId());
         assertEquals(5L, review3.getUserId());
-        assertEquals(Continent.ASIA.toString(), review3.getContinent());
-        assertEquals(Country.JP.toString(), review3.getCountry());
+        assertEquals(Continent.ASIA, review3.getContinent());
+        assertEquals(Country.JP, review3.getCountry());
         assertEquals("도쿄", review3.getRegion());
         assertEquals("도쿄 여행", review3.getTitle());
         assertEquals("도쿄 여행이 최고에요", review3.getContents());
-        assertEquals("/xyz/xyz/xyz", review3.getFiles().get(0).getFileAddress());
+        assertEquals("/xyz/xyz/xyz", review3.getReviewFiles().get(0).getFileAddress());
     }
 
 }

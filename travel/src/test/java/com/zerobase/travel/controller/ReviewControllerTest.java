@@ -14,8 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.travel.application.ReviewFacade;
+import com.zerobase.travel.application.dto.ReviewFacadeDto;
 import com.zerobase.travel.dto.request.ReviewRequestDto;
 import com.zerobase.travel.dto.response.ReviewResponseDto;
+import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.service.ReviewService;
 import com.zerobase.travel.typeCommon.Continent;
 import com.zerobase.travel.typeCommon.Country;
@@ -24,6 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,6 +39,9 @@ class ReviewControllerTest {
 
     @MockBean
     private ReviewService reviewService;
+
+    @MockBean
+    private ReviewFacade reviewFacade;
 
     @Autowired
     private MockMvc mockMvc;
@@ -187,65 +196,78 @@ class ReviewControllerTest {
     void successGetReviewPage() throws Exception {
 
         // given
-        // given
-        List<ReviewResponseDto.Review> reviewList = List.of(
-            ReviewResponseDto.Review.builder()
+        List<ReviewFacadeDto.Review> reviewList = List.of(
+            ReviewFacadeDto.Review.builder()
                 .reviewId(1L)
                 .postId(2L)
                 .userId(3L)
-                .continent(Continent.AFRICA.toString())
-                .country(Country.KR.toString())
+                .continent(Continent.AFRICA)
+                .country(Country.KR)
                 .region("서울")
                 .title("서울 여행")
                 .contents("서울여행 좋아요.")
-                .files(List.of(
-                    ReviewResponseDto.ReviewFile.builder()
+                .reviewFiles(List.of(
+                    ReviewFacadeDto.ReviewFile.builder()
                         .fileAddress("/asd/asd/asd")
                         .build()
                 ))
+                .user(
+                    ReviewFacadeDto.User.builder()
+                        .nickname("닉네임1")
+                        .mbti(MBTI.ENFJ)
+                        .fileAddress("/zxc/zxc/zxc")
+                        .build()
+                )
                 .build(),
-            ReviewResponseDto.Review.builder()
+            ReviewFacadeDto.Review.builder()
                 .reviewId(2L)
                 .postId(3L)
                 .userId(4L)
-                .continent(Continent.EUROPE.toString())
-                .country(Country.FR.toString())
+                .continent(Continent.EUROPE)
+                .country(Country.FR)
                 .region("파리")
                 .title("파리 여행")
                 .contents("파리여행 추천해요.")
-                .files(List.of(
-                    ReviewResponseDto.ReviewFile.builder()
+                .reviewFiles(List.of(
+                    ReviewFacadeDto.ReviewFile.builder()
                         .fileAddress("/qwe/qwe/qwe")
                         .build()
                 ))
+                .user(
+                    ReviewFacadeDto.User.builder()
+                        .nickname("닉네임2")
+                        .mbti(MBTI.ISTP)
+                        .fileAddress("/asd/asd/asd")
+                        .build()
+                )
                 .build(),
-            ReviewResponseDto.Review.builder()
+            ReviewFacadeDto.Review.builder()
                 .reviewId(3L)
                 .postId(4L)
                 .userId(5L)
-                .continent(Continent.ASIA.toString())
-                .country(Country.JP.toString())
+                .continent(Continent.ASIA)
+                .country(Country.JP)
                 .region("도쿄")
                 .title("도쿄 여행")
                 .contents("도쿄여행 최고에요.")
-                .files(List.of(
-                    ReviewResponseDto.ReviewFile.builder()
+                .reviewFiles(List.of(
+                    ReviewFacadeDto.ReviewFile.builder()
                         .fileAddress("/xyz/xyz/xyz")
                         .build()
                 ))
+                .user(
+                    ReviewFacadeDto.User.builder()
+                        .nickname("닉네임3")
+                        .mbti(MBTI.INFP)
+                        .fileAddress("/qwe/qwe/qwe")
+                        .build()
+                )
                 .build()
         );
 
-        ReviewResponseDto.ReviewPage reviewPage = ReviewResponseDto.ReviewPage.builder()
-            .reviews(reviewList)
-            .pageNumber(0)
-            .pageSize(3)
-            .totalElements(10L)
-            .totalPages(4)
-            .last(false)
-            .build();
+        Page<ReviewFacadeDto.Review> reviewPage = new PageImpl<>(reviewList, PageRequest.of(0, 8), reviewList.size());
 
-        given(reviewService.getReviews(any(), any()))
+        given(reviewFacade.getReviews(any(), any()))
             .willReturn(reviewPage);
 
         // when
@@ -254,10 +276,10 @@ class ReviewControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.result").value("SUCCESS"))
             .andExpect(jsonPath("$.data.pageNumber").value(0))
-            .andExpect(jsonPath("$.data.pageSize").value(3))
-            .andExpect(jsonPath("$.data.totalElements").value(10))
-            .andExpect(jsonPath("$.data.totalPages").value(4))
-            .andExpect(jsonPath("$.data.last").value(false))
+            .andExpect(jsonPath("$.data.pageSize").value(8))
+            .andExpect(jsonPath("$.data.totalElements").value(reviewList.size()))
+            .andExpect(jsonPath("$.data.totalPages").value(1))
+            .andExpect(jsonPath("$.data.last").value(true))
 
             // Review 1
             .andExpect(jsonPath("$.data.reviews[0].reviewId").value(1L))
@@ -269,6 +291,9 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.data.reviews[0].title").value("서울 여행"))
             .andExpect(jsonPath("$.data.reviews[0].contents").value("서울여행 좋아요."))
             .andExpect(jsonPath("$.data.reviews[0].files[0].fileAddress").value("/asd/asd/asd"))
+            .andExpect(jsonPath("$.data.reviews[0].nickname").value("닉네임1"))
+            .andExpect(jsonPath("$.data.reviews[0].mbti").value(MBTI.ENFJ.toString()))
+            .andExpect(jsonPath("$.data.reviews[0].profileFileAddress").value("/zxc/zxc/zxc"))
 
             // Review 2
             .andExpect(jsonPath("$.data.reviews[1].reviewId").value(2L))
@@ -280,6 +305,9 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.data.reviews[1].title").value("파리 여행"))
             .andExpect(jsonPath("$.data.reviews[1].contents").value("파리여행 추천해요."))
             .andExpect(jsonPath("$.data.reviews[1].files[0].fileAddress").value("/qwe/qwe/qwe"))
+            .andExpect(jsonPath("$.data.reviews[1].nickname").value("닉네임2"))
+            .andExpect(jsonPath("$.data.reviews[1].mbti").value(MBTI.ISTP.toString()))
+            .andExpect(jsonPath("$.data.reviews[1].profileFileAddress").value("/asd/asd/asd"))
 
             // Review 3
             .andExpect(jsonPath("$.data.reviews[2].reviewId").value(3L))
@@ -290,8 +318,11 @@ class ReviewControllerTest {
             .andExpect(jsonPath("$.data.reviews[2].region").value("도쿄"))
             .andExpect(jsonPath("$.data.reviews[2].title").value("도쿄 여행"))
             .andExpect(jsonPath("$.data.reviews[2].contents").value("도쿄여행 최고에요."))
-            .andExpect(jsonPath("$.data.reviews[2].files[0].fileAddress").value("/xyz/xyz/xyz"));
+            .andExpect(jsonPath("$.data.reviews[2].files[0].fileAddress").value("/xyz/xyz/xyz"))
+            .andExpect(jsonPath("$.data.reviews[2].nickname").value("닉네임3"))
+            .andExpect(jsonPath("$.data.reviews[2].mbti").value(MBTI.INFP.toString()))
+            .andExpect(jsonPath("$.data.reviews[2].profileFileAddress").value("/qwe/qwe/qwe"));
 
-        verify(reviewService, times(1)).getReviews(any(), any());
+        verify(reviewFacade, times(1)).getReviews(any(), any());
     }
 }

@@ -1,11 +1,15 @@
 package com.zerobase.travel.controller;
 
+import com.zerobase.travel.application.ReviewFacade;
+import com.zerobase.travel.application.dto.ReviewFacadeDto.Review;
 import com.zerobase.travel.common.response.ResponseMessage;
 import com.zerobase.travel.dto.request.ReviewRequestDto;
 import com.zerobase.travel.dto.response.ReviewResponseDto;
+import com.zerobase.travel.dto.response.ReviewResponseDto.ReviewPage;
 import com.zerobase.travel.repository.specification.ReviewSearchDto;
 import com.zerobase.travel.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
     private final ReviewService reviewService;
-
+    private final ReviewFacade reviewFacade;
     @PostMapping("/posts/{postId}/reviews")
     public ResponseEntity<ResponseMessage<Void>> createReview(
         @RequestHeader("X-User-Email") String userEmail,
@@ -97,7 +101,7 @@ public class ReviewController {
             .build();
 
         return ResponseEntity.ok(ResponseMessage.success(
-            reviewService.getReviews(reviewSearchDto, pageRequest)
+            ReviewPage.fromDto(reviewFacade.getReviews(reviewSearchDto, pageRequest))
         ));
     }
 

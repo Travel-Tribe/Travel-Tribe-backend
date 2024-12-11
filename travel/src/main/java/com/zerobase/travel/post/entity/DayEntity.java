@@ -43,13 +43,13 @@ public class DayEntity {
 
     // Day와 DayDetail 간의 연관관계 설정
     @OrderColumn(name = "order_number")
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @Builder.Default
     private List<DayDetailEntity> dayDetails = new ArrayList<>();
 
     // Day와 ItineraryVisit 간의 연관관계 설정
     @OrderColumn(name = "order_number")
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @Builder.Default
     private List<ItineraryVisitEntity> itineraryVisits = new ArrayList<>();
 

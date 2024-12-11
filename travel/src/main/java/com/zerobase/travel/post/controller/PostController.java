@@ -96,57 +96,11 @@ public class PostController {
         @RequestParam(required = false) String mbti,
         @PageableDefault(size = 8, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        // 검색 기준 설정
-        PostSearchCriteria criteria = new PostSearchCriteria();
-        criteria.setTitle(title);
-        criteria.setContent(content);
 
-        if (continent != null && !continent.isEmpty()) {
-            try {
-                criteria.setContinent(Enum.valueOf(Continent.class, continent.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                log.error("Invalid continent value: {}", continent);
-                throw new BizException(INVALID_CONTINENT_VALUE);
-            }
-        }
-
-        if (country != null && !country.isEmpty()) {
-            String countryUpper = country.toUpperCase();
-            Set<Country> representativeCountries = RepresentativeCountries.ALL_REPRESENTATIVE_COUNTRIES;
-            if (representativeCountries.stream().anyMatch(c -> c.name().equals(countryUpper))) {
-                try {
-                    criteria.setCountry(Enum.valueOf(Country.class, countryUpper));
-                } catch (IllegalArgumentException e) {
-                    log.error("Invalid country value: {}", country);
-                    throw new BizException(INVALID_COUNTRY_VALUE);
-                }
-            } else {
-                // "기타" 국가로 간주
-                criteria.setOthers(true);
-            }
-        }
-
-        if (mbti != null && !mbti.isEmpty()) {
-            try {
-                criteria.setMbti(Enum.valueOf(com.zerobase.travel.post.type.MBTI.class, mbti.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                log.error("Invalid MBTI value: {}", mbti);
-                throw new BizException(INVALID_MBTI_VALUE);
-            }
-        }
-
-        // 검색 수행
-        Page<ResponsePostsDTO> postPage = postService.searchPosts(criteria, pageable);
-
-        // PagedResponseDTO로 변환
-        PagedResponseDTO<ResponsePostsDTO> pagedResponse = PagedResponseDTO.<ResponsePostsDTO>builder()
-            .content(postPage.getContent())
-            .pageNumber(postPage.getNumber())
-            .pageSize(postPage.getSize())
-            .totalElements(postPage.getTotalElements())
-            .totalPages(postPage.getTotalPages())
-            .last(postPage.isLast())
-            .build();
+        // 검색 수행: 서비스 계층으로 요청 전달
+        PagedResponseDTO<ResponsePostsDTO> pagedResponse = postService.searchPosts(
+            title, content, continent, country, mbti, pageable
+        );
 
         return ResponseEntity.status(OK).body(ResponseMessage.success(pagedResponse));
     }

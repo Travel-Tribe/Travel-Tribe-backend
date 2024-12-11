@@ -8,11 +8,13 @@ import static com.zerobase.travel.exception.errorcode.BasicErrorCode.USER_NOT_FO
 
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.BasicErrorCode;
+import com.zerobase.travel.post.constants.RepresentativeCountries;
 import com.zerobase.travel.post.dto.request.DayDTO;
 import com.zerobase.travel.post.dto.request.DayDetailDTO;
 import com.zerobase.travel.post.dto.request.ItineraryVisitDTO;
 import com.zerobase.travel.post.dto.request.PostDTO;
 import com.zerobase.travel.post.dto.request.PostSearchCriteria;
+import com.zerobase.travel.post.dto.response.PagedResponseDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostDTO;
 import com.zerobase.travel.post.dto.response.ResponsePostsDTO;
 import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
@@ -24,9 +26,12 @@ import com.zerobase.travel.post.repository.PostRepository;
 import com.zerobase.travel.post.specification.PostSpecification;
 import com.zerobase.travel.post.type.MBTI;
 import com.zerobase.travel.post.type.PostStatus;
+import com.zerobase.travel.typeCommon.Continent;
+import com.zerobase.travel.typeCommon.Country;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -307,16 +312,80 @@ public class PostService {
                 .collect(Collectors.toList()))
             .build();
     }
+    
+    public PagedResponseDTO<ResponsePostsDTO> searchPosts(
+        String title, String content, String continent, String country, String mbti, Pageable pageable
+    ) {
+        // 검색 조건 생성
+        PostSearchCriteria criteria = buildSearchCriteria(title, content, continent, country, mbti);
 
+        // 데이터베이스 조회
+        Page<ResponsePostsDTO> postPage = postRepository.findAll(
+            PostSpecification.getPosts(criteria), pageable
+        ).map(this::mapToDTO);
 
-    @Transactional(readOnly = true)
-    public Page<ResponsePostsDTO> searchPosts(PostSearchCriteria criteria,
-        Pageable pageable) {
-        // 'others=true'인 경우, country는 이미 criteria에 반영됨
-        return postRepository.findAll(PostSpecification.getPosts(criteria),
-                pageable)
+        // 결과를 PagedResponseDTO로 변환
+        return PagedResponseDTO.<ResponsePostsDTO>builder()
+            .content(postPage.getContent())
+            .pageNumber(postPage.getNumber())
+            .pageSize(postPage.getSize())
+            .totalElements(postPage.getTotalElements())
+            .totalPages(postPage.getTotalPages())
+            .last(postPage.isLast())
+            .build();
+    }
 
-            .map(this::mapToDTO);
+    private PostSearchCriteria buildSearchCriteria(
+        String title, String content, String continent, String country, String mbti
+    ) {
+        // 검색 기준 설정
+        PostSearchCriteria criteria = new PostSearchCriteria();
+        criteria.setTitle(title);
+        criteria.setContent(content);
+
+        // 대륙 검증 및 설정
+        if (continent != null && !continent.isEmpty()) {
+            try {
+                criteria.setContinent(Enum.valueOf(Continent.class, continent.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid continent value: {}", continent);
+                throw new BizException(BasicErrorCode.INVALID_CONTINENT_VALUE);
+            }
+        }
+
+        // 국가 검증 및 설정
+        if (country != null && !country.isEmpty()) {
+            validateAndSetCountry(criteria, country);
+        }
+
+        // MBTI 검증 및 설정
+        if (mbti != null && !mbti.isEmpty()) {
+            try {
+                criteria.setMbti(Enum.valueOf(MBTI.class, mbti.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid MBTI value: {}", mbti);
+                throw new BizException(BasicErrorCode.INVALID_MBTI_VALUE);
+            }
+        }
+
+        return criteria;
+    }
+
+    private void validateAndSetCountry(PostSearchCriteria criteria, String country) {
+        String countryUpper = country.toUpperCase();
+        Set<Country> representativeCountries = RepresentativeCountries.ALL_REPRESENTATIVE_COUNTRIES;
+
+        if (representativeCountries.stream().anyMatch(c -> c.name().equals(countryUpper))) {
+            try {
+                criteria.setCountry(Enum.valueOf(Country.class, countryUpper));
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid country value: {}", country);
+                throw new BizException(BasicErrorCode.INVALID_COUNTRY_VALUE);
+            }
+        } else {
+            // "기타" 국가로 간주
+            criteria.setOthers(true);
+        }
     }
 
     private ResponsePostsDTO mapToDTO(PostEntity existingPost) {

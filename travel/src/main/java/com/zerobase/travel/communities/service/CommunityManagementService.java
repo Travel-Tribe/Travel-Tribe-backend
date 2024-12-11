@@ -6,6 +6,8 @@ import com.zerobase.travel.communities.type.RequestCreateCommunity;
 import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
+import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
+import com.zerobase.travel.post.entity.UserClient;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,8 @@ public class CommunityManagementService {
 
     private final CommunityService communityService;
     private final CommunityFileService communityFileService;
+    private final UserClient userClient;
+
 
 
     // 포스트 생성
@@ -32,21 +36,22 @@ public class CommunityManagementService {
         List<CommunityFileDto> communityFileDtos
             = communityFileService.saveFiles(communityDto.getCommunityId(),request.getFiles());
 
+
         return ResponseCommunityDto.fromEntity(communityDto, communityFileDtos);
     }
 
     //다건 조회
     public PagedResponseDTO<ResponseCommunityDto> getPosts(Pageable pageable) {
 
-
         Page<CommunityDto> communityDtos = communityService.getPosts(pageable);
 
         Page<ResponseCommunityDto> responseCommunityDtos = communityDtos.map(e
             -> ResponseCommunityDto.fromEntity(e,
-            communityFileService.getFiles(e.getCommunityId())));
+            communityFileService.getFiles(e.getCommunityId()),
+            userClient.searchUserInfo("userId", e.getUserId().toString()).getData())
+        );
 
-        return ConvertPageToPagedResponse(
-            responseCommunityDtos);
+        return ConvertPageToPagedResponse(responseCommunityDtos);
     }
 
     private static PagedResponseDTO<ResponseCommunityDto> ConvertPageToPagedResponse(
@@ -70,10 +75,16 @@ public class CommunityManagementService {
     // 단건조회
     public ResponseCommunityDto getPost(long communityId) {
         CommunityDto communityDto = communityService.getPost(communityId);
+
         List<CommunityFileDto> communityFileDtos = communityFileService.getFiles(
             communityId);
 
-        return ResponseCommunityDto.fromEntity(communityDto, communityFileDtos);
+        UserInfoResponseDTO userinfoDto = userClient.searchUserInfo("userId",
+            communityDto.getUserId().toString()).getData();
+
+
+        return ResponseCommunityDto.fromEntity(communityDto, communityFileDtos,
+            userinfoDto);
 
     }
 

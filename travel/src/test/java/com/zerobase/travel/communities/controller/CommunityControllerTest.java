@@ -20,8 +20,6 @@ import com.zerobase.travel.communities.service.CommunityManagementService;
 import com.zerobase.travel.communities.type.RequestUpdateCommunity;
 import com.zerobase.travel.communities.type.ResponseCommunityDto;
 import com.zerobase.travel.post.dto.response.PagedResponseDTO;
-import com.zerobase.travel.typeCommon.Continent;
-import com.zerobase.travel.typeCommon.Country;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,7 +67,7 @@ class CommunityControllerTest {
             .userId(SAMPLE_USER_ID)
             .title("Sample Community")
             .content("Sample content")
-            .files(Collections.emptyList())
+            .communityFiles(Collections.emptyList())
             .build();
     }
 

@@ -59,7 +59,7 @@ public class ReissueService {
         Long userEntityId = userEntity.getId();
 
         // 새로운 Access, Refresh 토큰 생성
-        String newAccessToken = jwtUtil.createJwt("access", email, role, 600000L, userEntityId);  // 10분 만료
+        String newAccessToken = jwtUtil.createJwt("access", email, role, 1800000L, userEntityId);  // 30분 만료
         String newRefreshToken = jwtUtil.createJwt("refresh", email, role, 86400000L, userEntityId);  // 1일 만료
 
         // DB에 새 Refresh 토큰 저장

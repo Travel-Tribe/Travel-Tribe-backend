@@ -5,7 +5,7 @@ import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ResponseMyParticipationsDto;
 import com.zerobase.travel.dto.ParticipationDto;
-import com.zerobase.travel.dto.ResponseParticipationsByPostDto;
+import com.zerobase.travel.dto.ParticipationsByPostDto;
 import com.zerobase.travel.entity.ParticipationEntity;
 import com.zerobase.travel.exception.BizException;
 import com.zerobase.travel.exception.errorcode.ParticipationErrorCode;
@@ -270,7 +270,7 @@ public class ParticipationService {
 
 
     // 현재 여행을 참여하고 있는 복수 인원리스트 반환
-    public List<ResponseParticipationsByPostDto> getParticipationsDtosAfterJoin(
+    public List<ParticipationsByPostDto> getParticipationsByPostIdAndStatusActive(
         Long postId) {
         log.info("service getParticipationsStatusOfJoinAndJoin");
 
@@ -279,8 +279,10 @@ public class ParticipationService {
             postId,
             List.of(ParticipationStatus.JOIN, ParticipationStatus.JOIN_READY,ParticipationStatus.TRAVEL_FINISHED));
 
+
+
         return participationEntities.stream()
-            .map(ResponseParticipationsByPostDto::fromEntity).toList();
+            .map(ParticipationsByPostDto::fromEntity).toList();
     }
 
 

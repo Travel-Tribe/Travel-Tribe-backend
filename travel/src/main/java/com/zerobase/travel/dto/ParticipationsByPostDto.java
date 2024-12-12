@@ -12,15 +12,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResponseParticipationsByPostDto {
+public class ParticipationsByPostDto {
     private Long participationId;
     private Long postId;
     private String userId;
 
 
 
-    public static ResponseParticipationsByPostDto fromEntity(ParticipationEntity participationEntity) {
-        return ResponseParticipationsByPostDto.builder()
+    public static ParticipationsByPostDto fromEntity(ParticipationEntity participationEntity) {
+        return ParticipationsByPostDto.builder()
             .participationId(participationEntity.getParticipationId())
             .postId(participationEntity.getPostEntity().getPostId())
             .userId(participationEntity.getUserId())

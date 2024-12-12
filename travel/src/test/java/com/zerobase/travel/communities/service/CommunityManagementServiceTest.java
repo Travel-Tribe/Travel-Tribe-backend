@@ -70,7 +70,7 @@ class CommunityManagementServiceTest {
         // Then
         assertThat(response.getCommunityId()).isEqualTo(1L);
         assertThat(response.getTitle()).isEqualTo("Sample Title");
-        assertThat(response.getFiles()).hasSize(2);
+        assertThat(response.getCommunityFiles()).hasSize(2);
 
         verify(communityService, times(1)).createPost(any(), any(),  eq("user1"));
         verify(communityFileService, times(1)).saveFiles(anyLong(), any());
@@ -90,7 +90,7 @@ class CommunityManagementServiceTest {
         // Then
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).getTitle()).isEqualTo("Sample Title");
-        assertThat(response.getContent().get(0).getFiles()).hasSize(2);
+        assertThat(response.getContent().get(0).getCommunityFiles()).hasSize(2);
 
         verify(communityService, times(1)).getPosts(pageable);
         verify(communityFileService, times(1)).getFiles(anyLong());
@@ -109,7 +109,7 @@ class CommunityManagementServiceTest {
         // Then
         assertThat(response.getCommunityId()).isEqualTo(1L);
         assertThat(response.getTitle()).isEqualTo("Sample Title");
-        assertThat(response.getFiles()).hasSize(2);
+        assertThat(response.getCommunityFiles()).hasSize(2);
 
         verify(communityService, times(1)).getPost(communityId);
         verify(communityFileService, times(1)).getFiles(communityId);
@@ -165,7 +165,7 @@ class CommunityManagementServiceTest {
         // Then
         assertThat(response.getTitle()).isEqualTo("Updated Title");
         assertThat(response.getContent()).isEqualTo("Updated Content");
-        assertThat(response.getFiles()).hasSize(2);
+        assertThat(response.getCommunityFiles()).hasSize(2);
 
         verify(communityService, times(1)).updatePost(anyLong(), any(), any(), eq("user1"));
         verify(communityFileService, times(1)).deleteAllByCommunityId(anyLong());

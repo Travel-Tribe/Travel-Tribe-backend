@@ -4,10 +4,12 @@ import com.zerobase.travel.api.PayApi;
 import com.zerobase.travel.communities.type.CustomException;
 import com.zerobase.travel.communities.type.ErrorCode;
 import com.zerobase.travel.dto.ParticipationDto;
+import com.zerobase.travel.dto.ParticipationsByPostDto;
+import com.zerobase.travel.dto.ReseponseParticipation;
 import com.zerobase.travel.entity.ParticipationEntity;
-import com.zerobase.travel.post.entity.PostEntity;
+import com.zerobase.travel.post.dto.response.UserInfoResponseDTO;
+import com.zerobase.travel.post.entity.UserClient;
 import com.zerobase.travel.post.service.PostService;
-import com.zerobase.travel.redis.PostLock;
 import com.zerobase.travel.type.RatingStatus;
 import java.time.LocalDate;
 import java.util.List;
@@ -50,6 +52,7 @@ public class ParticipationManagementService {
     private final ParticipationService participationService;
     private final PayApi payApi;
     private final PostService postService;
+    private final UserClient userClient;
 
 
     private final int DEPOSIT_RETURN_DATE_DEFAULT = 30;
@@ -230,4 +233,18 @@ public class ParticipationManagementService {
     }
 
 
+    public List<ReseponseParticipation>  getParticipationsByPostIdAndStatusActive(long postId) {
+
+        log.info("service getParticipationsStatusOfJoinAndJoin");
+
+        List<ParticipationsByPostDto> participationsByPostDtos = participationService.getParticipationsByPostIdAndStatusActive(
+            postId);
+
+        List<ReseponseParticipation> reponseParticipations = participationsByPostDtos.stream()
+            .map(e -> ReseponseParticipation.fromDtos(e,
+                userClient.searchUserInfo("userId", e.getUserId().toString()).getData())
+            ).toList();
+
+        return reponseParticipations;
+    }
 }

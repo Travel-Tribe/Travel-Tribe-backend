@@ -143,6 +143,16 @@ public class PayManagementService {
         payTransactionalService.saveDepositAndPaymentEntities(depositEntity,paymentEntity);
     }
 
+    public void handleClientDepositPayResult(PaymentStatus result, long depositId, String userId, String pgToken) {
+
+        if(result==PaymentStatus.PAY_COMPLETED){
+            this.clientSuccessDepositPay(depositId,userId,pgToken);
+
+        } else if (result==PaymentStatus.PAY_FAILED) {
+            this.clientFailedDepositPay(userId,depositId);
+        }
+    }
+
 
     @Service
     @RequiredArgsConstructor

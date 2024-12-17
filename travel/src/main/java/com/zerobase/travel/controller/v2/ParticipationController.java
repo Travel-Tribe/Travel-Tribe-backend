@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(value = "api/v2/posts/")
-@RestController
+@RestController("participationControllerV2")
 @RequiredArgsConstructor
 @Slf4j
 public class ParticipationController {

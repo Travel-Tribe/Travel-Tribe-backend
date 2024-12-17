@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  페이서비스에 결제 준비를 요청 -> client 결제정보 수신
  -> client 성공, 실패, 취소에 따라 서로다른 URL 로 연결됨.
  */
-@RestController
+@RestController("payControllerV2")
 @RequestMapping(value = "/api/v2/pay")
 @RequiredArgsConstructor
 @Slf4j

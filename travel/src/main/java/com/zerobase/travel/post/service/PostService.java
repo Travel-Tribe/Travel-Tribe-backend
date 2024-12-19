@@ -314,10 +314,10 @@ public class PostService {
     }
     
     public PagedResponseDTO<ResponsePostsDTO> searchPosts(
-        String title, String content, String continent, String country, String mbti, Pageable pageable
+        String title, String content, String continent, String country, String mbti, String region, Pageable pageable
     ) {
         // 검색 조건 생성
-        PostSearchCriteria criteria = buildSearchCriteria(title, content, continent, country, mbti);
+        PostSearchCriteria criteria = buildSearchCriteria(title, content, continent, country, mbti, region);
 
         // 데이터베이스 조회
         Page<ResponsePostsDTO> postPage = postRepository.findAll(
@@ -336,12 +336,13 @@ public class PostService {
     }
 
     private PostSearchCriteria buildSearchCriteria(
-        String title, String content, String continent, String country, String mbti
+        String title, String content, String continent, String country, String mbti, String region
     ) {
         // 검색 기준 설정
         PostSearchCriteria criteria = new PostSearchCriteria();
         criteria.setTitle(title);
         criteria.setContent(content);
+        criteria.setRegion(region);
 
         // 대륙 검증 및 설정
         if (continent != null && !continent.isEmpty()) {

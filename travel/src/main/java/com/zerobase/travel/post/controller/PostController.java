@@ -94,12 +94,13 @@ public class PostController {
         @RequestParam(required = false) String continent,
         @RequestParam(required = false) String country,
         @RequestParam(required = false) String mbti,
+        @RequestParam(required = false) String region,
         @PageableDefault(size = 8, sort = "postId", direction = Sort.Direction.DESC) Pageable pageable
     ) {
 
         // 검색 수행: 서비스 계층으로 요청 전달
         PagedResponseDTO<ResponsePostsDTO> pagedResponse = postService.searchPosts(
-            title, content, continent, country, mbti, pageable
+            title, content, continent, country, mbti, region, pageable
         );
 
         return ResponseEntity.status(OK).body(ResponseMessage.success(pagedResponse));

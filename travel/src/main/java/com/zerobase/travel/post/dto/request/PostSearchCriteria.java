@@ -12,5 +12,6 @@ public class PostSearchCriteria {
     private Continent continent;
     private Country country;
     private MBTI mbti;
+    private String region;
     private Boolean others; // 추가된 필드: 기타 국가 여부
 }

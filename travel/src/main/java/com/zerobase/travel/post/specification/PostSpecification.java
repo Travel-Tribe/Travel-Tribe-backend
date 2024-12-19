@@ -53,6 +53,13 @@ public class PostSpecification {
                     cb.equal(root.get("mbti"), criteria.getMbti()));
             }
 
+            // 지역(region) 필터링
+            if (criteria.getRegion() != null && !criteria.getRegion().isEmpty()) {
+                predicate = cb.and(predicate,
+                        cb.like(cb.lower(root.get("region")),
+                                "%" + criteria.getRegion().toLowerCase() + "%"));
+            }
+
             // '기타' 국가 필터링
             if (Boolean.TRUE.equals(criteria.getOthers())) {
                 predicate = cb.and(predicate,

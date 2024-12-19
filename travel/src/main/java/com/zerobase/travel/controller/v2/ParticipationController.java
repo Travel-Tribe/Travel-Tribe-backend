@@ -42,7 +42,7 @@ public class ParticipationController {
 
 
     // 참여자 조회시에 Status에 Join/joinready 상태의 유저 리스트 확인
-    @GetMapping("{postId}/participations?user_id={user_id}&status={join}&status={join_ready}")
+    @GetMapping("{postId}/participations?user_id={user_id}&status={join,join_ready}")
     public ResponseEntity<ResponseMessage<List<ReseponseParticipation>>> getParticipationsByPost(
         @PathVariable Long postId) {
         log.info("getParticipationsByPost controller start");

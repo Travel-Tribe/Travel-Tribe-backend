@@ -15,6 +15,7 @@ public class ReviewSearchDto {
     String content;
     String continent;
     String country;
+    String region;
     Long userId;
 
 }

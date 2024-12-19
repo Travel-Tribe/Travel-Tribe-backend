@@ -15,6 +15,7 @@ public class ReviewSpecification {
             .and(likeContent(dto.getContent()))
             .and(equalContinent(dto.getContinent()))
             .and(equalCountry(dto.getCountry()))
+            .and(likeRegion(dto.getRegion()))
             .and(equalUserId(dto.getUserId()))
             .and(orderByIdDesc());
     }
@@ -30,6 +31,15 @@ public class ReviewSpecification {
         }
 
         return (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("title"), "%" + title + "%");
+    }
+
+    private static Specification<ReviewEntity> likeRegion(final String titleRegion) {
+
+        if (titleRegion == null) {
+            return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
+        }
+
+        return (root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("region"), "%" + titleRegion + "%");
     }
 
     private static Specification<ReviewEntity> likeContent(final String content) {

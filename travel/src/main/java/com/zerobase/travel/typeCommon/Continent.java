@@ -17,5 +17,4 @@ public enum Continent {
 
     private final int number;
     private final String name;
-    //변경
 }

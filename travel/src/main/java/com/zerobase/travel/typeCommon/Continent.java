@@ -14,7 +14,7 @@ public enum Continent {
     NORTH_AMERICA(5, "북아메리카"),
     SOUTH_AMERICA(6, "남아메리카"),
     ANTARCTIC(7, "남극");
-    //
+    
     private final int number;
     private final String name;
 }

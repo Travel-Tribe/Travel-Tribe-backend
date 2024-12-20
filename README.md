@@ -98,4 +98,8 @@
 
 [API 명세서](https://www.notion.so/API-12ab4d82e56880e5b249fc4f538a326a) 
 
+
+## 📽️ 시연영상
+[여행족 시연영상](https://youtu.be/k6H9opjTh6c)
+
 ---
